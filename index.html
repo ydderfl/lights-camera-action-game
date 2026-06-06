@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 <title>🎬 Lights, Camera, Action!</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f2f1ed; --surface: #ffffff; --surface2: #f5f4f0; --surface3: #ebebea;
   --text: #1a1a18; --text2: #6b6b68; --text3: #9a9994;
@@ -110,6 +110,51 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .breakdown-pills { display: flex; gap: 3px; flex-shrink: 0; }
 .intro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 1.25rem; }
 @media (max-width: 380px) { .intro-grid { grid-template-columns: 1fr 1fr; } }
+.synergy-panel { background: var(--surface2); border-radius: var(--r-lg); padding: 0.9rem 1rem; margin-bottom: 1rem; text-align: left; border: 0.5px solid var(--border); }
+.synergy-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; font-weight: 600; }
+.synergy-row { padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+.synergy-row:last-child { border-bottom: none; }
+.synergy-row.neg .synergy-name { color: var(--red); }
+.synergy-row.neg .synergy-bonus { color: var(--red); }
+.synergy-name { font-size: 12px; font-weight: 600; color: var(--purple); display: block; margin-bottom: 2px; }
+.synergy-msg { font-size: 11px; color: var(--text2); display: block; margin-bottom: 3px; font-style: italic; }
+.synergy-bonus { font-size: 10px; font-weight: 600; color: var(--green); }
+
+/* RT meter */
+.rt-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+.rt-box { flex: 1; background: var(--surface2); border-radius: var(--r-lg); padding: 10px 12px; text-align: center; }
+.rt-score { font-size: 22px; font-weight: 700; }
+.rt-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.rt-tomato { font-size: 18px; }
+
+/* Critic quote */
+.critic-quote { background: var(--surface2); border-left: 3px solid var(--purple); border-radius: 0 var(--r-lg) var(--r-lg) 0; padding: 10px 12px; margin-bottom: 1rem; text-align: left; }
+.critic-text { font-size: 13px; font-style: italic; color: var(--text); line-height: 1.5; margin-bottom: 4px; }
+.critic-name { font-size: 10px; color: var(--text3); }
+
+/* Pick feedback flash */
+.pick-feedback { background: var(--purple-bg); border: 0.5px solid var(--purple); border-radius: var(--r-lg); padding: 10px 12px; margin-bottom: 1rem; font-size: 12px; color: var(--purple); line-height: 1.5; text-align: center; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* Chaos event */
+.chaos-banner { background: var(--red-bg); border: 0.5px solid var(--red); border-radius: var(--r-lg); padding: 10px 14px; margin-bottom: 1rem; font-size: 12px; color: var(--red); text-align: center; font-weight: 500; animation: fadeIn 0.4s ease; }
+
+/* Achievement toast */
+.achievement-popup { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-10px); background:var(--amber); color:#1a1a18; font-size:12px; font-weight:600; padding:10px 18px; border-radius:20px; opacity:0; transition:all 0.3s; pointer-events:none; z-index:1000; white-space:nowrap; text-align:center; }
+.achievement-popup.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Share card improvements */
+#screenshot-card { background: #111110; }
+.sc-rt { display:flex; gap:8px; margin:10px 0; }
+.sc-rt-box { flex:1; background:#1e1e1c; border-radius:8px; padding:6px 10px; text-align:center; }
+.sc-rt-score { font-size:18px; font-weight:700; }
+.sc-rt-lbl { font-size:8px; color:#6b6b68; text-transform:uppercase; letter-spacing:0.06em; }
+.sc-domain { font-size:10px; color:#6b6b68; text-align:center; margin-top:12px; letter-spacing:0.08em; text-transform:uppercase; }
+
+/* Instagram share */
+.share-btn-ig { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border: none; color: white; }
+.share-btn-ig .share-btn-label { color: rgba(255,255,255,0.9); }
+
 .intro-pill { background: var(--surface2); border-radius: var(--r-md); padding: 8px 10px; font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
 .footer { text-align: center; font-size: 11px; color: var(--text3); margin-top: 2rem; }
 .mode-row { display:flex; gap:8px; justify-content:center; margin-bottom:1rem; }
@@ -219,7 +264,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   <div class="wof-page" id="page-wof">
     <div id="wof-list"></div>
   </div>
-  <div class="footer">Made with Claude · claude.ai</div>
 
   <!-- Leaderboard page -->
   <div class="lb-page" id="lb-page">
@@ -247,9 +291,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div class="sc-num"><div class="sc-num-lbl">🥇 Wins</div><div class="sc-num-val" id="sc-wins" style="color:#FAC775"></div></div>
     </div>
     <div class="sc-crew" id="sc-crew"></div>
-    <div class="sc-footer">lightscameraaction.game</div>
+    <div class="sc-rt">
+      <div class="sc-rt-box"><div class="sc-rt-score" id="sc-rt-critic" style="color:#FA320A"></div><div class="sc-rt-lbl">Tomatometer</div></div>
+      <div class="sc-rt-box"><div class="sc-rt-score" id="sc-rt-audience" style="color:#FA8C00"></div><div class="sc-rt-lbl">Audience</div></div>
+    </div>
+    <div class="sc-domain">lights-camera-action.app</div>
   </div>
 
+  <!-- Achievement popup -->
+  <div class="achievement-popup" id="achievement-popup"></div>
   <!-- Toast notification -->
   <div class="share-toast" id="share-toast"></div>
 </div>
@@ -295,56 +345,149 @@ function generateFilmTitle(picks) {
 }
 
 function generateSynopsis(picks, filmTitle, boM, noms) {
-  const director = picks[0]?.name || "an unknown director";
-  const lead = picks[1]?.name || "an unnamed star";
-  const supporting = picks[2]?.name || "a supporting cast";
-  const studio = picks[3]?.name || "an indie studio";
-  const screenplay = picks[4]?.name || "an original script";
-  const genre = picks[5]?.name || "a drama";
-  const composer = picks[6]?.name || "an unknown composer";
-  const budget = picks[7]?.name || "mid-budget";
-  const season = picks[8]?.name || "limited release";
+  const director  = picks[0]?.name || "an unknown director";
+  const lead      = picks[1]?.name || "an unnamed star";
+  const supporting= picks[2]?.name || "a supporting cast";
+  const studio    = picks[3]?.name || "an indie studio";
+  const genre     = picks[5]?.name || "a drama";
+  const composer  = picks[6]?.name || "an unknown composer";
+  const budget    = picks[7]?.name || "mid-budget";
+  const season    = picks[8]?.name || "limited release";
 
-  const isBlockbuster = boM > 400;
-  const isFlop = boM < 80;
-  const isAwardsBait = noms >= 5;
-  const isCult = boM < 150 && noms >= 3;
+  const isBlockbuster = boM > 450;
+  const isFlop        = boM < 80;
+  const isAwardsBait  = noms >= 6;
+  const isCult        = boM < 150 && noms >= 3;
+  const isLowBudget   = budget.includes("Micro") || budget.includes("Zero") || budget.includes("Ultra");
+  const isHorror      = genre.includes("Horror");
+  const isMusical     = genre.includes("Musical");
+  const isComedy      = genre.includes("Comedy");
+  const isSci         = genre.includes("Sci-Fi");
+  const isAction      = genre.includes("Action") || genre.includes("Blockbuster") || genre.includes("Superhero");
+  const isSequel      = genre.includes("Sequel") || genre.includes("Part 2");
+  const isBiopic      = genre.includes("Biopic") || genre.includes("True Story");
+  const isCrime       = genre.includes("Crime") || genre.includes("Heist");
+  const isAnimated    = genre.includes("Animated");
 
-  const genreSetups = {
-    "Action Blockbuster": `When a rogue operative uncovers a global conspiracy, only one person stands between order and annihilation`,
-    "Action Blockbuster - Sequel": `The threat was never truly over. Years after the events that shook the world, a familiar face must answer the call once more`,
-    "Prestige Drama": `In a small town holding an enormous secret, two strangers find their lives irrevocably intertwined`,
-    "Romantic Comedy": `Two people who have absolutely nothing in common somehow keep ending up in the same place at the worst possible times`,
-    "Sci-Fi Epic": `In 2157, humanity receives a signal from a dying star, and the message changes everything we thought we knew`,
-    "Horror/Thriller": `Something is wrong with the house on Morrow Lane. Everyone who moves in feels it. No one who stays ever leaves the same`,
-    "Animated Family": `A young dreamer discovers a hidden world beneath their own, but saving it will mean giving up everything they love`,
-    "Indie Drama": `Over the course of one sweltering summer, a family unravels, and in the wreckage, learns what it means to stay`,
-    "Crime/Heist": `Five strangers. One vault. Zero trust. The perfect plan has one flaw: someone in the room is lying`,
-    "Musical": `On the last night before a legendary theater closes forever, its cast performs the show of their lives`,
-    "Fantasy/Adventure": `An ancient prophecy names an unlikely hero, someone who has spent their whole life running from exactly this moment`,
-    "Biopic/Doc": `The untold story of a visionary who changed the world and paid an impossible price for it`,
+  // Genre-specific setups - multiple per genre for variety
+  const setupPools = {
+    horror: [
+      `Something is wrong. Everyone in the house felt it on the first night. Nobody said anything, because saying it out loud would make it real`,
+      `The town has been keeping a secret for forty years. ${lead} just arrived. They have a gift for finding things people want left buried`,
+      `Three strangers renting the same lake house for the summer. A local legend. A noise from the basement. A decision that cannot be undone`,
+      `The sleep study was supposed to last seven days. On day three, the participants stopped sleeping. On day five, the researchers stopped asking why`,
+    ],
+    musical: [
+      `The theater has been closed for thirty years. The new owners find the old costumes. The costumes still fit. The songs still know all the words`,
+      `In a city where music has been banned, a street performer discovers a melody that moves people in ways the authorities cannot explain or permit`,
+      `${lead} inherits a recording studio from an uncle they never met. The tapes inside contain songs that have not been written yet`,
+      `Two rival musicians reach for the same dream from opposite sides of the city. The closer they get, the harder it becomes to stay apart`,
+    ],
+    action: [
+      `The intelligence was wrong. The mission was a lie. ${lead} is the only person left who knows the truth, and three governments want them silenced`,
+      `When the operation goes wrong, ${lead} has twelve hours to extract the asset, expose the conspiracy, and get out alive. Twelve hours is generous`,
+      `The bridge. The convoy. The window. Everything is in place. ${lead} has done this a hundred times. This time something is different`,
+      `The city has been taken. The hostages have a deadline. ${lead} retired five years ago. Retirement is over`,
+    ],
+    sequel: [
+      `It was supposed to be over. The threat was neutralised. The deal was signed. Three years later, ${lead} discovers the deal was a distraction`,
+      `Everyone survived the first time. Not everyone will survive this. ${lead} returns to the only world they know how to navigate`,
+      `The aftermath turned out to be a beginning. What looked like resolution was actually a countdown. This is what comes next`,
+    ],
+    scifi: [
+      `In 2157, the last transmission from the colony arrives on a fourteen-second delay. The fourteenth second is silence. ${lead} is sent to find out why`,
+      `The simulation has been running for six hundred years. ${lead} is the first person to ask whether the people inside it can tell the difference`,
+      `Contact was made at 3:17am on a Tuesday. The message was six words long. ${lead} has spent three years trying to decode the seventh`,
+      `The ship left Earth with a crew of eight. It is returning with a crew of nine. Nobody remembers picking anyone up`,
+    ],
+    biopic: [
+      `Everyone knew the name. Nobody knew the story. ${lead} embodies a life that changed everything, in a film that refuses to look away from the cost`,
+      `The official account left out the years that mattered most. This is the version the family wanted told. ${lead} carries the weight of it in every scene`,
+      `Genius, obsession, and the price of being right before the world is ready. ${lead} in the role they were born to play`,
+      `The letters were discovered in an archive. They rewrote history. ${lead} brings the person behind the letters back to life`,
+    ],
+    crime: [
+      `Five people in a room. One item worth $40 million. A plan that accounts for everything except the one person who isn't who they said they were`,
+      `The detective has been chasing this case for nine years. The case has been watching back. ${lead} is about to find out what that means`,
+      `The city runs on a system. The system has a flaw. ${lead} found it. Now everyone who benefits from the system wants ${lead} to disappear`,
+      `One last job. The phrase has been used before. The phrase has never been entirely true. This time is no different`,
+    ],
+    animated: [
+      `A small creature with an enormous problem discovers that the only person who can help is the one person they were told to avoid`,
+      `The map was drawn by someone who had never been to the place it shows. ${lead} follows it anyway. The map turns out to know more than its maker`,
+      `In a world where colour fades when people stop believing in things, one child still believes in everything. That child is about to be tested`,
+      `The migration has happened every year for a thousand years. This year, something has changed the path. Someone has to find out why`,
+    ],
+    comedy: [
+      `${lead} has exactly one weekend to fix everything they broke over the previous decade. They will need help. The help is also somewhat broken`,
+      `The reunion was supposed to last forty-eight hours. Forty-eight hours turned out to be long enough for every unresolved thing to resolve itself loudly`,
+      `The job, the apartment, and the relationship all ended on the same Tuesday. ${lead} is treating this as a sign. The sign is pointing somewhere unexpected`,
+      `Two families. One vacation rental. A booking error that neither is willing to concede. What follows is a masterclass in stubborn ingenuity`,
+    ],
+    general: [
+      `In a world on the edge of a change it cannot yet name, ${lead} makes a choice that starts a chain of events nobody predicted`,
+      `Some stories take years to understand. This one started thirty years ago. ${lead} has been living in the aftermath without knowing it`,
+      `The letter arrived on a Thursday. By Friday, everything ${lead} thought they knew about their family had become a question`,
+      `Two people. One decision. Everything that follows from it. ${director} finds the ordinary places where extraordinary things happen`,
+      `${lead} has been running from something for fifteen years. The something has been patient. This is where the running ends`,
+    ]
   };
 
-  const setup = genreSetups[genre] || `In a world on the edge of change, one choice will define everything`;
+  const pool = isHorror ? setupPools.horror : isMusical ? setupPools.musical : isAction ? setupPools.action : isSequel ? setupPools.sequel : isSci ? setupPools.scifi : isBiopic ? setupPools.biopic : isCrime ? setupPools.crime : isAnimated ? setupPools.animated : isComedy ? setupPools.comedy : setupPools.general;
+  const setup = pool[Math.floor(Math.random() * pool.length)];
 
-  const leadLine = `${lead} delivers what critics are calling ${isAwardsBait ? "a career-defining performance" : isFlop ? "a bold but uneven turn" : "a compelling and grounded portrayal"} opposite ${supporting}.`;
-
-  const directorLine = `Directed by ${director}, the film ${isBlockbuster ? "pulses with kinetic energy and crowd-pleasing spectacle" : isAwardsBait ? "unfolds with quiet precision and devastating emotional clarity" : isCult ? "defies easy categorization, part genre exercise, part meditation on loss" : "balances intimacy with ambition in ways few films attempt"}.`;
-
-  const techLine = `${studio} ${isBlockbuster ? "spared no expense" : "bet big on the material"}, with ${composer}'s score ${isAwardsBait ? "weaving through every scene like a second heartbeat" : "underscoring the tension with restrained brilliance"}.`;
-
-  const outcomeQuip = isBlockbuster
-    ? `A ${season.toLowerCase()} release that turned into the year's biggest conversation.`
+  // Lead performance line - varies by score and specific names
+  const perfAdjectives = isAwardsBait
+    ? ["career-defining", "transformative", "the kind of performance people describe to strangers", "the performance the Academy has been waiting for"]
     : isFlop
-    ? `A troubled ${season.toLowerCase()} rollout that couldn't find its audience, but found its defenders years later.`
+    ? ["committed but uneven", "bold in ways the film doesn't always support", "genuinely interesting even when the material isn't"]
+    : ["compelling and grounded", "fully inhabited", "impossible to look away from"];
+  const perfAdj = perfAdjectives[Math.floor(Math.random() * perfAdjectives.length)];
+
+  const leadLine = `${lead} delivers what critics are already calling ${perfAdj}, opposite ${supporting} in a supporting turn that may overshadow everything else in the film.`;
+
+  // Director line - varies by director style
+  const isAuteur = ["Nolan","Scorsese","PTA","Anderson","Fincher","Villeneuve","Cronenberg","Aster","von Trier","Lynch","Malick","Kubrick"].some(n => director.includes(n));
+  const dirStyle = isAuteur
+    ? `${director} works in a register that no other filmmaker can access, and this film finds them at the peak of their considerable powers`
+    : isBlockbuster
+    ? `${director} keeps the spectacle grounded in something human, which is the hardest thing to do at this scale and the thing that separates the great ones from the merely successful`
+    : isLowBudget
+    ? `${director} does more with less than anyone working today, finding in the constraints something that bigger films spend millions trying to manufacture`
+    : `${director} brings a clarity of vision to the material that elevates every scene beyond what it might have been in other hands`;
+
+  // Composer line
+  const isIconicComposer = ["Williams","Zimmer","Greenwood","Morricone","Herrmann","Goransson","Reznor"].some(n => composer.includes(n));
+  const compLine = isIconicComposer
+    ? `${composer}'s score is the film's second language, saying in music what the screenplay saves for silence`
+    : composer.includes("Stock") || composer.includes("AI")
+    ? `The score does what is asked of it without distinction. The film survives this`
+    : `${composer}'s score finds the emotional register the film lives in and never leaves it`;
+
+  // Budget/studio color
+  const contextLine = isLowBudget
+    ? `Made for a fraction of what studios spend on catering, the film proves that resourcefulness is not a limitation but a creative condition`
+    : budget.includes("All-In") || budget.includes("Mega") || budget.includes("Tentpole")
+    ? `${studio} committed at a scale that makes the project impossible to ignore. Every dollar is visible`
+    : `${studio} backed the material with the resources it needed and the distance it required`;
+
+  // Outcome line
+  const outcomeLines = isBlockbuster
+    ? [`A ${season.toLowerCase()} release that became the year's defining cinematic event`, `The kind of film that people see twice in the first weekend and bring their parents to see the third time`]
+    : isFlop
+    ? [`A ${season.toLowerCase()} rollout that couldn't find its audience in the moment. History will be kinder`, `The right film at the wrong time, or the wrong film at the right time. Either way, not the result anyone hoped for`]
     : isAwardsBait
-    ? `A ${season.toLowerCase()} release timed perfectly for the awards circuit, and it showed.`
-    : `A quiet ${season.toLowerCase()} release that exceeded every expectation.`;
+    ? [`The ${season.toLowerCase()} release date was chosen with surgical precision. The campaign is already underway`, `A film that rewards patience, multiple viewings, and the kind of attention cinema rarely asks for anymore`]
+    : isCult
+    ? [`Released quietly, discovered loudly. This is how cults begin`, `The midnight screening community found it six months after release. They have not stopped talking since`]
+    : [`A ${season.toLowerCase()} release that delivered exactly what it promised and occasionally something more`, `The film found its audience. The audience found the film. The transaction was honourable`];
+
+  const outcomeLine = outcomeLines[Math.floor(Math.random() * outcomeLines.length)];
 
   return {
     title: filmTitle,
     tagline: generateTagline(genre, isBlockbuster, isAwardsBait, isFlop),
-    body: `${setup}. ${leadLine} ${directorLine} ${techLine} ${outcomeQuip}`
+    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`
   };
 }
 
@@ -500,6 +643,23 @@ const DATA = {
     { name:"Brady Corbet",         bo:7,  oscar:16, era:"Arthouse",     known:"The Brutalist" },
     { name:"James Mangold",        bo:14, oscar:14, era:"Mainstream",   known:"Logan, Ford v Ferrari, Indiana Jones 5" },
     { name:"George Miller",        bo:15, oscar:14, era:"Action",       known:"Mad Max: Fury Road, Babe, Happy Feet" },
+    { name:"David Cronenberg",      bo:9,  oscar:15, era:"Body Horror",   known:"The Fly, Videodrome, Crash, Eastern Promises" },
+    { name:"Mark Borchardt",        bo:3,  oscar:9,  era:"Cult Outsider", known:"Coven, American Movie (subject), Northwestern" },
+    { name:"Tobe Hooper",           bo:10, oscar:10, era:"Horror Classic", known:"The Texas Chain Saw Massacre, Poltergeist, Salem's Lot" },
+    { name:"John Carpenter",        bo:11, oscar:10, era:"Horror Classic", known:"Halloween, The Thing, Escape from New York" },
+    { name:"Dario Argento",         bo:8,  oscar:12, era:"Giallo",         known:"Suspiria, Deep Red, Tenebrae" },
+    { name:"Wes Craven",            bo:12, oscar:9,  era:"Horror",         known:"A Nightmare on Elm Street, Scream, The Hills Have Eyes" },
+    { name:"Ti West",               bo:8,  oscar:11, era:"Elevated Horror", known:"X, Pearl, MaXXXine, The House of the Devil" },
+    { name:"James Wan",             bo:16, oscar:7,  era:"Horror/Action",  known:"Saw, The Conjuring, Aquaman" },
+    { name:"Mike Flanagan",         bo:9,  oscar:13, era:"Prestige Horror", known:"Haunting of Hill House, Doctor Sleep, Oculus" },
+    { name:"Rob Zombie",            bo:8,  oscar:5,  era:"Cult Horror",    known:"House of 1000 Corpses, The Devil's Rejects" },
+    { name:"Lars von Trier",        bo:6,  oscar:15, era:"Provocateur",    known:"Melancholia, Dancer in the Dark, Breaking the Waves" },
+    { name:"Michael Haneke",        bo:6,  oscar:16, era:"Arthouse",       known:"Amour, The White Ribbon, Cache" },
+    { name:"Gaspar Noe",            bo:5,  oscar:11, era:"Provocateur",    known:"Irreversible, Enter the Void, Climax" },
+    { name:"Claire Denis",          bo:5,  oscar:14, era:"Arthouse",       known:"Beau Travail, Trouble Every Day, Titane" },
+    { name:"Julia Ducournau",       bo:6,  oscar:14, era:"Body Horror",    known:"Titane, Raw" },
+    { name:"Ari Aster",             bo:10, oscar:13, era:"Elevated Horror", known:"Hereditary, Midsommar, Beau Is Afraid" },
+    { name:"Robert Eggers",         bo:9,  oscar:13, era:"Arthouse Horror", known:"The Witch, The Lighthouse, The Northman" },
   ],
 
   lead: [
@@ -1377,45 +1537,93 @@ const VERDICTS = [
   { id:"darling",              maxBO:260,  minOscar:9,    bg:"#EAF3DE", tc:"#3B6D11",
     title:"🌟 Awards Darling",
     detail:"The Academy is obsessed. Critics called it a once-in-a-decade film. The public ignored it completely. Playing in 12 theaters, it swept the Oscars and everyone pretended they had seen it." },
-  { id:"prestige",   minBO:260, maxBO:560, minOscar:7,    bg:"#FBEAF0", tc:"#993556",
+  { id:"prestige",   minBO:280, maxBO:500, minOscar:7, maxOscar:10, bg:"#FBEAF0", tc:"#993556",
     title:"🎨 Prestige Drama",
     detail:"Not the blockbuster they hoped for, but critics and the Academy loved every frame. Shortlisted for everything. The kind of film that wins Best Picture and makes $350M look respectable." },
-  { id:"hit",        minBO:360, maxBO:640, minOscar:4, maxOscar:8, bg:"#EEEDFE", tc:"#3C3489",
+  { id:"hit",        minBO:380, maxBO:640, minOscar:4, maxOscar:8, bg:"#EEEDFE", tc:"#3C3489",
     title:"✨ Crowd-Pleasing Hit",
     detail:"Audiences loved it, critics respected it, the Academy gave it a nod or two. A genuinely good time that holds up on rewatch. Not legendary, but nobody is complaining." },
-  { id:"blockbust",  minBO:300, maxBO:600, maxOscar:3,    bg:"#E6F1FB", tc:"#185FA5",
+  { id:"blockbust",  minBO:320, maxBO:600, maxOscar:3,    bg:"#E6F1FB", tc:"#185FA5",
     title:"🎯 Solid Blockbuster",
     detail:"Made real money. Critics gave it a polite fine. The Academy forgot it existed. A reliable popcorn film that tops the charts for two weekends then quietly disappears." },
   { id:"sleeper",    minBO:140, maxBO:360, minOscar:6, maxOscar:10, bg:"#EAF3DE", tc:"#27500A",
     title:"🌱 Sleeper Hit",
     detail:"Nobody expected this one. Limited release, word of mouth exploded, expanded to 3,000 screens in week three. Critics adored it and the Academy took notice. The little film that could." },
-  { id:"cult",       minBO:30,  maxBO:190, minOscar:4,    bg:"#FAECE7", tc:"#993C1D",
+  { id:"cult",       minBO:25,  maxBO:180, minOscar:3,    bg:"#FAECE7", tc:"#993C1D",
     title:"🕯️ Cult Classic",
     detail:"Nobody showed up in theaters. Then something strange happened. It found its audience on home video and midnight screenings. In 10 years it will be someone's entire personality." },
-  { id:"mid",        minBO:170, maxBO:360, minOscar:1, maxOscar:4,  bg:"#F1EFE8", tc:"#5F5E5A",
+  { id:"mid",        minBO:180, maxBO:360, minOscar:1, maxOscar:4,  bg:"#F1EFE8", tc:"#5F5E5A",
     title:"😐 Forgettable Mid",
     detail:"Not bad enough to be memorable, not good enough to matter. It opened at number 4, held for three weekends, and quietly disappeared. Streams on Peacock now." },
-  { id:"streaming",             maxBO:160, maxOscar:3,    bg:"#E1F5EE", tc:"#0F6E56",
+  { id:"streaming",             maxBO:150, maxOscar:3,    bg:"#E1F5EE", tc:"#0F6E56",
     title:"📺 Straight to Streaming",
     detail:"The studio quietly dropped it on a Friday with zero marketing. Briefly hit number 3 on the platform before being buried by a reality show. Strangely, 40M households have now seen it." },
   { id:"sobad",      minBO:60,  maxBO:240, maxOscar:2,    bg:"#FCEBEB", tc:"#A32D2D",
     title:"😂 So Bad It Is Good",
     detail:"Critics eviscerated it. Audiences went ironically and had a blast. Twitter lost its mind. It bombed, then became a meme, then sold out midnight screenings for years. An unintentional masterpiece." },
-  { id:"flop",                  maxBO:100, maxOscar:2,    bg:"#FCEBEB", tc:"#A32D2D",
+  { id:"flop",                  maxBO:90,  maxOscar:2,    bg:"#FCEBEB", tc:"#A32D2D",
     title:"💸 Box Office Flop",
-    detail:"The studio lost $100M. Three executives were quietly let go. It is now a business school case study on what not to do. The director's cut exists and is somehow longer and worse." },
-]
+    detail:"The studio lost $100M. Three executives were quietly let go. It is now a business school case study in what not to do. The director's cut exists and is somehow longer and worse." },
+  // Genre-specific outcomes (checked second via getVerdict logic)
+  { id:"horror_hit",  minBO:200, maxBO:550, minOscar:3, maxOscar:7, genre:"Horror",   bg:"#2A0A0A", tc:"#FF6B6B",
+    title:"🩸 Genre Sensation",
+    detail:"Horror fans declared it the scariest film in years before it left theaters. Reddit threads ran to 40,000 comments. The IP is now worth more than the studio that made it." },
+  { id:"horror_flop", maxBO:120, maxOscar:3,             genre:"Horror",              bg:"#1A0A0A", tc:"#CC4444",
+    title:"👻 Straight to Haunted Streaming",
+    detail:"It was supposed to be the next Get Out. Instead it is the next warning about what happens when marketing overpromises. The director is already in pre-production on something smaller." },
+  { id:"comedy_smash",minBO:350, maxBO:700, maxOscar:5,  genre:"Comedy",              bg:"#1A3A0A", tc:"#88CC44",
+    title:"😂 Comedy Smash",
+    detail:"The funniest film in years and everyone knows it. The quotes will outlive the box office. Three cast members are hosting awards shows before the year is out." },
+  { id:"indie_darling",minBO:30, maxBO:200, minOscar:7,  genre:"Indie",               bg:"#0A1A3A", tc:"#4488CC",
+    title:"🎞️ Indie Revelation",
+    detail:"Sundance standing ovation. Distribution bidding war. A24 got it for $4M. It made $40M and started six careers. This is how the industry renews itself." },
+  { id:"blockbuster_bomb", minBO:200, maxBO:400, maxOscar:3, budget:"Tentpole",       bg:"#3A1A0A", tc:"#CC6622",
+    title:"💣 Tentpole Disaster",
+    detail:"$250M budget. $180M worldwide. The post-mortem will be studied for years. The director has already been attached to a smaller project. Everyone learned something expensive." },
+  { id:"zero_budget_miracle", minBO:40, maxBO:300, minOscar:5, budget:"Zero",         bg:"#0A2A1A", tc:"#44AA66",
+    title:"📱 Zero Budget Miracle",
+    detail:"Shot on a phone over seventeen weekends. Premiered at Sundance. Sold for $8M. Made $60M. The cinematographer is now the most in-demand DP in independent film." },
+  { id:"sequel_fatigue", minBO:200, maxBO:500, maxOscar:4, screenplay:"Sequel",       bg:"#2A2A0A", tc:"#AAAA22",
+    title:"😴 Sequel Fatigue Sets In",
+    detail:"The third entry in the franchise opened to 40% less than its predecessor. Critics called it diminishing returns. The studio announced a reboot before the opening weekend was over." },
+  { id:"biopic_sweep", minBO:150, minOscar:8, screenplay:"Biopic",                    bg:"#1A0A2A", tc:"#9966CC",
+    title:"🎭 Biopic Sweep",
+    detail:"The subject's family cried at the premiere. The lead actor disappeared into the role so completely that people forgot they were watching a performance. Awards season has a winner." },
+  { id:"musical_phenom", minBO:400, minOscar:6, genre:"Musical",                      bg:"#2A0A2A", tc:"#CC44CC",
+    title:"🎵 Musical Phenomenon",
+    detail:"The soundtrack outsold the film. Three songs went to number one before the opening weekend ended. La La Land energy. The choreographer is on the cover of every magazine." },
+];
 
-function getVerdict(boM, noms) {
+function getVerdict(boM, noms, picks) {
+  // First: check genre/budget/screenplay specific outcomes
+  const genrePick = picks && picks[5] ? picks[5].name : "";
+  const budgetPick = picks && picks[7] ? picks[7].name : "";
+  const screenplayPick = picks && picks[4] ? picks[4].name : "";
+
   for (const v of VERDICTS) {
+    if (!v.genre && !v.budget && !v.screenplay) continue; // skip generic ones
+    const boOk = (v.minBO === undefined || boM >= v.minBO) && (v.maxBO === undefined || boM <= v.maxBO);
+    const osOk = (v.minOscar === undefined || noms >= v.minOscar) && (v.maxOscar === undefined || noms <= v.maxOscar);
+    if (!boOk || !osOk) continue;
+    if (v.genre && !genrePick.includes(v.genre)) continue;
+    if (v.budget && !budgetPick.includes(v.budget)) continue;
+    if (v.screenplay && !screenplayPick.includes(v.screenplay)) continue;
+    return v;
+  }
+
+  // Then: check generic score-based outcomes
+  for (const v of VERDICTS) {
+    if (v.genre || v.budget || v.screenplay) continue; // skip specific ones
     const boOk = (v.minBO === undefined || boM >= v.minBO) && (v.maxBO === undefined || boM <= v.maxBO);
     const osOk = (v.minOscar === undefined || noms >= v.minOscar) && (v.maxOscar === undefined || noms <= v.maxOscar);
     if (boOk && osOk) return v;
   }
-  // Fallback: pick closest by combined normalised distance
-  let best = VERDICTS[VERDICTS.length - 1];
+
+  // Fallback: closest by distance
+  const generic = VERDICTS.filter(v => !v.genre && !v.budget && !v.screenplay);
+  let best = generic[generic.length - 1];
   let bestDist = Infinity;
-  for (const v of VERDICTS) {
+  for (const v of generic) {
     const bMid = ((v.minBO || 0) + (v.maxBO || 1400)) / 2;
     const oMid = ((v.minOscar || 0) + (v.maxOscar || 14)) / 2;
     const d = Math.abs(boM - bMid) / 1400 + Math.abs(noms - oMid) / 14;
@@ -1425,6 +1633,110 @@ function getVerdict(boM, noms) {
 }
 
 function getRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
+
+// ── Synergy Combos ──────────────────────────────────────────────────────────
+const SYNERGIES = [
+  // ── LEGENDARY DIRECTOR x LEAD PAIRINGS ──
+  { names:["Martin Scorsese","Leonardo DiCaprio"],   boBonus:1, osBonus:3, label:"Scorsese x DiCaprio",    msg:"Their sixth collaboration. Every critic dusts off their best-of-decade draft and starts typing." },
+  { names:["Greta Gerwig","Margot Robbie"],          boBonus:3, osBonus:2, label:"Gerwig x Robbie",        msg:"The cultural event of the year is already decided. The internet hasn't been notified yet." },
+  { names:["Paul Thomas Anderson","Joaquin Phoenix"],boBonus:0, osBonus:4, label:"PTA x Phoenix",          msg:"The Academy collectively exhales. This is what they were born to vote for." },
+  { names:["Quentin Tarantino","Brad Pitt"],         boBonus:1, osBonus:2, label:"QT x Pitt",              msg:"Cinema Twitter declares it the most anticipated film in living memory. They're not wrong." },
+  { names:["Denis Villeneuve","Timothee Chalamet"],  boBonus:2, osBonus:2, label:"Villeneuve x Chalamet",  msg:"Dune 3 energy. IMAX screens are booking out. Critics are already writing career retrospectives." },
+  { names:["Alfonso Cuaron","Cate Blanchett"],       boBonus:0, osBonus:4, label:"Cuaron x Blanchett",     msg:"Two legends circling something extraordinary. Cannes has already sent a personal invitation." },
+  { names:["David Fincher","Rooney Mara"],           boBonus:1, osBonus:3, label:"Fincher x Mara",         msg:"Dragon Tattoo reunion energy. The film will be cold, precise, and completely unforgettable." },
+  { names:["Spike Lee","Denzel Washington"],         boBonus:1, osBonus:3, label:"Lee x Washington",       msg:"A pairing that somehow hasn't happened enough. The cultural weight is immeasurable." },
+  { names:["Kathryn Bigelow","Tom Hanks"],           boBonus:1, osBonus:3, label:"Bigelow x Hanks",        msg:"The most critically bulletproof combination in Hollywood. Awards season declared over early." },
+  { names:["Damien Chazelle","Ryan Gosling"],        boBonus:2, osBonus:3, label:"Chazelle x Gosling",     msg:"La La Land reunion. The internet tears up just reading the trades announcement." },
+  { names:["Wes Anderson","Bill Murray"],            boBonus:1, osBonus:2, label:"Anderson x Murray",      msg:"Their sixth collaboration. Letterboxd has already logged it. It hasn't been made yet." },
+  { names:["Jordan Peele","Daniel Kaluuya"],         boBonus:2, osBonus:3, label:"Peele x Kaluuya",        msg:"Get Out reunion energy. The cultural conversation starts before a single frame is shot." },
+  { names:["Barry Jenkins","Mahershala Ali"],        boBonus:0, osBonus:4, label:"Jenkins x Ali",          msg:"Moonlight reunion. Three Oscar voters just started crying pre-emptively." },
+  { names:["Luca Guadagnino","Zendaya"],             boBonus:2, osBonus:3, label:"Guadagnino x Zendaya",   msg:"Challengers energy. Fashion critics and film critics are writing the same piece." },
+  { names:["Christopher Nolan","Cillian Murphy"],    boBonus:2, osBonus:3, label:"Nolan x Murphy",         msg:"Oppenheimer energy. The runtime will be three hours. Nobody will complain." },
+  { names:["Sofia Coppola","Scarlett Johansson"],    boBonus:1, osBonus:3, label:"Coppola x Johansson",    msg:"Lost in Translation reunion. A film that will define a generation of sad Sunday afternoons." },
+
+  // ── DIRECTOR x COMPOSER MAGIC ──
+  { names:["Christopher Nolan","Hans Zimmer"],       boBonus:2, osBonus:2, label:"Nolan x Zimmer",         msg:"The IMAX colossus reunites. The score alone will sell tickets. Speakers will not survive." },
+  { names:["Christopher Nolan","Ludwig Goransson"],  boBonus:2, osBonus:2, label:"Nolan x Goransson",      msg:"A new era of Nolan begins. The internet cannot cope. Neither can the bass frequencies." },
+  { names:["Paul Thomas Anderson","Jonny Greenwood"],boBonus:0, osBonus:4, label:"PTA x Greenwood",        msg:"There Will Be Blood reunion energy. The score will be studied in conservatoires for decades." },
+  { names:["Denis Villeneuve","Hans Zimmer"],        boBonus:2, osBonus:2, label:"Villeneuve x Zimmer",    msg:"Dune reunion. A sonic landscape so immersive it should come with a geological survey." },
+  { names:["David Fincher","Trent Reznor"],          boBonus:1, osBonus:3, label:"Fincher x Reznor",       msg:"The Social Network energy. The score will be cold and precise. Critics will call it perfect." },
+  { names:["Bong Joon-ho","Jung Jae-il"],            boBonus:1, osBonus:3, label:"Bong x Parasite Score",  msg:"Parasite reunion. The score will be as tightly constructed as the screenplay. Cannes notices." },
+  { names:["Martin Scorsese","Robbie Robertson"],    boBonus:1, osBonus:3, label:"Scorsese x Robertson",   msg:"A partnership as old as cinema itself. The needle drops alone will carry the Oscars campaign." },
+  { names:["Wes Anderson","Alexandre Desplat"],      boBonus:1, osBonus:3, label:"Anderson x Desplat",     msg:"Grand Budapest reunion. The score will be whimsical, orchestral, and devastatingly good." },
+  { names:["Alfonso Cuaron","Steven Price"],         boBonus:1, osBonus:3, label:"Cuaron x Gravity Score", msg:"The silence between notes will say more than most films manage in two hours." },
+
+  // ── STUDIO x SEASON POWERPLAYS ──
+  { names:["Disney / Marvel","Summer Tentpole (May to Jul)"], boBonus:3, osBonus:0, label:"MCU Summer Machine",   msg:"The machine activates. $200M marketing spend. Every kid in America has seen the trailer four times." },
+  { names:["A24","Awards Season (Nov to Dec)"],      boBonus:0, osBonus:4, label:"A24 Awards Season",      msg:"Letterboxd crashes. Awards prognosticators start live blogs. The Oscars are basically decided." },
+  { names:["A24","Cannes Premiere to Wide"],         boBonus:1, osBonus:4, label:"A24 x Cannes",           msg:"The Palme d'Or race starts immediately. Distributors are already negotiating in the lobby." },
+  { names:["Blumhouse","Halloween Season"],          boBonus:3, osBonus:1, label:"Blumhouse Halloween",    msg:"The perfect marriage. $8M budget. $180M return. The formula is almost unfair." },
+  { names:["Blumhouse","Horror"],                    boBonus:3, osBonus:0, label:"Blumhouse Horror",       msg:"$5M budget, $200M return. The math is almost insulting. They've done it again." },
+  { names:["Neon","Film Festival"],                  boBonus:0, osBonus:4, label:"Neon Festival Premiere", msg:"They found the film everyone else passed on. History suggests they found gold." },
+  { names:["Searchlight Pictures","Awards Season (Nov to Dec)"], boBonus:0, osBonus:3, label:"Searchlight Awards", msg:"Searchlight in awards season is a fact of life like rain in November. Expect nominations." },
+  { names:["Warner Bros.","IMAX Global Event"],      boBonus:3, osBonus:1, label:"WB x IMAX",              msg:"The scale of ambition is jaw-dropping. Every screen in the world, simultaneously." },
+  { names:["Apple Original Films","Awards Season (Nov to Dec)"], boBonus:0, osBonus:4, label:"Apple Awards",       msg:"Apple's chequebook opened. The Academy's attention followed. This is how it works now." },
+  { names:["Pixar Animation","Summer Tentpole (May to Jul)"],    boBonus:3, osBonus:2, label:"Pixar Summer",        msg:"Parents and children weeping in unison. The emotional devastation will be total." },
+
+  // ── GENRE x SEASON TIMING ──
+  { names:["Horror","Halloween Season"],             boBonus:2, osBonus:0, label:"Horror x Halloween",    msg:"The calendar alignment is perfect. Every horror fan in the world is already buying tickets." },
+  { names:["Musical","Awards Season (Nov to Dec)"],  boBonus:1, osBonus:3, label:"Musical x Awards",      msg:"Musicals in awards season hit different. The Academy has a soft spot that never heals." },
+  { names:["Romantic Comedy","Valentine's Day"],     boBonus:3, osBonus:0, label:"Rom-Com Valentine's",   msg:"The most reliable equation in Hollywood. Couples everywhere. Florists also benefit." },
+  { names:["Sci-Fi Epic","IMAX Global Event"],       boBonus:3, osBonus:1, label:"Sci-Fi IMAX",           msg:"The scale demands the format. Audiences will travel specifically to see this on the biggest screen." },
+  { names:["Animated Feature","Summer Tentpole (May to Jul)"],   boBonus:3, osBonus:1, label:"Animation Summer",    msg:"Children will drag their parents. Parents will cry unexpectedly. The cycle continues." },
+  { names:["War Film","Awards Season (Nov to Dec)"], boBonus:1, osBonus:3, label:"War Film Awards",       msg:"The Academy's most reliable weakness. A serious war film in November is practically a nomination." },
+  { names:["Biopic","Awards Season (Nov to Dec)"],   boBonus:0, osBonus:4, label:"Biopic Awards",         msg:"The most predictable sentence in Hollywood: biopic plus awards season equals nominations." },
+
+  // ── WILD PAIRINGS AND CHAOS ──
+  { names:["Nicolas Cage","Tim Curry"],              boBonus:1, osBonus:1, label:"Cage x Curry",          msg:"The two most unpredictable performers alive in the same film. The set was reportedly transcendent." },
+  { names:["Mark Borchardt","All-In ($350M+)"],      boBonus:-1, osBonus:3, label:"Borchardt Goes Big",   msg:"The studio gave Borchardt $350M. This is either the bravest or most insane call in film history." },
+  { names:["Mark Borchardt","A24"],                  boBonus:0, osBonus:3, label:"Borchardt x A24",       msg:"A24 found the one director more committed to the vision than they are. Somehow this works." },
+  { names:["Dwayne Johnson","Lars von Trier"],        boBonus:-1, osBonus:3, label:"Rock x von Trier",    msg:"Nobody expected this. von Trier apparently makes everyone cry. The Rock was not exempt." },
+  { names:["Dwayne Johnson","Biopic"],               boBonus:-1, osBonus:-3, label:"Rock Bio Problem",    msg:"The casting makes historical accuracy difficult. The Academy is not returning calls." },
+  { names:["AI-Generated Score","Biopic"],           boBonus:-2, osBonus:-3, label:"AI Bio Score",        msg:"The subject's estate has issued two statements. Both were negative. The composer has no comment." },
+  { names:["AI-Generated Score","Awards Season (Nov to Dec)"], boBonus:-1, osBonus:-3, label:"AI x Awards Season", msg:"The Academy has opinions about AI scoring. All of them are negative. Firmly." },
+  { names:["No-Name Stock Score","Awards Season (Nov to Dec)"], boBonus:0, osBonus:-3, label:"Stock Score Awards",  msg:"The music branch noticed. They are not pleased. Oscar chances just took a serious hit." },
+  { names:["August Dump Month","Disney / Marvel"],   boBonus:-2, osBonus:-2, label:"MCU August Burial",   msg:"Disney buried an MCU film in August. Something went catastrophically wrong in post-production." },
+  { names:["August Dump Month","Action Blockbuster"],boBonus:-2, osBonus:0, label:"August Action Dump",   msg:"An action blockbuster in August means the studio saw the cut and quietly moved the release date." },
+  { names:["First-Time Filmmaker","All-In ($350M+)"],boBonus:-2, osBonus:1, label:"First-Timer $350M",   msg:"A $350M debut. The industry is either watching in awe or preparing the post-mortem. Possibly both." },
+  { names:["Mega ($250M to $350M)","First-Time Filmmaker"], boBonus:-2, osBonus:1, label:"Studio Roulette",      msg:"The studio handed a first-timer $300M and held their breath. The breathing has not resumed." },
+  { names:["David Cronenberg","Mega ($250M to $350M)"],     boBonus:-1, osBonus:2, label:"Cronenberg Goes Big",  msg:"Cronenberg with a $300M budget is the most interesting and terrifying sentence in cinema." },
+  { names:["David Cronenberg","Disney / Marvel"],    boBonus:-2, osBonus:2, label:"Cronenberg x Marvel",  msg:"Someone greenlit Cronenberg directing a Marvel film. The body horror implications are immense." },
+  { names:["Lars von Trier","Summer Tentpole (May to Jul)"], boBonus:-2, osBonus:2, label:"von Trier Summer",    msg:"A von Trier summer tentpole. The marketing department has resigned. The film may be extraordinary." },
+  { names:["Ari Aster","Summer Tentpole (May to Jul)"],      boBonus:0, osBonus:2, label:"Aster Summer",         msg:"Elevated horror in peak summer. Either a cultural touchstone or the most divisive film of the year." },
+  { names:["Gaspar Noe","Any"],                      boBonus:-1, osBonus:2, label:"Noe Effect",           msg:"Half the audience will walk out. The other half will call it a masterpiece. Both are right." },
+
+  // ── COMPOSER x LEAD CULTURAL MOMENTS ──
+  { names:["Kendrick Lamar","Biopic"],               boBonus:2, osBonus:2, label:"Kendrick Bio Score",    msg:"Pulitzer Prize winner scores a biopic. The album cycle and the awards cycle are now the same thing." },
+  { names:["Beyonce (vocal album)","Musical"],       boBonus:3, osBonus:2, label:"Beyonce Musical",       msg:"The album is the campaign. The film is the album. The culture has merged with the cinema." },
+  { names:["Taylor Swift","Romantic Comedy"],        boBonus:3, osBonus:1, label:"Swift Rom-Com",         msg:"The Swifties activate. Box office tracking just became irrelevant. The numbers will be enormous." },
+  { names:["A.R. Rahman","Bollywood"],               boBonus:2, osBonus:3, label:"Rahman World Cinema",   msg:"A global collaboration with the composer who changed what film music could be. The world notices." },
+  { names:["Son Lux","A24"],                         boBonus:0, osBonus:3, label:"Son Lux x A24",         msg:"Everything Everywhere energy. The score will be as maximalist and strange as the film deserves." },
+  { names:["Jonny Greenwood","Ari Aster"],           boBonus:0, osBonus:4, label:"Greenwood x Aster",     msg:"Two of cinema's most unsettling sensibilities combined. The Academy will be unsettled. In a good way." },
+  { names:["Hildur Gudnadottir","Psychological Thriller"], boBonus:1, osBonus:3, label:"Hildur Thriller",  msg:"The composer who made silence feel violent is scoring a psychological thriller. Perfect alignment." },
+  { names:["John Williams","Steven Spielberg"],      boBonus:2, osBonus:2, label:"Williams x Spielberg",  msg:"The most iconic partnership in film history reunites. The theme will be in your head for thirty years." },
+];
+
+function detectSynergies(picks) {
+  const active = [];
+  for (const syn of SYNERGIES) {
+    const matched = syn.names.every(name =>
+      name === "Any" ||
+      picks.some(p => p && p.name && syn.names.some(n => n !== "Any" && p.name.split(' ').some(w => name.includes(w)) && name.split(' ').filter(w=>w.length>3).every(w => p.name.includes(w))))
+    );
+    if (matched) active.push(syn);
+  }
+  return active;
+}
+
+function applySynergies(boNorm, osNorm, picks) {
+  const active = detectSynergies(picks);
+  let boBump = 0, osBump = 0;
+  for (const s of active) { boBump += s.boBonus; osBump += s.osBonus; }
+  // Convert bonus (out of 22 scale) to norm
+  const boAdj = Math.max(0, Math.min(1, boNorm + boBump / 22));
+  const osAdj = Math.max(0, Math.min(1, osNorm + osBump / 20));
+  return { boAdj, osAdj, active };
+}
 
 const BO_WEIGHTS  = { director:0.22, lead:0.20, supporting:0.06, studio:0.18, screenplay:0.07, genre:0.12, composer:0.03, budget:0.08, season:0.04 };
 const OS_WEIGHTS  = { director:0.22, lead:0.17, supporting:0.13, studio:0.04, screenplay:0.18, genre:0.07, composer:0.13, budget:0.03, season:0.03 };
@@ -1440,7 +1752,10 @@ function calcScores(picks) {
     osSum += (p.oscar / 20) * ow;
     boW += bw; osW += ow;
   });
-  return { boNorm: boW > 0 ? boSum / boW : 0, osNorm: osW > 0 ? osSum / osW : 0 };
+  const boNorm = boW > 0 ? boSum / boW : 0;
+  const osNorm = osW > 0 ? osSum / osW : 0;
+  const { boAdj, osAdj, active } = applySynergies(boNorm, osNorm, picks);
+  return { boNorm: boAdj, osNorm: osAdj, synergies: active };
 }
 
 function boToM(norm) {
@@ -1460,7 +1775,7 @@ function osWins(n) { return Math.max(0, Math.round(n * (0.20 + Math.random() * 0
 let S = fresh();
 let HARD_MODE = false;
 function fresh() {
-  return { phase:"intro", round:0, picks:[], skipRound:1, skipCat:1, opts:[], selIdx:null, spinning:false, synopsis:null, boM:0, noms:0, wins:0, verdict:null };
+  return { phase:"intro", round:0, picks:[], skipRound:1, skipCat:1, opts:[], selIdx:null, spinning:false, synopsis:null, boM:0, noms:0, wins:0, verdict:null, lastPickFeedback:null, activeSynergies:[], rtCritic:0, rtAudience:0 };
 }
 
 function render() {
@@ -1479,9 +1794,9 @@ function progressBar() {
 function scoreBar() {
   if (!S.picks.length) return "";
   if (HARD_MODE) return "";
-  const { boNorm, osNorm } = calcScores(S.picks);
-  const boP    = Math.round(boNorm * 100);
-  const osP    = Math.round(osNorm * 100);
+  const scores = calcScores(S.picks);
+  const boP    = Math.round((scores.boNorm || 0) * 100);
+  const osP    = Math.round((scores.osNorm || 0) * 100);
   return `<div class="score-bar">
     <div class="score-card">
       <div class="score-lbl">💰 Box Office</div>
@@ -1515,9 +1830,8 @@ function renderIntro() {
   return `<div style="text-align:center;padding:.5rem 0 1.5rem">
     <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1.25rem">
       <strong style="color:var(--text)">9 rounds</strong> to greenlight your movie.<br>
-      60 directors · 500+ actors · sequel genre variants.<br>
-      Budget &amp; Release are the final two rounds  -  4 options each.<br>
-      Balance <span style="color:var(--blue);font-weight:600">Box Office</span> vs <span style="color:var(--amber);font-weight:600">Oscar</span> power.
+      60 directors · 500+ actors · genre variants and chaos outcomes.<br>
+      Balance <span style="color:var(--blue);font-weight:600">Box Office</span>, <span style="color:var(--amber);font-weight:600">Oscar Power</span>, <span style="color:#FA320A;font-weight:600">Tomatometer</span> and <span style="color:#FA8C00;font-weight:600">Audience Score</span>.
     </p>
     <div class="intro-grid">
       ${CATEGORIES.map(c=>`<div class="intro-pill">${c.icon} ${c.label}${c.opts===4?' <span style="font-size:10px;color:var(--text3)">(4)</span>':''}</div>`).join("")}
@@ -1539,6 +1853,7 @@ function renderRolling() {
   return `${scoreBar()}${progressBar()}
   <div class="round-row"><span class="round-badge">Round ${S.round+1} of ${CATEGORIES.length}</span></div>
   ${picksSoFar()}
+  ${S.lastPickFeedback ? `<div class="pick-feedback">Industry reaction: ${S.lastPickFeedback}</div>` : ''}
   <div class="card">
     <div class="slot-hdr">Rolling for your next crew member…</div>
     <div class="slot-display">
@@ -1583,21 +1898,126 @@ function renderChoosing() {
 }
 
 function renderResult() {
-  const { boNorm, osNorm } = calcScores(S.picks);
+  const { boNorm, osNorm, synergies } = calcScores(S.picks);
   const boM    = boToM(boNorm);
   const noms   = osNoms(osNorm);
   const wins   = osWins(noms);
-  const v      = getVerdict(boM, noms);
-  // Generate synopsis once and cache on state
+  const v      = getVerdict(boM, noms, S.picks);
+
+  // Cache all result data on state so share functions can access it
   if (!S.synopsis) {
     const filmTitle = generateFilmTitle(S.picks);
     S.synopsis = generateSynopsis(S.picks, filmTitle, boM, noms);
-    S.boM = boM; S.noms = noms; S.wins = wins; S.verdict = v;
   }
+  S.boM = boM; S.noms = noms; S.wins = wins; S.verdict = v;
+  S.activeSynergies = synergies || [];
+
+  // RT scores
+  const rtCritic   = Math.min(99, Math.max(8,  Math.round(40 + osNorm * 55 + (Math.random()-0.5)*12)));
+  const rtAudience = Math.min(99, Math.max(15, Math.round(35 + boNorm * 55 + (Math.random()-0.5)*14)));
+  S.rtCritic = rtCritic; S.rtAudience = rtAudience;
+
+  // Critic quote - score and genre aware
+  const genreName = S.picks[5]?.name || "";
+  const dirName   = S.picks[0]?.name || "";
+  const leadName  = S.picks[1]?.name || "";
+  const studioName= S.picks[3]?.name || "";
+  const isHorror  = genreName.includes("Horror");
+  const isMusical = genreName.includes("Musical");
+  const isComedy  = genreName.includes("Comedy");
+  const isAction  = genreName.includes("Action") || genreName.includes("Blockbuster");
+  const isBiopic  = genreName.includes("Biopic") || genreName.includes("True Story");
+
+  const criticPools = {
+    horror: [
+      { critic:"David Ehrlich, IndieWire",        quote: noms>6 ? "The most unsettling film I have seen in a decade. It will not leave you." : "Has ideas it doesn't always know what to do with, but the dread is real." },
+      { critic:"Kate Erbland, IndieWire",          quote: boM>300 ? "Genre cinema operating at the highest possible level." : "A genuinely frightening film that trusts its audience to keep up." },
+      { critic:"A.O. Scott, New York Times",       quote: noms>7 ? "Horror as emotional archaeology. Extraordinary." : "Effective and sometimes brilliant. More interested in mood than logic, which is the right call." },
+    ],
+    musical: [
+      { critic:"Peter Travers, Rolling Stone",     quote: noms>7 ? "A musical miracle. The songs will outlive us all." : "The numbers land more than the story, but when they land, they soar." },
+      { critic:"Justin Chang, Los Angeles Times",  quote: boM>400 ? "Joyous, heartbreaking, and completely alive. A genuine event." : "The choreography alone is worth the price of admission." },
+      { critic:"Manohla Dargis, New York Times",   quote: noms>8 ? "A film that earns every moment of its runtime and then some." : "Technically accomplished but emotionally uneven." },
+    ],
+    action: [
+      { critic:"Peter Travers, Rolling Stone",     quote: boM>600 ? "The most purely exhilarating film of the year. Do not miss it on the biggest screen available." : "Delivers exactly what it promises and not much more. Sometimes that is enough." },
+      { critic:"David Ehrlich, IndieWire",         quote: noms>5 ? "Action filmmaking with genuine artistic ambition. The genre owes it a debt." : "Spectacular set pieces. A plot that mostly stays out of their way." },
+      { critic:"Justin Chang, Los Angeles Times",  quote: boM>500 ? "Viscerally thrilling. The craft on display is undeniable." : "The franchise continues. The law of diminishing returns applies." },
+    ],
+    biopic: [
+      { critic:"A.O. Scott, New York Times",       quote: noms>8 ? "A genuinely revelatory portrait. The performance is one for the history books." : "Respectful, well-crafted, and ultimately safe. Which is not always enough." },
+      { critic:"Manohla Dargis, New York Times",   quote: noms>7 ? "The film understands that the truth is stranger and more interesting than any embellishment." : "A dutiful adaptation of a remarkable life. The life deserved more." },
+      { critic:"Justin Chang, Los Angeles Times",  quote: boM>300 ? "The subject's complexity comes through in every scene. A film worthy of its subject." : "More interested in chronology than character. The life becomes a greatest hits collection." },
+    ],
+    general: [
+      { critic:"Peter Travers, Rolling Stone",     quote: boM>600 ? "A thunderous achievement. Do not miss it." : noms>8 ? "Quietly devastating. A masterwork." : "Has its moments, but ultimately struggles to sustain them." },
+      { critic:"A.O. Scott, New York Times",       quote: noms>7  ? "Luminous and urgent. The year's essential film." : boM>500 ? "Entertaining enough, though somewhat hollow at its core." : "A noble failure. Interesting in its ambitions, inconsistent in its execution." },
+      { critic:"Manohla Dargis, New York Times",   quote: noms>9  ? "An extraordinary film. A genuine gift to cinema." : boM>400 ? "Technically accomplished. Emotionally it keeps you at a distance." : "Competent work that rarely surprises and never unsettles." },
+      { critic:"David Ehrlich, IndieWire",         quote: boM<100 ? "A misfire of historic proportions. A film that fails on its own terms." : noms>6 ? "Achingly beautiful. The real deal. The year's most important film." : "Crowd-pleasing in the best and worst sense of the phrase." },
+      { critic:"Justin Chang, Los Angeles Times",  quote: noms>8  ? "Breathtaking in scope and feeling. The kind of film that changes people." : "A film that means well and delivers unevenly. The good parts are very good." },
+      { critic:"Amy Nicholson, Variety",           quote: boM>500 ? `${dirName} at the top of their game. Commercial cinema doing exactly what it should.` : noms>6 ? "The kind of film that stays with you for days after. That is the highest praise." : "Ambitious. Flawed. Worth seeing and arguing about afterward." },
+    ]
+  };
+
+  const criticPool = isHorror ? criticPools.horror : isMusical ? criticPools.musical : isAction ? criticPools.action : isBiopic ? criticPools.biopic : criticPools.general;
+  const cq = criticPool[Math.floor(Math.random() * criticPool.length)];
+
+  // Letterboxd reviews - genre and score aware
+  const lbPools = {
+    horror: [
+      { user:"horrorjunkie1987", stars:"★★★★★", review: noms>6 ? "watched this at midnight alone and had to call my sister afterward. she was asleep. i called anyway." : "the last twenty minutes are going to live in my head rent free for the rest of my life" },
+      { user:"scream_queen_anna", stars:"★★★★", review: boM>300 ? "people keep asking me why i keep rewatching it. i keep not having a good answer." : "the ending is the kind of thing you don't talk about with people who haven't seen it yet" },
+      { user:"practical_effects_pete", stars: boM<100 ? "★★★" : "★★★★", review: boM<100 ? "not for everyone. it was for me though." : "genre filmmaking operating at the level of actual art. we don't deserve this." },
+    ],
+    musical: [
+      { user:"showtune_stephanie", stars:"★★★★★", review: noms>7 ? "i am not okay. the second act is cinema." : "stood up in the theater at the end. stranger next to me also stood up. we did not speak but we understood each other." },
+      { user:"broadway_to_film", stars:"★★★★", review: "the choreography. THE CHOREOGRAPHY. someone give the choreographer everything they want." },
+      { user:"cried_three_times", stars: boM>400 ? "★★★★★" : "★★★★", review: boM>400 ? "the kind of film that makes you call people you haven't spoken to in years" : "not perfect but the musical numbers are so good they make you forgive everything else" },
+    ],
+    action: [
+      { user:"imax_or_nothing", stars: boM>500 ? "★★★★★" : "★★★★", review: boM>500 ? "saw it on the biggest screen i could find and i still felt like the screen wasn't big enough" : "the action sequences are genuinely incredible. the plot is where it spends its vacation." },
+      { user:"practical_stunt_appreciator", stars:"★★★★", review: "the third act set piece is one of the best things i've seen in a cinema in five years. full stop." },
+      { user:"franchise_defender", stars: boM>400 ? "★★★★" : "★★★", review: boM>400 ? "yes it's loud and yes it's excessive and yes i saw it three times" : "it's fine. better than the last one. worse than the first one. the law holds." },
+    ],
+    prestige: [
+      { user:"letterboxd_essay_guy", stars:"★★★★★", review: noms>8 ? `the way ${dirName} uses negative space in the third act is the most precise filmmaking i have witnessed this decade` : `this film understands something about grief that most films don't even try to touch` },
+      { user:"watched_it_twice_already", stars:"★★★★", review: noms>7 ? "second viewing revealed so many things i missed. this is why we rewatch films." : "not easy but worth it. sat in my car for twenty minutes after." },
+      { user:"criterion_shelf_material", stars: noms>8 ? "★★★★★" : "★★★★", review: noms>8 ? "shelf space already cleared. this is a permanent addition." : "the performance alone is worth watching. everything else is a bonus." },
+    ],
+    flop: [
+      { user:"disappointed_fan", stars:"★★", review: "i wanted so much more from this. the ingredients were all there. something happened in the edit." },
+      { user:"money_well_spent_NOT", stars:"★", review: "i drove forty minutes to see this. i would like the forty minutes back." },
+      { user:"contrarian_take", stars:"★★★", review: "actually it's not as bad as everyone is saying. it's bad. but not THAT bad." },
+    ],
+    general: [
+      { user:"film_adjacent", stars: boM>500 ? "★★★★★" : noms>7 ? "★★★★" : "★★★", review: boM>600 ? "the kind of film that reminds you why cinema exists as an art form and a social experience simultaneously" : noms>7 ? "sat with this for a week before writing anything. it deserves the time." : "good! not great. good. sometimes good is what you need." },
+      { user:"tuesday_night_moviegoer", stars: noms>6 ? "★★★★" : "★★★", review: noms>6 ? "this is going to win everything and it deserves to win everything" : boM>400 ? "exactly what the trailer promised. no surprises. not always a bad thing." : "the third act lost me a little. the first two acts earned it back." },
+      { user:"woke_up_thinking_about_it", stars: boM>500 || noms>8 ? "★★★★★" : "★★★★", review: boM>500 || noms>8 ? "woke up thinking about this film. the third night in a row. i have accepted my fate." : `${dirName} making their best film? i think so. fight me.` },
+      { user:"three_star_stan", stars:"★★★", review: boM<200 && noms<5 ? "not for me but i can see what it was going for. three stars feels right." : "the studio wanted a four-star film. they got a three-star one. the difference was probably the budget." },
+      { user:"just_here_for_the_vibes", stars: noms>8 ? "★★★★★" : "★★★★", review: `${leadName} in this role. ${leadName}. i am not calm about it.` },
+    ]
+  };
+
+  const lbPool = isHorror ? lbPools.horror : isMusical ? lbPools.musical : isAction ? lbPools.action : (noms>7 && boM<400) ? lbPools.prestige : (boM<150 && noms<4) ? lbPools.flop : lbPools.general;
+  const lbReview = lbPool[Math.floor(Math.random() * lbPool.length)];
+
+  // Synergy panel
+  const synHtml = S.activeSynergies && S.activeSynergies.length ? `
+    <div class="synergy-panel">
+      <div class="synergy-lbl">⚡ Chemistry detected</div>
+      ${S.activeSynergies.map(s => `<div class="synergy-row ${(s.boBonus < 0 || s.osBonus < 0) ? 'neg' : ''}">
+        <span class="synergy-name">${s.label}</span>
+        <span class="synergy-msg">${s.msg}</span>
+        <span class="synergy-bonus">${s.boBonus >= 0 ? '+' : ''}${s.boBonus} BO &nbsp; ${s.osBonus >= 0 ? '+' : ''}${s.osBonus} Oscar</span>
+      </div>`).join('')}
+    </div>` : '';
+
   const syn = S.synopsis;
+
   return `<div class="result">
     <div class="result-title">${v.title}</div>
-    <div class="result-sub">Your film has wrapped. Here's the box office report.</div>
+    <div class="result-sub">"${syn ? syn.title : 'Untitled'}" is in the can.</div>
+    ${synHtml}
     <div class="result-grid">
       <div class="result-big">
         <div class="result-big-lbl">💰 Box Office</div>
@@ -1609,6 +2029,16 @@ function renderResult() {
         <div class="result-big-val" style="color:var(--amber)">${noms} noms</div>
         <div class="result-big-sub">${wins} win${wins!==1?"s":""}</div>
       </div>
+    </div>
+    <div class="rt-row">
+      <div class="rt-box"><div class="rt-tomato">${rtCritic >= 60 ? "🍅" : "🤢"}</div><div class="rt-score" style="color:${rtCritic>=60?'#FA320A':'#5A9A38'}">${rtCritic}%</div><div class="rt-lbl">Tomatometer</div></div>
+      <div class="rt-box"><div class="rt-tomato">${rtAudience >= 60 ? "🍿" : "💀"}</div><div class="rt-score" style="color:${rtAudience>=60?'#FA8C00':'#5A9A38'}">${rtAudience}%</div><div class="rt-lbl">Audience Score</div></div>
+    </div>
+    <div class="critic-quote"><div class="critic-text">"${cq.quote}"</div><div class="critic-name">${cq.critic}</div></div>
+    <div class="critic-quote" style="border-left-color:var(--teal);margin-top:6px">
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">📱 Letterboxd</div>
+      <div class="critic-text" style="font-size:12px">${lbReview.stars} &nbsp;"${lbReview.review}"</div>
+      <div class="critic-name">@${lbReview.user}</div>
     </div>
     <div class="verdict-box" style="background:${v.bg}">
       <div class="verdict-title" style="color:${v.tc}">${v.title}</div>
@@ -1636,9 +2066,9 @@ function renderResult() {
           <span class="share-btn-icon">𝕏</span>
           <span class="share-btn-label">Post to X</span>
         </button>
-        <button class="share-btn" id="share-whatsapp-btn">
-          <span class="share-btn-icon">💬</span>
-          <span class="share-btn-label">WhatsApp</span>
+        <button class="share-btn share-btn-ig" id="share-instagram-btn">
+          <span class="share-btn-icon">📸</span>
+          <span class="share-btn-label">Instagram</span>
         </button>
       </div>
     </div>
@@ -1691,13 +2121,17 @@ renderWalkOfFame(); });
   });
   $("confirm-btn")?.addEventListener("click", ()=>{
     if(S.selIdx===null) return;
-    S.picks.push(S.opts[S.selIdx]);
+    const picked = S.opts[S.selIdx];
+    S.picks.push(picked);
+    S.lastPickFeedback = getPickFeedback(picked, S.round);
     S.round++; S.selIdx=null;
     S.phase = S.round>=CATEGORIES.length ? "result" : "rolling";
     render();
     if (S.phase === 'result') setTimeout(wireShareButtons, 50);
   });
   $("again-btn")?.addEventListener("click", ()=>{ S=fresh(); render(); });
+  // Check achievements when result is shown
+  if (S.phase === "result") setTimeout(() => checkAchievements(S), 500);
   // Wire share buttons whenever result is rendered
   if (S.phase === 'result') setTimeout(wireShareButtons, 50);
   $("submit-wof-btn")?.addEventListener("click", ()=>{
@@ -1816,7 +2250,7 @@ function buildShareText() {
   if (!S.synopsis || !S.verdict) return '';
   const v = S.verdict;
   const crew = S.picks.map((p,i)=>`${CATEGORIES[i].icon} ${p.name}`).join(' · ');
-  return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\n💰 $${S.boM}M worldwide · 🏆 ${S.noms} Oscar noms · 🥇 ${S.wins} wins\n\n${crew}\n\n🎬 Play at lightscameraaction.game`;
+  return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\n💰 $${S.boM}M worldwide · 🏆 ${S.noms} Oscar noms · 🥇 ${S.wins} wins\n\n${crew}\n\n🎬 Play at lights-camera-action.app`;
 }
 
 // ── Screenshot via canvas ──
@@ -1827,6 +2261,10 @@ function populateScreenshotCard() {
   document.getElementById('sc-bo').textContent = '$' + S.boM + 'M';
   document.getElementById('sc-noms').textContent = S.noms;
   document.getElementById('sc-wins').textContent = S.wins;
+  const rtC = document.getElementById('sc-rt-critic');
+  const rtA = document.getElementById('sc-rt-audience');
+  if (rtC && S.rtCritic) rtC.textContent = S.rtCritic + '%';
+  if (rtA && S.rtAudience) rtA.textContent = S.rtAudience + '%';
   const crew = S.picks.map((p,i)=>`<div class="sc-crew-row"><span class="sc-crew-cat">${CATEGORIES[i].label}</span><span class="sc-crew-name">${p.name}</span></div>`).join('');
   document.getElementById('sc-crew').innerHTML = crew;
 }
@@ -1896,6 +2334,267 @@ function wireShareButtons() {
 
   $('submit-wof-btn')?.removeEventListener('click', handleSubmitWof);
   $('submit-wof-btn')?.addEventListener('click', handleSubmitWof);
+}
+
+// ── Pick Feedback ─────────────────────────────────────────────────────────
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function getPickFeedback(chosen, roundIdx) {
+  const cat = CATEGORIES[roundIdx];
+  if (!cat) return null;
+  const name = chosen.name || "";
+  const isHighBO = chosen.bo >= 18;
+  const isHighOscar = chosen.oscar >= 17;
+  const isMidOscar = chosen.oscar >= 13 && chosen.oscar < 17;
+  const isLowBO = chosen.bo <= 6;
+  const isLowOscar = chosen.oscar <= 5;
+  const isChaos = chosen.bo <= 5 || chosen.oscar <= 3;
+
+  // ── Director-specific ──
+  if (cat.key === "director") {
+    const directorLines = {
+      "Christopher Nolan":    ["Every IMAX screen on earth just pre-booked. The runtime is already rumoured to be three hours. Nobody is complaining.","Practical effects. 70mm film. A score that will rattle foundations. The machine is in motion."],
+      "Martin Scorsese":      ["The trades report he has a personal letter from the subject's family. The Academy has already cleared its calendar.","He hasn't made a bad film in forty years. He is not starting now."],
+      "Greta Gerwig":         ["Two billion dollars happened last time. The cultural conversation is starting now, six months before filming begins.","She turns everything she touches into a mirror held up to the world. Critics are already nervous about how much they will love it."],
+      "James Cameron":        ["He will go over budget. He will go over schedule. He will also make $2 billion. This is not speculation, it is history.","The crew has reportedly been told the shoot will take four years. Nobody quit. That tells you everything."],
+      "Bong Joon-ho":         ["The Palme d'Or is already polishing itself. His films have the rare quality of being impossible to describe to someone who hasn't seen them.","A Bong film is an event. Not a film event. An event."],
+      "David Fincher":        ["He will shoot this scene 90 times. The 90th take will be the one. Nobody will know why. Nobody will need to.","The colour palette alone will be discussed in film schools for a decade."],
+      "Denis Villeneuve":     ["He turns scale into something intimate and intimacy into something vast. IMAX screens worldwide are spiritually preparing.","His films feel like memories of the future. Critics do not have the words yet. They will by November."],
+      "Ari Aster":            ["Half the audience will call it a masterpiece. The other half will need to talk about it with a therapist. Both responses are valid.","He does not make horror films. He makes grief films that happen to be terrifying."],
+      "David Cronenberg":     ["The body horror implications of this casting are already being discussed. The film does not exist yet. Cronenberg is already winning.","He has been making the same film his entire career. It has never been the same film twice."],
+      "Mark Borchardt":       ["The legend of American Movie has preceded him to every meeting. He brings a camcorder to the pre-production meeting. The crew respects this.","He will finish this film. He always finishes the film. Northwestern awaits."],
+      "Paul Thomas Anderson": ["Daniel Plainview energy. The score will be dissonant. The performances will be career-best. The Academy will require a moment.","He writes for actors the way composers write for instruments. Whoever he cast is about to give the performance of their life."],
+      "Wes Anderson":         ["The production designer was handed a 47-page colour bible. The cinematographer wept reading it. The film will be perfect.","Every frame will be a painting. Every line will be delivered in that specific cadence. The discourse will be enormous."],
+      "Quentin Tarantino":    ["The screenplay has apparently been circulating for two years. Every actor in Hollywood asked to be in it. The lucky ones got the call.","His films become grammar. People quote them before they leave the cinema. The merchandising of dialogue begins now."],
+      "Ridley Scott":         ["At 86 he is still the most visually ambitious director alive. The production scale is reportedly staggering. He has done this before.","He will deliver something enormous. Whether it is enormously good or enormously flawed, nobody will be able to ignore it."],
+      "Jordan Peele":         ["He started a genre. He is now three films into defining it. The social subtext is already being decoded by academics who haven't read the script.","The marketing alone will be a cultural event. The film itself will be the conversation of the year."],
+      "Lars von Trier":       ["He will make something genuinely difficult. Some will call it a masterpiece. Others will call it several other things. Both are true.","The casting announcement alone will generate twenty think-pieces. The film will generate two hundred more."],
+    };
+    const lines = directorLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    // Score-based fallbacks for directors
+    if (isHighBO && isHighOscar) return pick(["This director operates in the space where spectacle and substance are the same thing. The industry is taking notes.","The tracking numbers and the Awards circuit are both already interested. That combination is vanishingly rare."]);
+    if (isHighOscar) return pick(["Oscar prognosticators just opened a dedicated tab. This is a director the Academy has been waiting to celebrate.","The trades are calling it a passion project. That is code for awards bait. The Academy knows the code."]);
+    if (isHighBO) return pick(["The sequel is being discussed in a conference room right now. The film hasn't been made. This director's name is that powerful.","Every trailer slot in America just got more expensive. This hire moves box office mountains."]);
+    if (isChaos) return pick(["A genuinely unorthodox choice. The studio is either visionary or desperate. History will determine which.","The crew has a look in their eyes that suggests they know something is either brilliant or catastrophic. Possibly both."]);
+    return pick(["Solid hire. The trades will approve. No fireworks, no fires, no drama. Just a very good film.","A director who knows exactly what they are doing. The studio exhales."]);
+  }
+
+  // ── Lead Actor-specific ──
+  if (cat.key === "lead") {
+    const leadLines = {
+      "Meryl Streep":         ["Her 22nd Oscar nomination is already being written about. The film has not started shooting. This is simply how it works.","Every performance she gives is described as career-best. Somehow each time it is true."],
+      "Leonardo DiCaprio":    ["He did not make a film for four years. He waited for this. The tracking numbers just moved noticeably upward.","The internet will have opinions about whether he deserves the Oscar before the film is released. He will deserve it."],
+      "Tom Hanks":            ["The most likeable human being in the history of cinema is now attached to your film. The marketing writes itself. The awards follow.","He makes every film feel important without trying to. The audience trusts him unconditionally."],
+      "Joaquin Phoenix":      ["He disappears into roles the way method actors fantasise about. Whatever he becomes for this film, it will be extraordinary.","The Academy has voted for him before. They will be watching closely. He does not disappoint people who watch closely."],
+      "Cate Blanchett":       ["She is incapable of a bad performance. She is frequently capable of the best performance in any given year. Tár energy.","The role will be described as transformative in every review. The description will be accurate."],
+      "Daniel Day-Lewis":     ["He came out of retirement for this. The reasons will become clear when you see the performance. The Academy is physically unable to look away.","There Will Be Blood energy. He has already won this Oscar. The film just needs to be made."],
+      "Viola Davis":          ["She once made a speech and won an Emmy for it. Imagine what she does with a full film. The Academy imagines it constantly.","She brings an emotional honesty that makes audiences feel like they have never seen acting before. Because they haven't seen it like this."],
+      "Cillian Murphy":       ["Oppenheimer energy. The film does not need a marketing campaign. His face is the marketing campaign.","He has the rare quality of being completely still and completely alive at the same time. The camera adores it."],
+      "Timothee Chalamet":    ["The most photographed face of his generation is now on your poster. The awards circuit and the box office are both very pleased.","He makes difficult roles feel inevitable and inevitable roles feel surprising. The combination is devastating."],
+      "Margot Robbie":        ["She produced Barbie and starred in it and it made $1.4 billion. She is not an actress. She is a phenomenon.","The cultural moment she creates around a film is as important as the film itself. Both are extraordinary."],
+      "Dwayne Johnson":       ["Tracking numbers just went up significantly. The sequel is already being discussed. Whether the critics approve is technically optional.","He is the most commercially reliable actor alive. The audience will show up. The question is only how many."],
+      "Nicolas Cage":         ["He has not had a critical failure in a decade if you know where to look. Pig. Mandy. He is playing the long game and the long game is working.","The most unpredictable performer alive. Whatever he does with this role, it will be unforgettable. That is a guarantee, not a hope."],
+      "Tom Cruise":           ["He will do the stunt himself. The stunt will be insane. The footage will be in every trailer. The box office will respond accordingly.","Mission Impossible energy. He does not make films. He makes events. The audience has been trained to show up."],
+      "Zendaya":              ["She is simultaneously the biggest name in television and the most exciting name in film. The crossover audience is enormous.","Challengers energy. She is picking her roles with extraordinary precision. This one is clearly the next chapter."],
+    };
+    const lines = leadLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (isHighBO && isHighOscar) return pick(["The rare performer who makes studios and the Academy equally happy. This combination does not come along often. Treasure it.","A24 is jealous. Disney is nervous. Everyone else is just trying to get a meeting."]);
+    if (isHighOscar) return pick(["Their agent is sending fruit baskets to every Academy member. The baskets are unnecessary. The performance will do the work.","Three Oscar pundits just updated their predictions. The other seven will follow by morning."]);
+    if (isHighBO) return pick(["Tracking numbers just went up twelve points on the back of this announcement alone. This name opens films.","The studio just exhaled. The marketing department is already pulling images. This is box office certainty."]);
+    if (isChaos) return pick(["Interesting swing. Chaotic energy. The kind of casting that either defines a career or defines a cautionary tale.","Nobody saw this coming. Including their agent, who has apparently been very surprised."]);
+    return pick(["Good casting. The trades will approve. The audience will connect. The foundation is solid."]);
+  }
+
+  // ── Supporting Actor-specific ──
+  if (cat.key === "supporting") {
+    const supportLines = {
+      "Philip Seymour Hoffman": ["There is no such thing as a small role when Hoffman is in the film. The awards circuit learned this. The audience always knew it.","He made every scene he was in feel like the most important scene in the film. The film is lucky to have him."],
+      "Javier Bardem":          ["No Country for Old Men energy. He has a way of making every other actor in his scenes perform better just to survive.","The Supporting Actor race has a new frontrunner. Bardem in a supporting role is a reminder of what supporting roles can be."],
+      "Paul Dano":              ["He is the scene-stealer's scene-stealer. He will not be the lead. He will be what people are talking about on the way home.","There Will Be Blood energy. He has a quality that makes him impossible to ignore even when he is trying to disappear."],
+      "Cate Blanchett":         ["She is so good in supporting roles that the line between lead and supporting becomes a formality. The Academy agrees.","A supporting performance from Blanchett is what other films would call a lead performance."],
+      "Toni Collette":          ["She has never been nominated. This is one of cinema's great injustices. This film could correct it.","She brings emotional range to supporting roles that most actors cannot achieve in leading ones."],
+      "Nicolas Cage":           ["A supporting Cage is a controlled detonation. You know something is coming. You do not know when. That uncertainty is priceless.","He is technically in a supporting role. His energy will not be in a supporting role."],
+      "LeBron James":           ["Space Jam alumni in a supporting capacity adds an element of cultural crossover that no amount of marketing can replicate.","His social media audience is 150 million. They will all see the trailer. Some will see the film."],
+      "Bad Bunny":              ["Bullet Train proved he can hold a scene. The audience he brings crosses demographics in ways the studio did not anticipate.","The Reggaeton audience and the cinema audience have now been formally introduced. The tracking reflects this."],
+      "Elon Musk (cameo)":      ["The discourse around this cameo will be larger than the film. That is not a criticism. It is simply an observation about the current moment.","Iron Man 2 did this. The cultural resonance of that cameo outlasted the critical reception of the film by decades."],
+      "Tim Curry":              ["He has been delivering legendary performances in supporting roles for fifty years. This one will be no different.","The Rocky Horror Picture Show. Clue. IT. He makes every film he is in feel like it exists in a richer universe."],
+    };
+    const lines = supportLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (chosen.oscar >= 16) return pick(["The Supporting Actor race just got genuinely complicated. Awards bloggers are updating their predictions mid-sentence.","This performance will outlive the film. That is the highest compliment in the supporting category."]);
+    if (chosen.bo >= 16) return pick(["Their name alone changes the tracking numbers. Scene-stealer incoming. The marketing team is already pulling their best moments.","Awards bloggers and box office analysts are both interested. The rare supporting pick that moves both needles."]);
+    if (isChaos) return pick(["An audacious piece of casting. The internet will have strong feelings. Strong feelings drive ticket sales.","Nobody expected this name in this role. That element of surprise is worth three points in the tracking."]);
+    return pick(["A thoughtful addition to the ensemble. The performance will be discussed. The film is stronger for it."]);
+  }
+
+  // ── Studio-specific ──
+  if (cat.key === "studio") {
+    const studioLines = {
+      "A24":                  ["They have turned prestige cinema into a consumer identity. The audience does not just see A24 films. They schedule their lives around them.","The Letterboxd reviews will start before the film is finished. A24 audiences are ready before the film is ready."],
+      "Disney / Marvel":      ["The machine activates. $200M in marketing. Global release. Every timezone covered. This is not a film. This is infrastructure.","The post-credits scene is already being theorised about on Reddit. The film has not been announced publicly yet."],
+      "Blumhouse":            ["$8M budget. $200M ceiling. The formula is almost offensive in its consistency. They have done this before. They will do it again.","They find the film everyone else thought was too weird or too dark and they make it for nothing and it makes everything."],
+      "Neon":                 ["They found Parasite. They found I, Tonya. Their track record of discovering films that define their era is not luck. It is vision.","The Cannes lobby is already buzzing. Neon attached means this film will be talked about in places it was never expected."],
+      "Netflix Films":        ["The streaming numbers will be astronomical and the Academy will be watching. Netflix has learned how to play both games simultaneously.","Global day-one release. 200 million households. The numbers will be impossible to contextualise but everyone will try."],
+      "Warner Bros.":         ["The infrastructure of 100 years of filmmaking activated on behalf of this project. Every resource available. The scale will show.","They have the global release network and the marketing spend to turn a good film into an event. They will do exactly that."],
+      "Apple Original Films": ["Apple's involvement means unlimited resources and a very specific kind of prestige ambition. CODA won Best Picture. The template exists.","The budget discussions reportedly lasted less than ten minutes. Apple does not negotiate against itself. This is fully resourced."],
+      "First-Time Filmmaker": ["No prior credits. Complete creative freedom. A Sundance slot. Some of the best films ever made started exactly like this.","The industry is watching with a mixture of anxiety and excitement. So is everyone else. This is what cinema looks like at its most alive."],
+      "Miramax":              ["They invented the modern Oscar campaign. They have forgotten more about awards strategy than most studios have ever learned.","Pulp Fiction. Shakespeare in Love. Good Will Hunting. The name means something specific to Academy voters. It still does."],
+      "Annapurna Pictures":   ["They back films nobody else will back at the budgets those films need. Their track record for quality over commerce is unmatched.","Vice. Booksmart. Phantom Thread. The through-line is uncompromising artistic ambition. This film is in that tradition."],
+    };
+    const lines = studioLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (chosen.bo >= 19) return pick(["The global release infrastructure just activated. Marketing spend incoming. This studio knows how to make a film an event.","Their international release network covers every timezone. The numbers will be large. The conversation will be global."]);
+    if (chosen.oscar >= 18) return pick(["A prestige stamp that money genuinely cannot buy. The Academy has a relationship with this studio built over decades of good taste.","They backed the right projects at the right moments for long enough that the industry trusts their instincts implicitly."]);
+    if (isLowBO) return pick(["Brave studio. Small release. Deeply specific vision. Some of the most important films in history came from exactly this combination.","They believe in the material. That conviction is visible in every decision they make. The audience for this film will find it."]);
+    return pick(["A steady and experienced hand. The project is in capable care. The industry approves."]);
+  }
+
+  // ── Composer-specific ──
+  if (cat.key === "composer") {
+    const composerLines = {
+      "John Williams":        ["The theme will be in your head for the rest of your life. You do not know this yet. You will by the end of the first act.","Every needle drop in this film has been scored by the man who taught the world what film music could be. The bar is already legendary."],
+      "Hans Zimmer":          ["The bass frequencies will cause structural damage to older cinemas. The emotional damage will be universal.","He does not write scores. He writes emotional architecture. The audience will feel things they cannot name."],
+      "Jonny Greenwood":      ["There Will Be Blood energy. The Academy's music branch is already pre-occupied. The score will be discussed as a standalone work.","He approaches film scoring the way Greenwood approaches everything: as if the rules are interesting but optional."],
+      "Hildur Gudnadottir":   ["She makes silence feel violent and violence feel like silence. The psychological thriller elements of this film are in extraordinary hands.","Joker energy. The score will be inseparable from the performance. They will feel like the same thing. They are the same thing."],
+      "Ludwig Goransson":     ["Black Panther. Tenet. Oppenheimer. Each score was the sound of a cultural moment being defined. This one will be too.","He plays every instrument he scores for and writes for the specific performers. The result is always something personal and enormous."],
+      "Trent Reznor":         ["The Social Network energy. Cold, precise, completely unforgettable. The score will be downloaded before the film is released.","Reznor and Ross make scores that feel like the film's nervous system rather than its soundtrack. This film just got a very good nervous system."],
+      "A.R. Rahman":          ["Slumdog Millionaire energy. A global composer scoring a global film. The Academy has already heard his name in their dreams.","He changed what film music could be in 1992 and has been changing it in different ways ever since. The score will be the conversation."],
+      "Ennio Morricone":      ["The most iconic film composer in history lending his sensibility to your project is not a hire. It is a legacy entering the room.","Every scene he scored became the defining version of that scene. The film is lucky. The film knows it is lucky."],
+      "Bernard Herrmann":     ["Psycho. Vertigo. Taxi Driver. The musical vocabulary of dread and longing is his invention. The film inherits that vocabulary.","He understood that the score is not accompanying the film. The score is the film's subconscious. This film now has a very good subconscious."],
+      "No-Name Stock Score":  ["The mixer is doing their best. The budget did not accommodate more. The Academy's music branch has been notified. They are unimpressed.","It sounds like a score. All the notes are there. Something essential is missing. The film will survive it. The Oscar campaign will not."],
+      "AI-Generated Score":   ["Technically correct. Emotionally absent. The music branch has questions. The questions are pointed. The answers are not satisfying.","The score was generated in four minutes. This is impressive from a technological standpoint. It is not impressive from any other standpoint."],
+      "Taylor Swift":         ["The Swifties will see this film in the first weekend simply to hear new material. The crossover audience is an asset beyond calculation.","The album cycle and the awards campaign are now the same thing. This is either genius or chaos. The line is thinner than expected."],
+      "Kendrick Lamar":       ["A Pulitzer Prize winner scoring a film is an event outside of cinema. The cultural weight lands on the project immediately.","He approaches the score the way he approaches an album: as a complete statement. The film benefits from that ambition."],
+      "Daft Punk":            ["Tron Legacy energy. The score will be its own cultural artefact. People will listen to it who never see the film.","Electronic film scoring has never had a more iconic moment than Tron Legacy. Whatever they do next carries that inheritance."],
+      "Son Lux":              ["Everything Everywhere All at Once energy. The score will be maximalist and strange and precisely right.","Three composers working as one. The internal arguments produce something no single person could have made. It shows."],
+      "Danny Elfman":         ["Beetlejuice. Batman. Edward Scissorhands. The most recognisable sound in quirky Hollywood cinema is now in your film.","His scores are personalities as much as music. The film gains a second voice the moment he is attached."],
+    };
+    const lines = composerLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (isHighOscar) return pick(["The score is already being described in the trades as potentially essential. BAFTA and the Academy music branch have both made notes.","The film just found its emotional heartbeat. A great score does not elevate a film. It reveals what the film always was."]);
+    if (isHighBO) return pick(["The trailer drop just moved the opening weekend forecast. This composer's name has that kind of commercial pull.","The algorithm responds to this name. The trailer will have a score that sells the film before a single image lands."]);
+    if (isChaos) return pick(["Cost-effective choice. The mixer is working miracles. The studio has made a note. The note will be addressed in post.","Budget constraints have driven this decision. The film has other strengths. This is not one of them."]);
+    return pick(["The film has found its sound. That is not a small thing. A good score is the last thing audiences notice and the first thing they feel."]);
+  }
+
+  // ── Screenplay ──
+  if (cat.key === "screenplay") {
+    const spLines = {
+      "Original Screenplay":       ["Original material in a franchise era. The Academy rewards bravery. The audience is being asked to trust something new. That trust is not free.","This is the hardest type of film to greenlight and the most important type of film to make. The risk is real. So is the potential."],
+      "Sequel / Franchise Part 2":  ["The mythology is established. The audience is already there. The question is whether the story earned a continuation. Trailers will answer that.","The first film built the world. This one gets to live in it. The pressure to honour what came before is matched only by the freedom to expand it."],
+      "True Story / Biopic":        ["The subject's family has been consulted. Their reactions are described as measured. The Academy has a documented fondness for true stories told honestly.","Based on something that actually happened, which means the film carries the weight of reality. The marketing writes: based on the true story."],
+      "AI-Assisted Script":         ["The WGA has filed something. The director describes it as a starting point. Critics will ask what that means. The answers will be interesting.","Parts of this script were generated in four minutes. Other parts took four months. The seams are not always invisible."],
+      "Toy / Boardgame IP":          ["Barbie made $1.4 billion with this approach. Clue has been in development for thirty years. The IP carries commercial certainty and critical suspicion.","The toy aisle is now a development slate. The audience's relationship with the IP does half the marketing work before the first trailer drops."],
+    };
+    const lines = spLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (chosen.oscar >= 17) return pick(["The material is the foundation. This is strong material. Everything built on it starts from a position of strength.","Original voices get the Oscars the industry is most proud to give. The screenplay is the beginning of everything."]);
+    if (chosen.bo >= 18) return pick(["The IP recognition does enormous commercial work before a single frame is shot. The audience arrives pre-interested.","Built-in audience. Established mythology. The marketing budget just got effectively cheaper by about $40M."]);
+    return pick(["The blueprint is in place. Everything else serves the story. A good screenplay is invisible. This is the good kind of invisible."]);
+  }
+
+  // ── Genre ──
+  if (cat.key === "genre") {
+    const genreLines = {
+      "Biopic":                    ["The Academy has a diagnosed weakness for biopics. This is not a new development. It is a structural feature of their taste.","True stories allow actors to be compared directly to reality. The ones who survive that comparison are unforgettable."],
+      "Horror":                    ["Horror is the most honest genre. It asks what you are afraid of and then shows you. The best ones change what you are afraid of.","Elevated or not, horror connects audiences to something primal. The box office reflects what the genre understood before critics did."],
+      "Elevated Horror":           ["Hereditary energy. Midsommar energy. The genre is doing something that most dramas cannot: it makes the abstract physical.","The critics who dismissed horror are now writing about how horror is the most important genre. The genre forgives them. Mostly."],
+      "Musical":                   ["The Academy cannot resist a musical that earns its emotion. La La Land. Chicago. The format has a direct line to the music branch.","Songs that people leave the cinema humming have a secondary life that no other genre generates. The cultural longevity is real."],
+      "Superhero":                 ["The infrastructure of a billion-dollar mythology at the service of this story. The audience is already there. The question is only whether the story honours them.","The post-credits scene discourse will begin before the credits roll. This is the genre's gift and its burden simultaneously."],
+      "Romantic Comedy":           ["The most underrated genre in cinema is also one of the most difficult to do well. The ones that work work for decades.","People have been declaring the rom-com dead for twenty years. The rom-com keeps not being dead. This one intends to prove the point."],
+      "A24-style Arthouse":        ["Not a genre. An attitude. The film will be hard to market and impossible to forget. The audience for this film is intensely loyal.","The Letterboxd reviews will begin on opening night and continue for years. That community is a perpetual motion machine for good films."],
+      "True Crime Documentary":    ["The podcast audience crosses directly into the cinema audience for this genre. The cultural appetite is documented and large.","Someone somewhere is already planning a limited series based on this film. The cycle continues."],
+      "Dark Comedy":               ["The genre that requires the most precise tonal balance. Too dark and it becomes drama. Too light and it becomes something else. The middle is perfect.","The Academy rewards dark comedies that earned their darkness. This genre requires courage from everyone involved."],
+    };
+    const lines = genreLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (isHighBO) return pick(["The genre selection maximises commercial potential. The audience for this type of film is large, reliable, and enthusiastic.","This is a proven commercial genre with an established audience. The story needs to be good. The audience will show up either way."]);
+    if (isHighOscar) return pick(["The genre carries natural Oscar credibility. The material and the format are aligned. The Academy will notice.","Some genres carry prestige by association. This is one of them. The film inherits that reputation. Now it has to live up to it."]);
+    return pick(["Genre chosen. Story committed. The audience expectations are now set. The film's job is to meet them and then exceed them."]);
+  }
+
+  // ── Budget ──
+  if (cat.key === "budget") {
+    if (name.includes("Zero Budget")) return "A phone camera and a vision. Tangerine was shot on an iPhone. The work is the work. The camera is irrelevant.";
+    if (name.includes("Micro")) return "Ultra-low budget forces creative solutions. The best ones look like aesthetic choices. The Witch was made for $4M. The Witch is terrifying.";
+    if (name.includes("All-In") || name.includes("Mega") || name.includes("$350M")) return "The most expensive films in history are either the most successful or the most instructive failures. The gap between those two outcomes is a good script.";
+    if (name.includes("Tentpole")) return "Tentpole money means tentpole expectations. The marketing spend will be $100M before a ticket is sold. The returns need to justify that number.";
+    if (name.includes("Crowdfunded")) return "The audience is already invested. Literally. They funded this and they will see it and they will tell everyone they know. That is marketing that money cannot buy.";
+    if (name.includes("Passion Project")) return "Self-funded means total creative freedom and total financial risk. The films that survive this gamble become legends. The ones that don't become cautionary tales. Both are valuable.";
+    if (name.includes("Vanity")) return "A studio with a favour to repay and a filmmaker with a vision. The commercial ambitions are secondary. The creative ambitions are enormous. The results are genuinely unpredictable.";
+    if (name.includes("AI-Assisted") || name.includes("Tax Incentive")) return "Every dollar visible on screen has been carefully negotiated. The creative team is experienced at this. Experience with constraints produces interesting films.";
+    if (chosen.bo >= 18) return "The budget matches the ambition. Every dollar is visible on screen. This is what studios were built to make.";
+    if (chosen.oscar >= 15) return "Tight budget. Total creative freedom. Some of the most important films in history were made with exactly this arrangement.";
+    return "Budget confirmed. The money is real. The film is happening.";
+  }
+
+  // ── Season / Release ──
+  if (cat.key === "season") {
+    const seasonLines = {
+      "Summer Tentpole (May to Jul)":     ["Peak cinema-going season. Families. School holidays. Every screen available. The film needs to fill them. The tracking suggests it will.","The summer slot is competitive and rewarding. The films that win summer don't just win the weekend. They win the year."],
+      "Awards Season (Nov to Dec)":        ["The Academy votes in January. This release date is a statement of intent. The campaign starts now. The film is ready.","The November platform release is the oldest trick in the prestige playbook. It works because it has always worked."],
+      "IMAX Global Event":                 ["Not a film. An event. Every IMAX screen in the world on the same weekend. The spectacle is the point. The story earns the format.","IMAX adds approximately $80M to a film's opening weekend if the material justifies it. The material needs to justify it."],
+      "Film Festival → Wide":              ["The critical reception at the festival will set the commercial terms. A standing ovation at Cannes or Venice changes every conversation.","The film school circuit. The critics. The Academy. They all watch the same screenings. The word travels."],
+      "August Dump Month":                 ["Someone at the studio saw the cut and moved the release date. That is the most common explanation for an August release. It is not always wrong.","August has produced surprises. The bar is lower. The film only needs to be better than expected. That is not an impossible task."],
+      "Surprise Drop (No Marketing)":      ["Beyonce dropped albums like this. The element of surprise bypasses the discourse and goes directly to the audience. The reaction is unmediated.","No trailer. No campaign. Just a film that exists suddenly. The cultural impact of the surprise compounds the impact of the film."],
+      "Cannes Premiere to Wide":           ["The Palme d'Or is a commercial asset that takes decades to build and one wrong film to damage. This film arrives at the most important film festival in the world.","The Cannes audience sees something the world has not yet seen. The conversation they start will reach every cinema on earth."],
+      "Straight to Streaming":             ["The theatrical window is closed. 200 million households. The film will be seen by more people than most theatrical releases. That is not a consolation. It is a fact.","The streaming number will be extraordinary. The Academy considers this. Their consideration has been evolving."],
+      "TikTok Viral Campaign":             ["The algorithm is now a co-producer. If one scene connects, it connects with everyone, simultaneously, without a marketing budget.","The TikTok audience and the cinema audience are converging in ways studios did not predict. The overlaps are surprisingly large."],
+      "Midnight Screening Circuit":        ["Rocky Horror was a midnight screening film. The Room was a midnight screening film. The cult audience is the most faithful audience in cinema.","The film will be seen by fewer people than a wide release. Every one of them will see it ten times."],
+    };
+    const lines = seasonLines[name];
+    if (lines) return lines[Math.floor(Math.random() * lines.length)];
+
+    if (chosen.oscar >= 18) return "Release date confirmed. The awards calendar is now set. The campaign begins. The film needs to do the rest.";
+    if (chosen.bo >= 18) return "The slot is right. The screen count is ready. The marketing machine activates. The audience is waiting.";
+    return "Release strategy locked. The film is coming. The audience will find it when it arrives.";
+  }
+
+  return "The industry is watching.";
+}
+
+
+// ── Achievements ─────────────────────────────────────────────────────────────
+const ACHIEVEMENTS = [
+  { id:"first_run",   label:"Scene One, Take One",    check: (S) => S.picks.length === 9, icon:"🎬" },
+  { id:"all_prestige",label:"EGOT Energy",            check: (S) => S.picks.every(p => p.oscar >= 15), icon:"🏆" },
+  { id:"pure_chaos",  label:"Pure Chaos",             check: (S) => S.picks.some(p => p.bo <= 5) && S.picks.some(p => p.oscar <= 4), icon:"💀" },
+  { id:"box_beast",   label:"Box Office Beast",       check: (S) => S.picks.every(p => p.bo >= 15), icon:"💰" },
+  { id:"synergy_king",label:"Chemistry Class",        check: (S) => (S.activeSynergies||[]).length >= 3, icon:"⚡" },
+  { id:"borchardt",   label:"American Movie Energy",  check: (S) => S.picks.some(p => p.name && p.name.includes("Borchardt")), icon:"🎥" },
+  { id:"cronenberg",  label:"Body of Work",           check: (S) => S.picks.some(p => p.name && p.name.includes("Cronenberg")), icon:"🧬" },
+  { id:"cage_curry",  label:"Unhinged Casting",       check: (S) => S.picks.some(p=>p.name&&p.name.includes("Cage")) && S.picks.some(p=>p.name&&p.name.includes("Curry")), icon:"🤪" },
+  { id:"a24_sweep",   label:"Letterboxd Bait",        check: (S) => S.picks.some(p=>p.name==="A24") && S.picks.some(p=>p.oscar>=17), icon:"🎨" },
+  { id:"no_budget",   label:"Zero Dollar Dream",      check: (S) => S.picks.some(p=>p.name&&p.name.includes("Zero Budget")), icon:"📱" },
+];
+
+let unlockedAchievements = JSON.parse(localStorage.getItem('lca_achievements') || '[]');
+
+function checkAchievements(S) {
+  for (const ach of ACHIEVEMENTS) {
+    if (!unlockedAchievements.includes(ach.id) && ach.check(S)) {
+      unlockedAchievements.push(ach.id);
+      localStorage.setItem('lca_achievements', JSON.stringify(unlockedAchievements));
+      showAchievement(ach);
+    }
+  }
+}
+
+function showAchievement(ach) {
+  const el = document.getElementById('achievement-popup');
+  if (!el) return;
+  el.textContent = `${ach.icon} Achievement unlocked: ${ach.label}`;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
 }
 
 render();
