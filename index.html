@@ -3,11 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="description" content="Draft your cast & crew and chase box office glory or total infamy!">
-<meta property="og:title" content="🎬 Lights, Camera, Action!">
+<title>Lights, Camera, Action!  -  The Hollywood Draft Game</title>
+<meta name="description" content="Draft your director, cast, studio and genre. Chase box office records and Oscar glory  -  or total infamy. A new daily challenge every day.">
+<meta name="keywords" content="movie game, film draft game, hollywood game, oscar game, box office game, daily movie game, film trivia, cinema game">
+<link rel="canonical" href="https://lights-camera-action.app">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
-<title>🎬 Lights, Camera, Action!</title>
+<meta property="og:url" content="https://lights-camera-action.app">
+<meta property="og:title" content="Lights, Camera, Action!  -  The Hollywood Draft Game">
+<meta property="og:description" content="Draft your director, cast, studio and genre. Chase box office records and Oscar glory  -  or total infamy. Daily challenge available now.">
+<meta property="og:image" content="https://lights-camera-action.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Lights, Camera, Action!">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lights, Camera, Action!  -  The Hollywood Draft Game">
+<meta name="twitter:description" content="Draft your director, cast, studio and genre. Chase box office records and Oscar glory  -  or total infamy. New daily challenge every day.">
+<meta name="twitter:image" content="https://lights-camera-action.app/og-image.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Lights, Camera, Action!","description":"Draft your director, cast, studio and genre. Chase box office records and Oscar glory.","url":"https://lights-camera-action.app","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F3AC;</text></svg>">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1963,14 +1976,10 @@ function renderIntro() {
         <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#7BDD88;filter:drop-shadow(0 0 6px rgba(80,200,80,0.35))">20+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Outcomes</div></div>
       </div>
     </div>
-    <div style="background:${doneToday ? 'var(--surface2)' : 'var(--amber-bg)'};border:0.5px solid ${doneToday ? 'var(--border)' : 'var(--amber)'};border-radius:var(--r-lg);padding:1rem 1.1rem;margin-bottom:1rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-        <div>
-          <div style="font-size:12px;font-weight:600;color:${doneToday ? 'var(--text2)' : 'var(--amber)'};margin-bottom:2px">🎬 Daily Draft - ${getTodayString()}</div>
-          <div style="font-size:11px;color:var(--text3)">${doneToday ? ("You scored $" + (dailyResult.boM||0) + "M, " + (dailyResult.noms||0) + " noms, " + (dailyResult.verdict||"") + (streak>1?" - "+streak+" day streak 🔥":"")) : ("Everyone gets the same 8 options today. Beat your friends." + (streak>1?" "+streak+" day streak 🔥":""))}</div>
-        </div>
-        ${doneToday ? '<button class="btn-sm" id="share-daily-btn" style="flex-shrink:0">Share 📤</button>' : '<button class="mode-btn active" id="daily-start-btn" style="flex-shrink:0;white-space:nowrap">Play Daily</button>'}
-      </div>
+    <div style="background:${doneToday ? 'var(--surface2)' : 'var(--amber-bg)'};border:0.5px solid ${doneToday ? 'var(--border)' : 'var(--amber)'};border-radius:var(--r-lg);padding:1rem 1.1rem;margin-bottom:1rem;text-align:center">
+      <div style="font-size:12px;font-weight:600;color:${doneToday ? 'var(--text2)' : 'var(--amber)'};margin-bottom:4px">🎬 Daily Draft  -  ${getTodayString()}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5">${doneToday ? ("You scored $" + (dailyResult.boM||0) + "M · " + (dailyResult.noms||0) + " noms · " + (dailyResult.verdict||"") + (streak>1?" · "+streak+" day streak 🔥":"")) : ("Everyone gets the same 8 options today. Beat your friends." + (streak>1?" · "+streak+" day streak 🔥":""))}</div>
+      ${doneToday ? '<button class="btn-sm" id="share-daily-btn" style="margin:0 auto;display:block;max-width:180px">Share result 📤</button>' : '<button class="btn" id="daily-start-btn" style="max-width:220px;margin:0 auto;display:block">Play Daily Draft →</button>'}
     </div>
     <div class="mode-row">
       <button class="mode-btn ${!HARD_MODE?'active':''}" id="mode-normal">Normal</button>
