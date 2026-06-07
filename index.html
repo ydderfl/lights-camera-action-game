@@ -245,7 +245,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .submit-btn:hover { background: var(--purple); color: var(--surface); }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -278,25 +277,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <button class="lb-filter" data-sort="recent" onclick="setLbSort('recent')">🕐 Recent</button>
     </div>
     <div id="lb-list"></div>
+  <div style="margin-top:1.5rem">
+    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">🌍 Global Walk of Fame</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Films submitted by all players worldwide, ranked by box office.</div>
+    <div id="global-lb-list">
+      <div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Switch to this tab to load the global board.</div>
+    </div>
+  </div>
   </div>
 
-  <!-- Off-screen screenshot card -->
-  <div id="screenshot-card">
-    <div class="sc-eyebrow"><span>🎬</span> Lights, Camera, Action!</div>
-    <div class="sc-verdict" id="sc-verdict"></div>
-    <div class="sc-tagline" id="sc-tagline"></div>
-    <div class="sc-nums">
-      <div class="sc-num"><div class="sc-num-lbl">💰 Box Office</div><div class="sc-num-val" id="sc-bo" style="color:#B5D4F4"></div></div>
-      <div class="sc-num"><div class="sc-num-lbl">🏆 Oscar Noms</div><div class="sc-num-val" id="sc-noms" style="color:#FAC775"></div></div>
-      <div class="sc-num"><div class="sc-num-lbl">🥇 Wins</div><div class="sc-num-val" id="sc-wins" style="color:#FAC775"></div></div>
-    </div>
-    <div class="sc-crew" id="sc-crew"></div>
-    <div class="sc-rt">
-      <div class="sc-rt-box"><div class="sc-rt-score" id="sc-rt-critic" style="color:#FA320A"></div><div class="sc-rt-lbl">Tomatometer</div></div>
-      <div class="sc-rt-box"><div class="sc-rt-score" id="sc-rt-audience" style="color:#FA8C00"></div><div class="sc-rt-lbl">Audience</div></div>
-    </div>
-    <div class="sc-domain">lights-camera-action.app</div>
-  </div>
+  <!-- Share card now built via SVG in JS -->
 
   <!-- Achievement popup -->
   <div class="achievement-popup" id="achievement-popup"></div>
@@ -581,85 +571,126 @@ const CATEGORIES = [
 
 const DATA = {
   director: [
-    { name:"Steven Spielberg",     bo:18, oscar:15, era:"Blockbuster",  known:"Schindler's List, Jaws, E.T." },
-    { name:"Christopher Nolan",    bo:20, oscar:12, era:"Cerebral",     known:"Inception, The Dark Knight, Oppenheimer" },
-    { name:"Martin Scorsese",      bo:10, oscar:18, era:"Prestige",     known:"Goodfellas, The Departed, Killers of the Flower Moon" },
-    { name:"James Cameron",        bo:22, oscar:14, era:"Epic",         known:"Titanic, Avatar, Aliens" },
-    { name:"Greta Gerwig",         bo:14, oscar:16, era:"Indie",        known:"Barbie, Little Women, Lady Bird" },
-    { name:"Ridley Scott",         bo:15, oscar:11, era:"Epic",         known:"Gladiator, Alien, Blade Runner" },
-    { name:"Kathryn Bigelow",      bo:9,  oscar:17, era:"Prestige",     known:"The Hurt Locker, Zero Dark Thirty" },
-    { name:"David Fincher",        bo:13, oscar:14, era:"Thriller",     known:"Fight Club, Se7en, The Social Network" },
-    { name:"Quentin Tarantino",    bo:14, oscar:15, era:"Cult",         known:"Pulp Fiction, Kill Bill, Django Unchained" },
-    { name:"Denis Villeneuve",     bo:16, oscar:13, era:"Cerebral",     known:"Dune, Arrival, Blade Runner 2049" },
-    { name:"Sofia Coppola",        bo:7,  oscar:14, era:"Indie",        known:"Lost in Translation, The Virgin Suicides" },
-    { name:"Spike Lee",            bo:8,  oscar:16, era:"Prestige",     known:"Do the Right Thing, Malcolm X, BlacKkKlansman" },
-    { name:"Bong Joon-ho",         bo:11, oscar:19, era:"Arthouse",     known:"Parasite, Memories of Murder, Snowpiercer" },
-    { name:"Wes Anderson",         bo:9,  oscar:13, era:"Quirky",       known:"The Grand Budapest Hotel, Moonrise Kingdom" },
-    { name:"Jordan Peele",         bo:15, oscar:16, era:"Genre",        known:"Get Out, Us, Nope" },
-    { name:"Alfonso Cuarón",       bo:10, oscar:18, era:"Prestige",     known:"Gravity, Roma, Children of Men" },
-    { name:"Ryan Coogler",         bo:18, oscar:13, era:"Blockbuster",  known:"Black Panther, Creed, Fruitvale Station" },
-    { name:"Ava DuVernay",         bo:10, oscar:16, era:"Prestige",     known:"Selma, 13th, A Wrinkle in Time" },
-    { name:"Paul Thomas Anderson", bo:8,  oscar:18, era:"Arthouse",     known:"There Will Be Blood, Boogie Nights, Phantom Thread" },
-    { name:"Chloé Zhao",           bo:9,  oscar:18, era:"Prestige",     known:"Nomadland, Eternals, The Rider" },
-    { name:"Sam Raimi",            bo:16, oscar:9,  era:"Genre",        known:"Spider-Man, Evil Dead, Doctor Strange 2" },
-    { name:"Peter Jackson",        bo:20, oscar:16, era:"Epic",         known:"The Lord of the Rings trilogy" },
-    { name:"Francis Ford Coppola", bo:14, oscar:19, era:"Classic",      known:"The Godfather, Apocalypse Now" },
-    { name:"Stanley Kubrick",      bo:11, oscar:17, era:"Auteur",       known:"2001: A Space Odyssey, The Shining, Full Metal Jacket" },
-    { name:"Damien Chazelle",      bo:13, oscar:17, era:"Prestige",     known:"La La Land, Whiplash, Babylon" },
-    { name:"Taika Waititi",        bo:17, oscar:14, era:"Comedy",       known:"Thor: Ragnarok, Jojo Rabbit, What We Do in the Shadows" },
-    { name:"Yorgos Lanthimos",     bo:8,  oscar:17, era:"Arthouse",     known:"Poor Things, The Favourite, The Lobster" },
-    { name:"Barry Jenkins",        bo:9,  oscar:18, era:"Prestige",     known:"Moonlight, If Beale Street Could Talk" },
-    { name:"M. Night Shyamalan",   bo:15, oscar:8,  era:"Thriller",     known:"The Sixth Sense, Unbreakable, Signs" },
-    { name:"Michael Bay",          bo:20, oscar:3,  era:"Action",       known:"Transformers, Bad Boys, The Rock" },
-    { name:"Todd Phillips",        bo:18, oscar:12, era:"Mainstream",   known:"Joker, The Hangover, War Dogs" },
-    { name:"Luca Guadagnino",      bo:10, oscar:16, era:"Arthouse",     known:"Call Me By Your Name, Challengers, Suspiria" },
-    { name:"Guillermo del Toro",   bo:14, oscar:17, era:"Fantasy",      known:"The Shape of Water, Pan's Labyrinth, Hellboy" },
-    { name:"Robert Zemeckis",      bo:17, oscar:14, era:"Blockbuster",  known:"Forrest Gump, Back to the Future, Cast Away" },
-    { name:"Oliver Stone",         bo:13, oscar:16, era:"Prestige",     known:"Platoon, JFK, Born on the Fourth of July" },
-    { name:"Ang Lee",              bo:12, oscar:17, era:"Prestige",     known:"Brokeback Mountain, Life of Pi, Crouching Tiger" },
-    { name:"Darren Aronofsky",     bo:9,  oscar:15, era:"Arthouse",     known:"Black Swan, Requiem for a Dream, The Wrestler" },
-    { name:"Clint Eastwood",       bo:14, oscar:16, era:"Classic",      known:"Million Dollar Baby, Unforgiven, American Sniper" },
-    { name:"Ron Howard",           bo:15, oscar:14, era:"Mainstream",   known:"A Beautiful Mind, Apollo 13, Opie from Happy Days (director)" },
-    { name:"Spike Jonze",          bo:8,  oscar:16, era:"Indie",        known:"Her, Being John Malkovich, Adaptation" },
-    { name:"Kelly Reichardt",      bo:5,  oscar:15, era:"Indie",        known:"First Cow, Certain Women, Wendy and Lucy" },
-    { name:"Céline Sciamma",       bo:6,  oscar:17, era:"Arthouse",     known:"Portrait of a Lady on Fire, Petite Maman" },
-    { name:"Park Chan-wook",       bo:9,  oscar:17, era:"Arthouse",     known:"Oldboy, The Handmaiden, Decision to Leave" },
-    { name:"Wong Kar-wai",         bo:7,  oscar:16, era:"Arthouse",     known:"In the Mood for Love, Chungking Express" },
-    { name:"Pedro Almodóvar",      bo:8,  oscar:17, era:"Arthouse",     known:"All About My Mother, Talk to Her, Pain and Glory" },
-    { name:"Steven Soderbergh",    bo:14, oscar:15, era:"Indie",        known:"Traffic, Erin Brockovich, Ocean's Eleven" },
-    { name:"Joel & Ethan Coen",    bo:12, oscar:17, era:"Cult",         known:"No Country for Old Men, Fargo, The Big Lebowski" },
-    { name:"Tim Burton",           bo:15, oscar:10, era:"Quirky",       known:"Edward Scissorhands, Batman, Big Eyes" },
-    { name:"David Lynch",          bo:7,  oscar:15, era:"Surreal",      known:"Mulholland Drive, Blue Velvet, Twin Peaks" },
-    { name:"Terrence Malick",      bo:6,  oscar:16, era:"Poetic",       known:"The Tree of Life, The Thin Red Line, Badlands" },
-    { name:"Antoine Fuqua",        bo:14, oscar:11, era:"Action",       known:"Training Day, The Equalizer, Emancipation" },
-    { name:"F. Gary Gray",         bo:15, oscar:9,  era:"Action",       known:"Straight Outta Compton, The Fate of the Furious, Friday" },
-    { name:"Jon Favreau",          bo:18, oscar:9,  era:"Franchise",    known:"Iron Man, The Lion King (2019), The Jungle Book" },
-    { name:"J.J. Abrams",          bo:18, oscar:9,  era:"Franchise",    known:"Star Wars: The Force Awakens, Mission: Impossible III" },
-    { name:"Zack Snyder",          bo:17, oscar:6,  era:"Action",       known:"Man of Steel, 300, Justice League" },
-    { name:"Chad Stahelski",       bo:16, oscar:7,  era:"Action",       known:"John Wick franchise" },
-    { name:"Patty Jenkins",        bo:16, oscar:11, era:"Blockbuster",  known:"Wonder Woman, Monster" },
-    { name:"Emerald Fennell",      bo:8,  oscar:16, era:"Prestige",     known:"Promising Young Woman, Saltburn" },
-    { name:"Edward Berger",        bo:9,  oscar:17, era:"Prestige",     known:"All Quiet on the Western Front, Conclave" },
-    { name:"Brady Corbet",         bo:7,  oscar:16, era:"Arthouse",     known:"The Brutalist" },
-    { name:"James Mangold",        bo:14, oscar:14, era:"Mainstream",   known:"Logan, Ford v Ferrari, Indiana Jones 5" },
-    { name:"George Miller",        bo:15, oscar:14, era:"Action",       known:"Mad Max: Fury Road, Babe, Happy Feet" },
-    { name:"David Cronenberg",      bo:9,  oscar:15, era:"Body Horror",   known:"The Fly, Videodrome, Crash, Eastern Promises" },
-    { name:"Mark Borchardt",        bo:3,  oscar:9,  era:"Cult Outsider", known:"Coven, American Movie (subject), Northwestern" },
-    { name:"Tobe Hooper",           bo:10, oscar:10, era:"Horror Classic", known:"The Texas Chain Saw Massacre, Poltergeist, Salem's Lot" },
-    { name:"John Carpenter",        bo:11, oscar:10, era:"Horror Classic", known:"Halloween, The Thing, Escape from New York" },
-    { name:"Dario Argento",         bo:8,  oscar:12, era:"Giallo",         known:"Suspiria, Deep Red, Tenebrae" },
-    { name:"Wes Craven",            bo:12, oscar:9,  era:"Horror",         known:"A Nightmare on Elm Street, Scream, The Hills Have Eyes" },
-    { name:"Ti West",               bo:8,  oscar:11, era:"Elevated Horror", known:"X, Pearl, MaXXXine, The House of the Devil" },
-    { name:"James Wan",             bo:16, oscar:7,  era:"Horror/Action",  known:"Saw, The Conjuring, Aquaman" },
-    { name:"Mike Flanagan",         bo:9,  oscar:13, era:"Prestige Horror", known:"Haunting of Hill House, Doctor Sleep, Oculus" },
-    { name:"Rob Zombie",            bo:8,  oscar:5,  era:"Cult Horror",    known:"House of 1000 Corpses, The Devil's Rejects" },
-    { name:"Lars von Trier",        bo:6,  oscar:15, era:"Provocateur",    known:"Melancholia, Dancer in the Dark, Breaking the Waves" },
+    { name:"Steven Spielberg",      bo:18, oscar:15, era:"Blockbuster",    known:"Schindler's List, Jaws, E.T." },
+    { name:"James Cameron",         bo:22, oscar:14, era:"Epic",           known:"Titanic, Avatar, Aliens" },
+    { name:"Christopher Nolan",     bo:20, oscar:12, era:"Cerebral",       known:"Inception, The Dark Knight, Oppenheimer" },
+    { name:"Michael Bay",           bo:20, oscar:3,  era:"Action",         known:"Transformers, Bad Boys, The Rock" },
+    { name:"Peter Jackson",         bo:20, oscar:16, era:"Epic",           known:"The Lord of the Rings trilogy" },
+    { name:"J.J. Abrams",           bo:18, oscar:9,  era:"Franchise",      known:"Star Wars: The Force Awakens, MI III" },
+    { name:"Jon Favreau",           bo:18, oscar:9,  era:"Franchise",      known:"Iron Man, The Lion King (2019)" },
+    { name:"Zack Snyder",           bo:17, oscar:6,  era:"Action",         known:"Man of Steel, 300, Justice League" },
+    { name:"Roland Emmerich",       bo:16, oscar:4,  era:"Disaster",       known:"Independence Day, The Day After Tomorrow" },
+    { name:"Antoine Fuqua",         bo:14, oscar:11, era:"Action",         known:"Training Day, The Equalizer, Emancipation" },
+    { name:"F. Gary Gray",          bo:15, oscar:9,  era:"Action",         known:"Straight Outta Compton, The Fate of the Furious" },
+    { name:"Chad Stahelski",        bo:16, oscar:7,  era:"Action",         known:"John Wick franchise" },
+    { name:"Patty Jenkins",         bo:16, oscar:11, era:"Blockbuster",    known:"Wonder Woman, Monster" },
+    { name:"George Miller",         bo:15, oscar:14, era:"Action",         known:"Mad Max: Fury Road, Babe, Happy Feet" },
+    { name:"James Mangold",         bo:14, oscar:14, era:"Mainstream",     known:"Logan, Ford v Ferrari, Indiana Jones 5" },
+    { name:"Sam Raimi",             bo:16, oscar:9,  era:"Genre",          known:"Spider-Man, Evil Dead, Doctor Strange 2" },
+    { name:"Martin Scorsese",       bo:10, oscar:18, era:"Prestige",       known:"Goodfellas, The Departed, Killers of the Flower Moon" },
+    { name:"Francis Ford Coppola",  bo:14, oscar:19, era:"Classic",        known:"The Godfather, Apocalypse Now" },
+    { name:"Stanley Kubrick",       bo:11, oscar:17, era:"Auteur",         known:"2001: A Space Odyssey, The Shining, Full Metal Jacket" },
+    { name:"Ridley Scott",          bo:15, oscar:11, era:"Epic",           known:"Gladiator, Alien, Blade Runner" },
+    { name:"Kathryn Bigelow",       bo:9,  oscar:17, era:"Prestige",       known:"The Hurt Locker, Zero Dark Thirty" },
+    { name:"Oliver Stone",          bo:13, oscar:16, era:"Prestige",       known:"Platoon, JFK, Born on the Fourth of July" },
+    { name:"Ang Lee",               bo:12, oscar:17, era:"Prestige",       known:"Brokeback Mountain, Life of Pi, Crouching Tiger" },
+    { name:"Clint Eastwood",        bo:14, oscar:16, era:"Classic",        known:"Million Dollar Baby, Unforgiven, American Sniper" },
+    { name:"Ron Howard",            bo:15, oscar:14, era:"Mainstream",     known:"A Beautiful Mind, Apollo 13, Rush" },
+    { name:"Robert Zemeckis",       bo:17, oscar:14, era:"Blockbuster",    known:"Forrest Gump, Back to the Future, Cast Away" },
+    { name:"Damien Chazelle",       bo:13, oscar:17, era:"Prestige",       known:"La La Land, Whiplash, Babylon" },
+    { name:"Barry Jenkins",         bo:9,  oscar:18, era:"Prestige",       known:"Moonlight, If Beale Street Could Talk" },
+    { name:"Alfonso Cuaron",        bo:10, oscar:18, era:"Prestige",       known:"Gravity, Roma, Children of Men" },
+    { name:"Steve McQueen (dir)",   bo:9,  oscar:18, era:"Prestige",       known:"12 Years a Slave, Shame, Small Axe" },
+    { name:"Todd Haynes",           bo:7,  oscar:16, era:"Prestige",       known:"Carol, Far from Heaven, Velvet Goldmine" },
+    { name:"Alexander Payne",       bo:9,  oscar:15, era:"Indie",          known:"Nebraska, Sideways, The Descendants" },
+    { name:"Edward Berger",         bo:9,  oscar:17, era:"Prestige",       known:"All Quiet on the Western Front, Conclave" },
+    { name:"Brady Corbet",          bo:7,  oscar:16, era:"Arthouse",       known:"The Brutalist" },
+    { name:"Denis Villeneuve",      bo:16, oscar:13, era:"Cerebral",       known:"Dune, Arrival, Blade Runner 2049" },
+    { name:"David Fincher",         bo:13, oscar:14, era:"Thriller",       known:"Fight Club, Se7en, The Social Network" },
+    { name:"Paul Thomas Anderson",  bo:8,  oscar:18, era:"Arthouse",       known:"There Will Be Blood, Boogie Nights, Phantom Thread" },
+    { name:"Joel and Ethan Coen",   bo:12, oscar:17, era:"Cult",           known:"No Country for Old Men, Fargo, The Big Lebowski" },
+    { name:"Spike Jonze",           bo:8,  oscar:16, era:"Indie",          known:"Her, Being John Malkovich, Adaptation" },
+    { name:"Charlie Kaufman",       bo:6,  oscar:16, era:"Cerebral",       known:"Synecdoche New York, I'm Thinking of Ending Things" },
+    { name:"Michel Gondry",         bo:8,  oscar:13, era:"Quirky",         known:"Eternal Sunshine, The Science of Sleep" },
+    { name:"Richard Linklater",     bo:9,  oscar:15, era:"Indie",          known:"Before trilogy, Boyhood, Dazed and Confused" },
+    { name:"Terrence Malick",       bo:6,  oscar:16, era:"Poetic",         known:"The Tree of Life, The Thin Red Line, Badlands" },
+    { name:"David Lynch",           bo:7,  oscar:15, era:"Surreal",        known:"Mulholland Drive, Blue Velvet, Twin Peaks" },
+    { name:"Darren Aronofsky",      bo:9,  oscar:15, era:"Arthouse",       known:"Black Swan, Requiem for a Dream, The Wrestler" },
+    { name:"Yorgos Lanthimos",      bo:8,  oscar:17, era:"Arthouse",       known:"Poor Things, The Favourite, The Lobster" },
     { name:"Michael Haneke",        bo:6,  oscar:16, era:"Arthouse",       known:"Amour, The White Ribbon, Cache" },
-    { name:"Gaspar Noe",            bo:5,  oscar:11, era:"Provocateur",    known:"Irreversible, Enter the Void, Climax" },
-    { name:"Claire Denis",          bo:5,  oscar:14, era:"Arthouse",       known:"Beau Travail, Trouble Every Day, Titane" },
+    { name:"Lars von Trier",        bo:6,  oscar:15, era:"Provocateur",    known:"Melancholia, Dancer in the Dark, Breaking the Waves" },
+    { name:"Greta Gerwig",          bo:14, oscar:16, era:"Indie",          known:"Barbie, Little Women, Lady Bird" },
+    { name:"Sofia Coppola",         bo:7,  oscar:14, era:"Indie",          known:"Lost in Translation, The Virgin Suicides" },
+    { name:"Spike Lee",             bo:8,  oscar:16, era:"Prestige",       known:"Do the Right Thing, Malcolm X, BlacKkKlansman" },
+    { name:"Ryan Coogler",          bo:18, oscar:13, era:"Blockbuster",    known:"Black Panther, Creed, Fruitvale Station" },
+    { name:"Ava DuVernay",          bo:10, oscar:16, era:"Prestige",       known:"Selma, 13th, A Wrinkle in Time" },
+    { name:"Chloé Zhao",            bo:9,  oscar:18, era:"Prestige",       known:"Nomadland, Eternals, The Rider" },
+    { name:"Jordan Peele",          bo:15, oscar:16, era:"Genre",          known:"Get Out, Us, Nope" },
+    { name:"Luca Guadagnino",       bo:10, oscar:16, era:"Arthouse",       known:"Call Me By Your Name, Challengers, Suspiria" },
+    { name:"Emerald Fennell",       bo:8,  oscar:16, era:"Prestige",       known:"Promising Young Woman, Saltburn" },
+    { name:"Kelly Reichardt",       bo:5,  oscar:15, era:"Indie",          known:"First Cow, Certain Women, Wendy and Lucy" },
+    { name:"Celine Sciamma",        bo:6,  oscar:17, era:"Arthouse",       known:"Portrait of a Lady on Fire, Petite Maman" },
+    { name:"Taika Waititi",         bo:17, oscar:14, era:"Comedy",         known:"Thor: Ragnarok, Jojo Rabbit" },
+    { name:"Bong Joon-ho",          bo:11, oscar:19, era:"Arthouse",       known:"Parasite, Memories of Murder, Snowpiercer" },
+    { name:"Wes Anderson",          bo:9,  oscar:13, era:"Quirky",         known:"The Grand Budapest Hotel, Moonrise Kingdom" },
+    { name:"M. Night Shyamalan",    bo:15, oscar:8,  era:"Thriller",       known:"The Sixth Sense, Unbreakable, Signs" },
+    { name:"Todd Phillips",         bo:18, oscar:12, era:"Mainstream",     known:"Joker, The Hangover, War Dogs" },
+    { name:"Quentin Tarantino",     bo:14, oscar:15, era:"Cult",           known:"Pulp Fiction, Kill Bill, Django Unchained" },
+    { name:"David Cronenberg",      bo:9,  oscar:15, era:"Body Horror",    known:"The Fly, Videodrome, Eastern Promises" },
+    { name:"Mark Borchardt",        bo:3,  oscar:9,  era:"Cult Outsider",  known:"Coven, American Movie" },
+    { name:"Tobe Hooper",           bo:10, oscar:10, era:"Horror Classic", known:"The Texas Chain Saw Massacre, Poltergeist" },
+    { name:"John Carpenter",        bo:11, oscar:10, era:"Horror Classic", known:"Halloween, The Thing, Escape from New York" },
+    { name:"Wes Craven",            bo:12, oscar:9,  era:"Horror",         known:"A Nightmare on Elm Street, Scream" },
+    { name:"Dario Argento",         bo:8,  oscar:12, era:"Giallo",         known:"Suspiria, Deep Red, Tenebrae" },
+    { name:"James Wan",             bo:16, oscar:7,  era:"Horror/Action",  known:"Saw, The Conjuring, Aquaman" },
+    { name:"Mike Flanagan",         bo:9,  oscar:13, era:"Prestige Horror",known:"Haunting of Hill House, Doctor Sleep" },
+    { name:"Ari Aster",             bo:10, oscar:13, era:"Elevated Horror",known:"Hereditary, Midsommar, Beau Is Afraid" },
+    { name:"Robert Eggers",         bo:9,  oscar:13, era:"Arthouse Horror",known:"The Witch, The Lighthouse, The Northman" },
+    { name:"Ti West",               bo:8,  oscar:11, era:"Elevated Horror",known:"X, Pearl, MaXXXine" },
+    { name:"Rob Zombie",            bo:8,  oscar:5,  era:"Cult Horror",    known:"House of 1000 Corpses, The Devil's Rejects" },
     { name:"Julia Ducournau",       bo:6,  oscar:14, era:"Body Horror",    known:"Titane, Raw" },
-    { name:"Ari Aster",             bo:10, oscar:13, era:"Elevated Horror", known:"Hereditary, Midsommar, Beau Is Afraid" },
-    { name:"Robert Eggers",         bo:9,  oscar:13, era:"Arthouse Horror", known:"The Witch, The Lighthouse, The Northman" },
+    { name:"Gaspar Noe",            bo:5,  oscar:11, era:"Provocateur",    known:"Irreversible, Enter the Void, Climax" },
+    { name:"Park Chan-wook",        bo:9,  oscar:17, era:"Arthouse",       known:"Oldboy, The Handmaiden, Decision to Leave" },
+    { name:"Wong Kar-wai",          bo:7,  oscar:16, era:"Arthouse",       known:"In the Mood for Love, Chungking Express" },
+    { name:"Pedro Almodovar",       bo:8,  oscar:17, era:"Arthouse",       known:"All About My Mother, Talk to Her" },
+    { name:"Guillermo del Toro",    bo:14, oscar:17, era:"Fantasy",        known:"The Shape of Water, Pan's Labyrinth" },
+    { name:"Claire Denis",          bo:5,  oscar:14, era:"Arthouse",       known:"Beau Travail, Trouble Every Day" },
+    { name:"Akira Kurosawa",        bo:9,  oscar:17, era:"Classic",        known:"Seven Samurai, Rashomon, Ran" },
+    { name:"Federico Fellini",      bo:7,  oscar:16, era:"Classic",        known:"8 1/2, La Dolce Vita, Amarcord" },
+    { name:"Ingmar Bergman",        bo:6,  oscar:16, era:"Classic",        known:"The Seventh Seal, Wild Strawberries, Persona" },
+    { name:"Francois Truffaut",     bo:6,  oscar:14, era:"New Wave",       known:"The 400 Blows, Jules and Jim, Day for Night" },
+    { name:"Jean-Luc Godard",       bo:5,  oscar:13, era:"New Wave",       known:"Breathless, Band of Outsiders" },
+    { name:"Werner Herzog",         bo:6,  oscar:13, era:"Auteur",         known:"Aguirre, Nosferatu, Fitzcarraldo" },
+    { name:"Hirokazu Kore-eda",     bo:7,  oscar:15, era:"Japanese",       known:"Shoplifters, Nobody Knows, Like Father Like Son" },
+    { name:"Hayao Miyazaki",        bo:13, oscar:16, era:"Animation",      known:"Spirited Away, Princess Mononoke" },
+    { name:"Alejandro Inarritu",    bo:10, oscar:18, era:"Prestige",       known:"The Revenant, Birdman, Babel" },
+    { name:"Paolo Sorrentino",      bo:7,  oscar:15, era:"Arthouse",       known:"The Great Beauty, Youth, Il Divo" },
+    { name:"Steven Soderbergh",     bo:14, oscar:15, era:"Indie",          known:"Traffic, Erin Brockovich, Ocean's Eleven" },
+    { name:"Tim Burton",            bo:15, oscar:10, era:"Quirky",         known:"Edward Scissorhands, Batman, Big Eyes" },
+    { name:"Edgar Wright",          bo:13, oscar:12, era:"Genre",          known:"Shaun of the Dead, Hot Fuzz, Baby Driver" },
+    { name:"Adam McKay",            bo:12, oscar:13, era:"Comedy",         known:"The Big Short, Vice, Don't Look Up" },
+    { name:"Judd Apatow",           bo:13, oscar:8,  era:"Comedy",         known:"Knocked Up, The 40-Year-Old Virgin" },
+    { name:"Paul Feig",             bo:13, oscar:7,  era:"Comedy",         known:"Bridesmaids, Spy, The Heat" },
+    { name:"Christopher Guest",     bo:9,  oscar:10, era:"Comedy",         known:"This Is Spinal Tap, Best in Show" },
+    { name:"Shane Black",           bo:14, oscar:9,  era:"Action",         known:"Kiss Kiss Bang Bang, The Nice Guys" },
+    { name:"Boots Riley",           bo:7,  oscar:12, era:"Indie",          known:"Sorry to Bother You" },
+    { name:"Kogonada",              bo:6,  oscar:13, era:"Arthouse",       known:"Columbus, After Yang" },
+    { name:"RaMell Ross",           bo:6,  oscar:14, era:"Arthouse",       known:"Nickel Boys, Hale County This Morning" },
+    { name:"Mati Diop",             bo:5,  oscar:14, era:"Arthouse",       known:"Atlantics, Dahomey" },
+    { name:"John Ford",             bo:8,  oscar:14, era:"Classic",        known:"The Searchers, Stagecoach, The Grapes of Wrath" },
+    { name:"Billy Wilder",          bo:9,  oscar:15, era:"Classic",        known:"Some Like It Hot, Sunset Boulevard, The Apartment" },
+    { name:"Howard Hawks",          bo:7,  oscar:12, era:"Classic",        known:"Bringing Up Baby, Scarface, His Girl Friday" },
+    { name:"Frank Capra",           bo:7,  oscar:12, era:"Classic",        known:"It's a Wonderful Life, Mr. Smith Goes to Washington" },
+    { name:"Alfred Hitchcock",      bo:13, oscar:13, era:"Thriller Classic",known:"Psycho, Vertigo, Rear Window, North by Northwest" },
+    { name:"David Lean",            bo:10, oscar:15, era:"Classic Epic",   known:"Lawrence of Arabia, The Bridge on the River Kwai, Doctor Zhivago" },
+    { name:"Sydney Pollack",        bo:11, oscar:13, era:"Classic",        known:"Tootsie, Out of Africa, Three Days of the Condor" },
+    { name:"Sidney Lumet",          bo:10, oscar:14, era:"Classic",        known:"Dog Day Afternoon, Network, 12 Angry Men" },
+    { name:"Arthur Penn",           bo:9,  oscar:12, era:"Classic",        known:"Bonnie and Clyde, The Miracle Worker" },
+    { name:"Elia Kazan",            bo:8,  oscar:14, era:"Classic",        known:"A Streetcar Named Desire, On the Waterfront, East of Eden" },
+    { name:"Lina Wertmuller",       bo:6,  oscar:13, era:"Classic",        known:"Seven Beauties, Swept Away, Love and Anarchy" },
+    { name:"Agnès Varda",           bo:5,  oscar:14, era:"New Wave",       known:"Cléo from 5 to 7, Vagabond, The Gleaners and I" },
+    { name:"Jacques Tati",          bo:6,  oscar:12, era:"Classic",        known:"Mon Oncle, Playtime, Mr. Hulot's Holiday" },
+    { name:"Vittorio De Sica",      bo:6,  oscar:13, era:"Classic",        known:"Bicycle Thieves, Umberto D., Two Women" },
   ],
 
   lead: [
@@ -735,13 +766,6 @@ const DATA = {
     { name:"Zhang Ziyi",           bo:10, oscar:14, era:"Drama",        known:"Crouching Tiger Hidden Dragon, Memoirs of a Geisha" },
     { name:"Song Kang-ho",         bo:10, oscar:16, era:"Arthouse",     known:"Parasite, Memories of Murder, Snowpiercer" },
     { name:"Rinko Kikuchi",        bo:8,  oscar:14, era:"Drama",        known:"Babel, Pacific Rim, 47 Ronin" },
-    { name:"Aishwarya Rai",        bo:10, oscar:11, era:"Drama",        known:"Devdas, Jodhaa Akbar, Bride and Prejudice" },
-    { name:"Priyanka Chopra",      bo:11, oscar:9,  era:"Mainstream",   known:"Quantico, Baywatch, The Matrix Resurrections" },
-    { name:"Deepika Padukone",     bo:11, oscar:10, era:"Drama",        known:"Pathaan, Padmaavat, Piku" },
-    { name:"Ranveer Singh",        bo:11, oscar:11, era:"Blockbuster",  known:"Bajirao Mastani, Padmaavat, '83" },
-    { name:"Shah Rukh Khan",       bo:12, oscar:10, era:"Classic",      known:"Dilwale Dulhania Le Jayenge, My Name Is Khan" },
-    { name:"Aamir Khan",           bo:12, oscar:14, era:"Prestige",     known:"3 Idiots, Dangal, Lagaan" },
-    { name:"Ranbir Kapoor",        bo:10, oscar:12, era:"Drama",        known:"Sanju, Brahmastra, Barfi!" },
     { name:"Gal Gadot",            bo:17, oscar:7,  era:"Franchise",    known:"Wonder Woman, Fast & Furious, Red Notice" },
     { name:"Jason Statham",        bo:15, oscar:4,  era:"Action",       known:"The Transporter, Spy, The Expendables" },
     { name:"Vin Diesel",           bo:18, oscar:3,  era:"Franchise",    known:"Fast & Furious franchise, Guardians of the Galaxy" },
@@ -754,7 +778,6 @@ const DATA = {
     { name:"Keanu Reeves",         bo:18, oscar:6,  era:"Action",       known:"The Matrix, John Wick, Speed" },
     { name:"Nicole Kidman",        bo:13, oscar:16, era:"Drama",        known:"Moulin Rouge!, The Hours, Eyes Wide Shut" },
     { name:"Cate Blanchett",       bo:11, oscar:18, era:"Drama",        known:"Tár, Blue Jasmine, The Lord of the Rings" },
-    { name:"Kate Blanchett",       bo:10, oscar:16, era:"Drama",        known:"Notes on a Scandal, Elizabeth: The Golden Age" },
     { name:"Helena Bonham Carter", bo:13, oscar:13, era:"Quirky",       known:"Fight Club, The Crown, Harry Potter" },
     { name:"Gary Oldman",          bo:13, oscar:15, era:"Drama",        known:"Darkest Hour, The Dark Knight, Tinker Tailor" },
     { name:"Anthony Hopkins",      bo:12, oscar:18, era:"Prestige",     known:"The Silence of the Lambs, The Two Popes, Nixon" },
@@ -795,16 +818,12 @@ const DATA = {
     { name:"Fantasia Barrino",     bo:8,  oscar:13, era:"Drama",        known:"The Color Purple (2023)" },
     { name:"Niecy Nash",           bo:8,  oscar:11, era:"Drama",        known:"Dahmer, Selma, Claws" },
     { name:"Ruth Negga",           bo:7,  oscar:14, era:"Prestige",     known:"Loving, Passing, Preacher" },
-    { name:"Yalitza Aparicio",     bo:7,  oscar:14, era:"Arthouse",     known:"Roma" },
-    { name:"Fernanda Torres",      bo:7,  oscar:14, era:"Arthouse",     known:"I'm Still Here, Foreign Land" },
-    { name:"Fernanda Montenegro",  bo:7,  oscar:15, era:"Arthouse",     known:"Central Station, House of Sand" },
     { name:"Marion Cotillard",     bo:11, oscar:16, era:"Drama",        known:"La Vie en Rose, Inception, Midnight in Paris" },
     { name:"Léa Seydoux",          bo:9,  oscar:15, era:"Arthouse",     known:"Blue Is the Warmest Colour, Spectre, The Grand Budapest Hotel" },
     { name:"Isabelle Huppert",     bo:7,  oscar:17, era:"Arthouse",     known:"Elle, The Piano Teacher, I Heart Huckabees" },
     { name:"Audrey Tautou",        bo:10, oscar:12, era:"Drama",        known:"Amélie, The Da Vinci Code, Coco Before Chanel" },
     { name:"Adèle Exarchopoulos",  bo:8,  oscar:15, era:"Arthouse",     known:"Blue Is the Warmest Colour, Versus" },
     { name:"Charlotte Rampling",   bo:6,  oscar:14, era:"Arthouse",     known:"45 Years, Swimming Pool, The Night Porter" },
-    { name:"Anamaria Vartolomei",  bo:7,  oscar:14, era:"Arthouse",     known:"Happening (L'Événement)" },
     { name:"Penélope Cruz",        bo:11, oscar:16, era:"Drama",        known:"Vicky Cristina Barcelona, Volver, Parallel Mothers" },
     { name:"Paz Vega",             bo:8,  oscar:10, era:"Drama",        known:"Sex and Lucía, Spanglish, Rambo" },
     { name:"Elena Anaya",          bo:7,  oscar:11, era:"Arthouse",     known:"The Skin I Live In, Wonder Woman" },
@@ -823,7 +842,6 @@ const DATA = {
     { name:"Gabourey Sidibe",      bo:7,  oscar:13, era:"Drama",        known:"Precious, American Horror Story" },
     { name:"Quvenzhané Wallis",    bo:7,  oscar:14, era:"Drama",        known:"Beasts of the Southern Wild, Annie (2014)" },
     { name:"Amandla Stenberg",     bo:10, oscar:12, era:"Drama",        known:"The Hate U Give, Bodies Bodies Bodies" },
-    { name:"Mekki Lehouarche",     bo:6,  oscar:11, era:"Arthouse",     known:"The Teachers' Lounge" },
     { name:"Sophia Loren",         bo:9,  oscar:16, era:"Classic",      known:"Two Women, Marriage Italian Style, Yesterday, Today and Tomorrow" },
     { name:"Monica Bellucci",      bo:10, oscar:10, era:"Drama",        known:"Malèna, The Matrix Reloaded, Spectre" },
     { name:"Asia Argento",         bo:7,  oscar:10, era:"Cult",         known:"The Stendhal Syndrome, xXx" },
@@ -954,12 +972,7 @@ const DATA = {
     { name:"Elvis Presley",        bo:9,  oscar:4,  era:"Pop Event",    known:"Jailhouse Rock, Blue Hawaii, Viva Las Vegas" },
     { name:"Frank Sinatra",        bo:8,  oscar:9,  era:"Classic",      known:"From Here to Eternity, The Manchurian Candidate, Ocean's Eleven" },
     { name:"Riz Ahmed",            bo:9,  oscar:14, era:"Drama",        known:"Sound of Metal, Four Lions, Nightcrawler" },
-    { name:"Tahar Rahim",          bo:8,  oscar:13, era:"Drama",        known:"A Prophet, The Serpent, The Mauritanian" },
-    { name:"Omar Sy",              bo:9,  oscar:10, era:"Drama",        known:"The Intouchables, Lupin, Jurassic World" },
     { name:"Matthieu Amalric",     bo:7,  oscar:12, era:"Arthouse",     known:"A Christmas Tale, Munich, The Grand Budapest Hotel" },
-    { name:"Gong Li",              bo:9,  oscar:14, era:"Arthouse",     known:"Raise the Red Lantern, Farewell My Concubine, Miami Vice" },
-    { name:"Zhang Yimou (actor)",  bo:7,  oscar:10, era:"Arthouse",     known:"The Old Well" },
-    { name:"Zhao Tao",             bo:6,  oscar:12, era:"Arthouse",     known:"Ash Is Purest White, Mountains May Depart" },
     { name:"Hiroshi Abe",          bo:7,  oscar:10, era:"Drama",        known:"After Life, Our Little Sister, The Departure" },
     { name:"Ken Watanabe",         bo:8,  oscar:10, era:"Drama",        known:"The Last Samurai, Letters from Iwo Jima, Inception" },
     { name:"Takeshi Kitano",       bo:7,  oscar:10, era:"Arthouse",     known:"Hana-bi, Sonatine, Battle Royale" },
@@ -980,37 +993,9 @@ const DATA = {
     { name:"Justin H. Min",        bo:7,  oscar:9,  era:"Drama",        known:"The Umbrella Academy, After Yang" },
     { name:"Manny Jacinto",        bo:7,  oscar:8,  era:"Drama",        known:"The Good Place, Nine Perfect Strangers" },
     { name:"Charles Melton",       bo:7,  oscar:10, era:"Drama",        known:"May December, Riverdale" },
-    { name:"Ali Fazal",            bo:7,  oscar:9,  era:"Drama",        known:"Victoria & Abdul, Mirzapur, Furious 7" },
-    { name:"Nawazuddin Siddiqui",  bo:8,  oscar:13, era:"Drama",        known:"The Lunchbox, Gangs of Wasseypur, Sacred Games" },
-    { name:"Irrfan Khan",          bo:9,  oscar:13, era:"Drama",        known:"Slumdog Millionaire, Life of Pi, The Namesake" },
-    { name:"Naseeruddin Shah",     bo:7,  oscar:12, era:"Arthouse",     known:"Monsoon Wedding, The League of Extraordinary Gentlemen" },
-    { name:"Manoj Bajpayee",       bo:8,  oscar:12, era:"Drama",        known:"Gangs of Wasseypur, The Family Man, Satya" },
-    { name:"Pankaj Tripathi",      bo:7,  oscar:11, era:"Drama",        known:"Stree, Sacred Games, Mirzapur" },
-    { name:"Ayushmann Khurrana",   bo:8,  oscar:10, era:"Drama",        known:"Andhadhun, Article 15, Vicky Donor" },
     { name:"Rajkummar Rao",        bo:8,  oscar:11, era:"Drama",        known:"Newton, Stree, Trapped" },
-    { name:"Taapsee Pannu",        bo:8,  oscar:10, era:"Drama",        known:"Thappad, Badla, Pink" },
-    { name:"Kangana Ranaut",       bo:9,  oscar:11, era:"Drama",        known:"Queen, Tanu Weds Manu, Manikarnika" },
-    { name:"Vidya Balan",          bo:9,  oscar:11, era:"Drama",        known:"Kahaani, The Dirty Picture, Tumhari Sulu" },
-    { name:"Amitabh Bachchan",     bo:12, oscar:12, era:"Classic",      known:"Sholay, Deewar, Pink" },
-    { name:"Rishi Kapoor",         bo:8,  oscar:10, era:"Classic",      known:"Bobby, Amar Akbar Anthony, Mulk" },
-    { name:"Sharmila Tagore",      bo:7,  oscar:11, era:"Classic",      known:"The World of Apu, An Evening in Paris" },
-    { name:"Shabana Azmi",         bo:7,  oscar:12, era:"Arthouse",     known:"Arth, Ankur, Fire" },
-    { name:"Smita Patil",          bo:6,  oscar:12, era:"Arthouse",     known:"Mirch Masala, Bhumika, Arth" },
-    { name:"Naseeruddin Shah",     bo:7,  oscar:12, era:"Arthouse",     known:"Sparsh, Masoom, Iqbal" },
-    { name:"Ali Hassan",           bo:6,  oscar:9,  era:"Drama",        known:"El-Gebha, Cairo Station" },
-    { name:"Yousra",               bo:6,  oscar:9,  era:"Drama",        known:"Closed Doors, Cairo Station" },
-    { name:"Ahmed Zaki",           bo:6,  oscar:10, era:"Drama",        known:"Alexandria...Why?, Land of Fear" },
-    { name:"Nour El-Sherif",       bo:6,  oscar:9,  era:"Drama",        known:"The Night of Counting the Years" },
     { name:"Omar Sharif",          bo:10, oscar:12, era:"Classic",      known:"Lawrence of Arabia, Doctor Zhivago, Funny Girl" },
-    { name:"Nadine Labaki",        bo:7,  oscar:13, era:"Arthouse",     known:"Capernaum, Where Do We Go Now?" },
-    { name:"Adam Bakri",           bo:6,  oscar:11, era:"Drama",        known:"Omar, Villa Touma" },
-    { name:"Rim Turki",            bo:5,  oscar:9,  era:"Drama",        known:"Making Of, Red Satin" },
-    { name:"Hend Sabry",           bo:6,  oscar:9,  era:"Drama",        known:"The Justifier, Fatwa" },
-    { name:"Meriem Medjkane",      bo:5,  oscar:9,  era:"Arthouse",     known:"Giant, Masquerades" },
     { name:"Saïd Taghmaoui",       bo:7,  oscar:9,  era:"Drama",        known:"La Haine, Three Kings, Wonder Woman" },
-    { name:"Lubna Azabal",         bo:7,  oscar:11, era:"Drama",        known:"Incendies, Paradise Now, Body of Lies" },
-    { name:"Mélissa Désormeaux-Poulin",bo:6, oscar:10,era:"Drama",     known:"Incendies, Felix & Meira" },
-    { name:"Denis Ménochet",       bo:6,  oscar:9,  era:"Drama",        known:"Inglourious Basterds, Peter von Kant" },
     { name:"Aisling Franciosi",    bo:7,  oscar:11, era:"Drama",        known:"The Nightingale, Game of Thrones" },
     { name:"Sharon Horgan",        bo:7,  oscar:8,  era:"Comedy",       known:"Catastrophe, Motherland, Bad Sisters" },
     { name:"Jessie Buckley",       bo:8,  oscar:13, era:"Drama",        known:"Wild Rose, The Lost Daughter, Men" },
@@ -1028,30 +1013,9 @@ const DATA = {
     { name:"Naomie Harris",        bo:10, oscar:12, era:"Drama",        known:"Moonlight, No Time to Die, Pirates of the Caribbean" },
     { name:"Thandiwe Newton",      bo:9,  oscar:11, era:"Drama",        known:"Westworld, Mission: Impossible 2, Beloved" },
     { name:"Sophie Okonedo",       bo:8,  oscar:12, era:"Drama",        known:"Hotel Rwanda, Ace Ventura: When Nature Calls" },
-    { name:"Nikita Abrosimov",     bo:5,  oscar:8,  era:"Arthouse",     known:"Compartment No. 6" },
-    { name:"Leila Hatami",         bo:6,  oscar:12, era:"Arthouse",     known:"A Separation, The Past" },
     { name:"Taraneh Alidoosti",    bo:6,  oscar:13, era:"Arthouse",     known:"The Salesman, About Elly" },
     { name:"Shahab Hosseini",      bo:6,  oscar:12, era:"Arthouse",     known:"A Separation, The Salesman" },
-    { name:"Peyman Maadi",         bo:6,  oscar:11, era:"Arthouse",     known:"A Separation, Camp X-Ray" },
-    { name:"Golshifteh Farahani",  bo:7,  oscar:11, era:"Drama",        known:"About Elly, Paterson, Pirates of the Caribbean" },
-    { name:"Arash Marandi",        bo:6,  oscar:10, era:"Arthouse",     known:"A Girl Walks Home Alone at Night" },
-    { name:"Mehdi Bajestani",      bo:5,  oscar:9,  era:"Arthouse",     known:"Just 6.5, Leila's Brothers" },
-    { name:"Pitobash",             bo:5,  oscar:8,  era:"Drama",        known:"Miss Lovely, Ship of Theseus" },
-    { name:"Rajkumar Rao",         bo:8,  oscar:11, era:"Drama",        known:"Newton, Bareilly Ki Barfi" },
-    { name:"Nimrat Kaur",          bo:7,  oscar:9,  era:"Drama",        known:"The Lunchbox, Homeland, Airlift" },
-    { name:"Richa Chadha",         bo:7,  oscar:10, era:"Drama",        known:"Gangs of Wasseypur, Masaan, Inside Edge" },
-    { name:"Swara Bhasker",        bo:6,  oscar:9,  era:"Drama",        known:"Nil Battey Sannata, Anaarkali of Aarah" },
-    { name:"Radhika Apte",         bo:7,  oscar:10, era:"Drama",        known:"Padman, Sacred Games, A Death in the Gunj" },
-    { name:"Konkona Sen Sharma",   bo:6,  oscar:11, era:"Arthouse",     known:"15 Park Avenue, Page 3, A Death in the Gunj" },
-    { name:"Kalki Koechlin",       bo:7,  oscar:10, era:"Drama",        known:"Dev D, Margarita with a Straw, Zindagi Na Milegi Dobara" },
-    { name:"Shefali Shah",         bo:6,  oscar:10, era:"Drama",        known:"Delhi Crime, Dil Dhadakne Do, Darlings" },
-    { name:"Huma Qureshi",         bo:7,  oscar:9,  era:"Drama",        known:"Gangs of Wasseypur, Army of the Dead" },
-    { name:"Divya Dutta",          bo:6,  oscar:9,  era:"Drama",        known:"Veer-Zaara, Bhaag Milkha Bhaag" },
-    { name:"Shabana Azmi",         bo:7,  oscar:12, era:"Arthouse",     known:"Arth, Ankur, Fire" },
     { name:"Jackie Chan",          bo:14, oscar:6,  era:"Action",       known:"Rush Hour, Police Story, Drunken Master" },
-    { name:"Xu Zheng",             bo:10, oscar:9,  era:"Comedy",       known:"Lost in Thailand, Detective Chinatown" },
-    { name:"Fan Bingbing",         bo:10, oscar:10, era:"Drama",        known:"I Am Not Madame Bovary, X-Men: Days of Future Past" },
-    { name:"Gong Jun",             bo:8,  oscar:9,  era:"Drama",        known:"Word of Honor, Ace Troops" },
     { name:"Huang Bo",             bo:9,  oscar:10, era:"Drama",        known:"Crazy Stone, Lost in Thailand, The Wailing" },
     { name:"Shu Qi",               bo:8,  oscar:10, era:"Drama",        known:"The Assassin, Millennium Mambo, Three Times" },
     { name:"Chang Chen",           bo:7,  oscar:11, era:"Arthouse",     known:"Crouching Tiger Hidden Dragon, Three Times, 2046" },
@@ -1069,7 +1033,6 @@ const DATA = {
     { name:"Vicky Krieps",         bo:7,  oscar:14, era:"Drama",        known:"Phantom Thread, Bergman Island, Corsage" },
     { name:"Sandra Hüller",        bo:7,  oscar:15, era:"Arthouse",     known:"Anatomy of a Fall, Toni Erdmann, Zone of Interest" },
     { name:"Maria Bakalova",       bo:8,  oscar:13, era:"Comedy",       known:"Borat Subsequent Moviefilm, Bodies Bodies Bodies" },
-    { name:"Renate Reinsve",       bo:6,  oscar:13, era:"Drama",        known:"The Worst Person in the World" },
     { name:"Andrea Riseborough",   bo:7,  oscar:13, era:"Drama",        known:"To Leslie, Birdman, Possessor" },
     { name:"Hailee Steinfeld",     bo:11, oscar:13, era:"Drama",        known:"True Grit, Pitch Perfect, Arcane" },
     { name:"Elle Fanning",         bo:10, oscar:12, era:"Drama",        known:"The Great, Somewhere, 20th Century Women" },
@@ -1108,6 +1071,37 @@ const DATA = {
     { name:"Simone Ashley",        bo:8,  oscar:9,  era:"Mainstream",   known:"Bridgerton, Sex Education" },
     { name:"Jonathan Daviss",      bo:6,  oscar:7,  era:"Drama",        known:"Outer Banks, The 5th Wave" },
     { name:"Chase Stokes",         bo:7,  oscar:6,  era:"Drama",        known:"Outer Banks, I Am Legend" },
+    // ── Classic Hollywood Legends ──
+    { name:"Humphrey Bogart",        bo:10, oscar:12, era:"Classic",        known:"Casablanca, The African Queen, The Maltese Falcon" },
+    { name:"Cary Grant",             bo:9,  oscar:10, era:"Classic",        known:"North by Northwest, His Girl Friday, An Affair to Remember" },
+    { name:"James Stewart",          bo:10, oscar:12, era:"Classic",        known:"It's a Wonderful Life, Rear Window, Vertigo" },
+    { name:"Marlon Brando",          bo:11, oscar:16, era:"Classic",        known:"The Godfather, A Streetcar Named Desire, Apocalypse Now" },
+    { name:"Audrey Hepburn",         bo:11, oscar:14, era:"Classic",        known:"Roman Holiday, Breakfast at Tiffany's, My Fair Lady" },
+    { name:"Katharine Hepburn",      bo:9,  oscar:16, era:"Classic",        known:"Bringing Up Baby, The Philadelphia Story, The African Queen" },
+    { name:"Paul Newman",            bo:10, oscar:13, era:"Classic",        known:"The Hustler, Cool Hand Luke, The Verdict" },
+    { name:"Bette Davis",            bo:8,  oscar:14, era:"Classic",        known:"All About Eve, What Ever Happened to Baby Jane?" },
+    { name:"Jack Nicholson",         bo:13, oscar:16, era:"Classic",        known:"One Flew Over the Cuckoo's Nest, The Shining, Chinatown" },
+    { name:"Robert De Niro",         bo:13, oscar:15, era:"Classic",        known:"Raging Bull, The Godfather Part II, Taxi Driver" },
+    { name:"Al Pacino",              bo:12, oscar:14, era:"Classic",        known:"The Godfather, Scarface, Serpico" },
+    { name:"Dustin Hoffman",         bo:12, oscar:15, era:"Classic",        known:"The Graduate, Midnight Cowboy, Kramer vs. Kramer" },
+    { name:"Faye Dunaway",           bo:9,  oscar:13, era:"Classic",        known:"Bonnie and Clyde, Network, Chinatown" },
+    { name:"Diane Keaton",           bo:10, oscar:13, era:"Classic",        known:"Annie Hall, The Godfather, Something's Gotta Give" },
+    { name:"Jane Fonda",             bo:10, oscar:14, era:"Classic",        known:"Klute, Coming Home, 9 to 5" },
+    { name:"Sidney Poitier",         bo:10, oscar:14, era:"Classic",        known:"Guess Who's Coming to Dinner, In the Heat of the Night" },
+    { name:"Kirk Douglas",           bo:8,  oscar:10, era:"Classic",        known:"Spartacus, Paths of Glory, Champion" },
+    { name:"Gregory Peck",           bo:9,  oscar:12, era:"Classic",        known:"To Kill a Mockingbird, Roman Holiday" },
+    { name:"Ingrid Bergman",         bo:9,  oscar:14, era:"Classic",        known:"Casablanca, Notorious, Autumn Sonata" },
+    { name:"Grace Kelly",            bo:10, oscar:12, era:"Classic",        known:"Rear Window, To Catch a Thief, The Country Girl" },
+    { name:"Sophia Loren",           bo:9,  oscar:16, era:"Classic",        known:"Two Women, Marriage Italian Style" },
+    { name:"Gene Hackman",           bo:10, oscar:13, era:"Classic",        known:"The French Connection, Unforgiven, The Royal Tenenbaums" },
+    { name:"Barbra Streisand",       bo:11, oscar:12, era:"Classic",        known:"Funny Girl, Yentl, The Way We Were" },
+    { name:"Warren Beatty",          bo:10, oscar:11, era:"Classic",        known:"Bonnie and Clyde, Shampoo, Reds" },
+    { name:"Robert Redford",         bo:11, oscar:12, era:"Classic",        known:"The Sting, Butch Cassidy, All the President's Men" },
+    { name:"Sissy Spacek",           bo:8,  oscar:14, era:"Classic",        known:"Carrie, Coal Miner's Daughter, In the Bedroom" },
+    { name:"Steve McQueen (actor)",  bo:11, oscar:10, era:"Classic",        known:"Bullitt, The Great Escape, Papillon" },
+    { name:"Peter Sellers",          bo:8,  oscar:11, era:"Classic",        known:"Dr. Strangelove, Being There, The Pink Panther" },
+    { name:"Alec Guinness",          bo:8,  oscar:13, era:"Classic",        known:"The Bridge on the River Kwai, Kind Hearts and Coronets" },
+    { name:"Shirley MacLaine",       bo:9,  oscar:13, era:"Classic",        known:"Terms of Endearment, The Apartment, Some Came Running" },
   ],
 
   supporting: [
@@ -1236,7 +1230,6 @@ const DATA = {
     { name:"Tony Todd",              bo:7,  oscar:6,  era:"Horror",         known:"Candyman, The Rock, Final Destination" },
 
     // -- Global stars crossing over --
-    { name:"Gong Li",                bo:9,  oscar:14, era:"Arthouse",       known:"Raise the Red Lantern, Miami Vice, Farewell My Concubine" },
     { name:"Tony Leung",             bo:10, oscar:15, era:"Arthouse",       known:"In the Mood for Love, Hero, Shang-Chi" },
     { name:"Song Kang-ho",           bo:10, oscar:15, era:"Arthouse",       known:"Parasite, Memories of Murder, The Host" },
     { name:"Penelope Cruz",          bo:11, oscar:16, era:"Drama",          known:"Vicky Cristina Barcelona, Volver, All About My Mother" },
@@ -1245,9 +1238,6 @@ const DATA = {
     { name:"Marion Cotillard",       bo:11, oscar:16, era:"Drama",          known:"La Vie en Rose, Inception, Midnight in Paris" },
     { name:"Vincent Cassel",         bo:8,  oscar:11, era:"Drama",          known:"Black Swan, Eastern Promises, The Crimson Rivers" },
     { name:"Adrien Brody",           bo:10, oscar:14, era:"Drama",          known:"The Pianist, Summer of Sam, The French Dispatch" },
-    { name:"Tahar Rahim",            bo:8,  oscar:13, era:"Drama",          known:"A Prophet, The Mauritanian, The Serpent" },
-    { name:"Irrfan Khan",            bo:9,  oscar:13, era:"Drama",          known:"Slumdog Millionaire, Life of Pi, The Lunchbox" },
-    { name:"Amitabh Bachchan",       bo:12, oscar:12, era:"Bollywood Icon",  known:"Sholay, Black, Pink" },
     { name:"Toshiro Mifune",         bo:8,  oscar:12, era:"Classic",        known:"Seven Samurai, Rashomon, Yojimbo" },
     { name:"Omar Sharif",            bo:10, oscar:12, era:"Classic",        known:"Lawrence of Arabia, Doctor Zhivago, Funny Girl" },
 
@@ -1300,6 +1290,25 @@ const DATA = {
     { name:"LL Cool J",              bo:8,  oscar:5,  era:"Music Star",     known:"Any Given Sunday, Rollerball, NCIS: Los Angeles" },
     { name:"Usher",                  bo:9,  oscar:5,  era:"Music Star",     known:"She's All That, In the Mix, Hands of Stone" },
     { name:"Mark Wahlberg",          bo:15, oscar:9,  era:"Action",         known:"Boogie Nights, The Departed, Transformers" },
+    { name:"Brendan Gleeson",        bo:9,  oscar:14, era:"Drama",          known:"In Bruges, The Banshees of Inisherin, Calvary" },
+    { name:"Colin Farrell",          bo:11, oscar:14, era:"Drama",          known:"The Banshees of Inisherin, In Bruges, The Lobster" },
+    { name:"Tom Wilkinson",          bo:9,  oscar:14, era:"Drama",          known:"Michael Clayton, In the Bedroom, Shakespeare in Love" },
+    { name:"Rosamund Pike",          bo:10, oscar:13, era:"Drama",          known:"Gone Girl, A Private War, I Care a Lot" },
+    { name:"Carey Mulligan",         bo:10, oscar:16, era:"Drama",          known:"An Education, Promising Young Woman, Maestro" },
+    { name:"Michael Fassbender",     bo:11, oscar:14, era:"Drama",          known:"12 Years a Slave, Steve Jobs, X-Men: First Class" },
+    { name:"Oscar Isaac",            bo:13, oscar:14, era:"Drama",          known:"Inside Llewyn Davis, Ex Machina, Moon Knight" },
+    { name:"Ethan Hawke",            bo:10, oscar:13, era:"Drama",          known:"Training Day, Boyhood, Before trilogy" },
+    { name:"Laura Dern",             bo:9,  oscar:15, era:"Drama",          known:"Marriage Story, Wild, Jurassic Park" },
+    { name:"Allison Janney",         bo:9,  oscar:14, era:"Comedy",         known:"I, Tonya, Mom, American Beauty" },
+    { name:"Sam Rockwell",           bo:9,  oscar:14, era:"Drama",          known:"Three Billboards, Moon, Seven Psychopaths" },
+    { name:"Amy Adams",              bo:12, oscar:14, era:"Drama",          known:"Arrival, American Hustle, Doubt" },
+    { name:"Glenn Close",            bo:9,  oscar:16, era:"Drama",          known:"Fatal Attraction, Damages, The Wife" },
+    { name:"Frances McDormand",      bo:10, oscar:18, era:"Prestige",       known:"Fargo, Three Billboards, Nomadland" },
+    { name:"Richard Jenkins",        bo:8,  oscar:13, era:"Drama",          known:"The Shape of Water, The Visitor, Burn After Reading" },
+    { name:"Ed Norton",              bo:11, oscar:14, era:"Drama",          known:"American History X, Fight Club, Moonrise Kingdom" },
+    { name:"Saoirse Ronan",          bo:11, oscar:17, era:"Drama",          known:"Little Women, Lady Bird, Atonement" },
+    { name:"Jessica Lange",          bo:9,  oscar:16, era:"Classic",        known:"Tootsie, Blue Sky, American Horror Story" },
+    { name:"Sam Neill",              bo:10, oscar:10, era:"Drama",          known:"Jurassic Park, The Piano, Peaky Blinders" },
   ],
 
   studio: [
@@ -1564,6 +1573,27 @@ const VERDICTS = [
   { id:"flop",                  maxBO:90,  maxOscar:2,    bg:"#FCEBEB", tc:"#A32D2D",
     title:"💸 Box Office Flop",
     detail:"The studio lost $100M. Three executives were quietly let go. It is now a business school case study in what not to do. The director's cut exists and is somehow longer and worse." },
+  { id:"prestige_miss", minBO:100, maxBO:250, minOscar:5, maxOscar:8, bg:"#F4ECF9", tc:"#6B2D8B",
+    title:"🎭 Prestige Miss",
+    detail:"Critics were respectful but not ecstatic. The Academy gave it polite nominations. It made modest money and will be remembered as a film that was good but not quite enough." },
+  { id:"midnight",    minBO:30,  maxBO:120, minOscar:1, maxOscar:3,  bg:"#120808", tc:"#FF8C69",
+    title:"🌙 Midnight Movie",
+    detail:"It screened at 11pm to forty people on opening night. By week six it sold out. By month three it had a devoted community. By year three it was a cultural institution." },
+  { id:"critic_darling", minBO:60, maxBO:200, minOscar:8,             bg:"#042C53", tc:"#B5D4F4",
+    title:"🖊️ Critic Darling",
+    detail:"Every major critic gave it five stars. Sight and Sound ran a cover story. It played in eleven cities. Nobody else saw it but everybody claims they have an opinion about it." },
+  { id:"comeback_kid", minBO:420, maxBO:700, minOscar:5, maxOscar:9, bg:"#FFF0E0", tc:"#994400",
+    title:"🔥 Career Comeback",
+    detail:"Nobody believed in this project. The lead had not had a hit in eight years. Now they are everywhere. Two magazine covers. A24 greenlit their next four films before the reviews were published." },
+  { id:"summer_event", minBO:700, maxBO:950, maxOscar:4,              bg:"#042C53", tc:"#6BAAFF",
+    title:"🌊 Summer Event",
+    detail:"Every screen. Every weekend. Every demographic. The film became the soundtrack to a summer. People saw it four times. It meant different things each time. That is what summer is for." },
+  { id:"underdog_oscar", minBO:100, maxBO:350, minOscar:9,            bg:"#EAF3DE", tc:"#27500A",
+    title:"🌿 Underdog at the Oscars",
+    detail:"Nobody tracked it. Nobody predicted it. The studio did not even buy billboards. Then the nominations came out and it led the field. The Academy had been watching quietly the whole time." },
+  { id:"franchise_threat", minBO:680, maxBO:950, minOscar:5,          bg:"#E1F5EE", tc:"#0F6E56",
+    title:"👑 Franchise Launched",
+    detail:"Not just a hit. A world. The ending set up three more films, two spin-offs, and a television series. The studio called a meeting before the credits finished rolling. A new era begins." },
   // Genre-specific outcomes (checked second via getVerdict logic)
   { id:"horror_hit",  minBO:200, maxBO:550, minOscar:3, maxOscar:7, genre:"Horror",   bg:"#2A0A0A", tc:"#FF6B6B",
     title:"🩸 Genre Sensation",
@@ -1631,6 +1661,15 @@ function getVerdict(boM, noms, picks) {
   }
   return best;
 }
+
+const CHAOS_EVENTS = [
+  { round:2, chance:0.18, msg:"🚨 Studio Notes: The studio wants a bigger name. You can reroll your lead this round.", penaltyBO:0,  penaltyOS:0 },
+  { round:3, chance:0.15, msg:"📰 Tabloid Scandal: Your lead actor is front page news for the wrong reasons. Box office takes a hit.", penaltyBO:-1, penaltyOS:0 },
+  { round:4, chance:0.15, msg:"💰 Budget Cut: Finance pulled 30% of your budget. Choose carefully.", penaltyBO:-1, penaltyOS:0 },
+  { round:5, chance:0.12, msg:"🎤 Director Drama: The director publicly disagreed with the studio. Tension on set.", penaltyBO:-1, penaltyOS:-1 },
+  { round:6, chance:0.14, msg:"🏆 Festival Buzz: An early cut screened at a festival. Critics are whispering awards.", penaltyBO:0,  penaltyOS:2 },
+  { round:7, chance:0.10, msg:"🎵 Score Leak: The composer's score leaked online. Reaction is divided.", penaltyBO:1,  penaltyOS:-1 },
+];
 
 function getRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
 
@@ -1714,6 +1753,20 @@ const SYNERGIES = [
   { names:["Jonny Greenwood","Ari Aster"],           boBonus:0, osBonus:4, label:"Greenwood x Aster",     msg:"Two of cinema's most unsettling sensibilities combined. The Academy will be unsettled. In a good way." },
   { names:["Hildur Gudnadottir","Psychological Thriller"], boBonus:1, osBonus:3, label:"Hildur Thriller",  msg:"The composer who made silence feel violent is scoring a psychological thriller. Perfect alignment." },
   { names:["John Williams","Steven Spielberg"],      boBonus:2, osBonus:2, label:"Williams x Spielberg",  msg:"The most iconic partnership in film history reunites. The theme will be in your head for thirty years." },
+  { names:["Alfred Hitchcock","Cary Grant"],          boBonus:2, osBonus:3, label:"Hitchcock x Grant",      msg:"The defining thriller pairing of Hollywood golden era. The tension starts before the camera rolls." },
+  { names:["Alfred Hitchcock","James Stewart"],       boBonus:2, osBonus:3, label:"Hitchcock x Stewart",    msg:"Rear Window. Vertigo. The collaboration that defined psychological cinema. Another chapter begins." },
+  { names:["Stanley Kubrick","Jack Nicholson"],       boBonus:1, osBonus:3, label:"Kubrick x Nicholson",    msg:"The Shining reunion energy. Nobody is prepared for what this pairing will produce. Including the actors." },
+  { names:["Francis Ford Coppola","Marlon Brando"],   boBonus:2, osBonus:4, label:"Coppola x Brando",       msg:"The Godfather energy. A performance so definitive it changes the vocabulary of cinema permanently." },
+  { names:["Martin Scorsese","Robert De Niro"],       boBonus:1, osBonus:4, label:"Scorsese x De Niro",     msg:"Their seventh collaboration. Every film school in the world cancels its next semester to watch this." },
+  { names:["Emerald Fennell","Carey Mulligan"],       boBonus:1, osBonus:3, label:"Fennell x Mulligan",     msg:"Promising Young Woman reunion. The Academy clears its schedule. Twice." },
+  { names:["Ari Aster","Toni Collette"],              boBonus:0, osBonus:3, label:"Aster x Collette",       msg:"Hereditary reunion. The horror community loses its mind. Justifiably." },
+  { names:["Robert Eggers","Willem Dafoe"],           boBonus:0, osBonus:3, label:"Eggers x Dafoe",         msg:"The Lighthouse reunion. The most intensely watched film of the year by a very specific kind of person." },
+  { names:["Ti West","Mia Goth"],                    boBonus:1, osBonus:2, label:"West x Goth",            msg:"The X trilogy energy. An actress disappearing so completely into a role that people check if she is okay." },
+  { names:["Damien Chazelle","Emma Stone"],           boBonus:2, osBonus:3, label:"Chazelle x Stone",       msg:"La La Land reunion. The sadness starts before the first note plays. Everyone knew this was coming." },
+  { names:["Tom Hanks","Steven Spielberg"],           boBonus:2, osBonus:3, label:"Hanks x Spielberg",      msg:"Saving Private Ryan. Cast Away. The Terminal. Their sixth film together. The reliability is mathematical." },
+  { names:["Dwayne Johnson","A24"],                   boBonus:1, osBonus:-1, label:"Rock x A24",            msg:"The most confusing press release of the decade. A24 sent a statement. It raised more questions." },
+  { names:["Gaspar Noe","Disney / Marvel"],           boBonus:-2, osBonus:2, label:"Noe x Disney",          msg:"Someone made this happen. Someone will lose their job over it. The film will be extraordinary and wrong." },
+  { names:["Kelly Reichardt","All-In ($350M+)"],      boBonus:-2, osBonus:3, label:"Reichardt $350M",       msg:"The studio gave Reichardt $350M. She will spend $12M of it. The other $338M will confuse everyone." },
 ];
 
 function detectSynergies(picks) {
@@ -1755,7 +1808,17 @@ function calcScores(picks) {
   const boNorm = boW > 0 ? boSum / boW : 0;
   const osNorm = osW > 0 ? osSum / osW : 0;
   const { boAdj, osAdj, active } = applySynergies(boNorm, osNorm, picks);
-  return { boNorm: boAdj, osNorm: osAdj, synergies: active };
+  const avgBO = picks.reduce((s,p)=>s+(p.bo||0),0) / Math.max(picks.length,1);
+  const avgOS = picks.reduce((s,p)=>s+(p.oscar||0),0) / Math.max(picks.length,1);
+  const greenlightBonus = avgBO >= 17 && avgOS >= 15;
+  const multiplier = greenlightBonus ? 1.12 : 1.0;
+  const chaosBoAdj = (S.chaosModBO || 0) / 22;
+  const chaosOsAdj = (S.chaosModOS || 0) / 20;
+  return {
+    boNorm: Math.max(0, Math.min(1, boAdj * multiplier + chaosBoAdj)),
+    osNorm: Math.max(0, Math.min(1, osAdj * multiplier + chaosOsAdj)),
+    synergies: active, greenlightBonus,
+  };
 }
 
 function boToM(norm) {
@@ -1774,8 +1837,43 @@ function osWins(n) { return Math.max(0, Math.round(n * (0.20 + Math.random() * 0
 
 let S = fresh();
 let HARD_MODE = false;
+let DAILY_MODE = false;
+
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function getDailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+}
+function getSeededOptions(arr, n, rng) {
+  return [...arr].sort(() => rng() - 0.5).slice(0, n);
+}
+function getTodayString() {
+  return new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+}
+function getDailyKey() { return 'lca_daily_' + getDailySeed(); }
+function hasDoneDaily() { return !!localStorage.getItem(getDailyKey()); }
+function saveDailyResult(boM, noms, wins, verdict) {
+  localStorage.setItem(getDailyKey(), JSON.stringify({ boM, noms, wins, verdict, ts: Date.now() }));
+}
+function getDailyStreak() {
+  let streak = 0;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = 'lca_daily_' + (d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate());
+    if (localStorage.getItem(k)) streak++; else break;
+  }
+  return streak;
+}
+
 function fresh() {
-  return { phase:"intro", round:0, picks:[], skipRound:1, skipCat:1, opts:[], selIdx:null, spinning:false, synopsis:null, boM:0, noms:0, wins:0, verdict:null, lastPickFeedback:null, activeSynergies:[], rtCritic:0, rtAudience:0 };
+  return { phase:"intro", round:0, picks:[], skipRound:1, skipCat:1, opts:[], selIdx:null, spinning:false, synopsis:null, boM:0, noms:0, wins:0, verdict:null, lastPickFeedback:null, activeSynergies:[], rtCritic:0, rtAudience:0, dailyRng:null, chaosEvent:null, chaosModBO:0, chaosModOS:0 };
 }
 
 function render() {
@@ -1827,33 +1925,49 @@ function picksSoFar() {
 }
 
 function renderIntro() {
-  return `<div style="text-align:center;padding:.5rem 0 1.5rem">
-    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1.25rem">
-      <strong style="color:var(--text)">9 rounds</strong> to greenlight your movie.<br>
-      60 directors · 500+ actors · genre variants and chaos outcomes.<br>
-      Balance <span style="color:var(--blue);font-weight:600">Box Office</span>, <span style="color:var(--amber);font-weight:600">Oscar Power</span>, <span style="color:#FA320A;font-weight:600">Tomatometer</span> and <span style="color:#FA8C00;font-weight:600">Audience Score</span>.
-    </p>
-    <div class="intro-grid">
-      ${CATEGORIES.map(c=>`<div class="intro-pill">${c.icon} ${c.label}${c.opts===4?' <span style="font-size:10px;color:var(--text3)">(4)</span>':''}</div>`).join("")}
+  const streak = getDailyStreak();
+  const doneToday = hasDoneDaily();
+  const dailyResult = doneToday ? JSON.parse(localStorage.getItem(getDailyKey()) || "{}") : null;
+  return `<div style="padding:.5rem 0 1.5rem">
+    <div style="background:#0a0a08;border-radius:var(--r-lg);padding:2rem 1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid #2a2a20">
+      <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">A lights-camera-action.app Production</div>
+      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#7a5a18;margin-bottom:4px;font-style:italic">Presents</div>
+      <div style="margin-bottom:8px"><span style="font-size:30px;font-weight:900;letter-spacing:-0.01em;font-style:italic;background:linear-gradient(135deg,#FFD700 0%,#FFA500 35%,#FF6B35 65%,#FFD700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(255,165,0,0.35))">Lights, Camera, Action!</span></div>
+      <div style="font-size:11px;color:#6a5a38;letter-spacing:0.08em;margin-bottom:18px;font-style:italic">The Hollywood Draft Game</div>
+      <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#FFD700;filter:drop-shadow(0 0 6px rgba(255,215,0,0.4))">150+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Directors</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#FF6B6B;filter:drop-shadow(0 0 6px rgba(255,80,80,0.35))">500+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Actors</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#6BAAFF;filter:drop-shadow(0 0 6px rgba(80,140,255,0.35))">9</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Rounds</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#7BDD88;filter:drop-shadow(0 0 6px rgba(80,200,80,0.35))">20+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Outcomes</div></div>
+      </div>
     </div>
-    <div style="display:flex;gap:12px;justify-content:center;font-size:12px;color:var(--text3);margin-bottom:1.5rem">
-      <span>🎲 1 Round skip</span><span>·</span><span>🔀 1 Option reroll</span>
+    <div style="background:${doneToday ? 'var(--surface2)' : 'var(--amber-bg)'};border:0.5px solid ${doneToday ? 'var(--border)' : 'var(--amber)'};border-radius:var(--r-lg);padding:1rem 1.1rem;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:${doneToday ? 'var(--text2)' : 'var(--amber)'};margin-bottom:2px">🎬 Daily Draft - ${getTodayString()}</div>
+          <div style="font-size:11px;color:var(--text3)">${doneToday ? ("You scored $" + (dailyResult.boM||0) + "M, " + (dailyResult.noms||0) + " noms, " + (dailyResult.verdict||"") + (streak>1?" - "+streak+" day streak 🔥":"")) : ("Everyone gets the same 8 options today. Beat your friends." + (streak>1?" "+streak+" day streak 🔥":""))}</div>
+        </div>
+        ${doneToday ? '<button class="btn-sm" id="share-daily-btn" style="flex-shrink:0">Share 📤</button>' : '<button class="mode-btn active" id="daily-start-btn" style="flex-shrink:0;white-space:nowrap">Play Daily</button>'}
+      </div>
     </div>
     <div class="mode-row">
       <button class="mode-btn ${!HARD_MODE?'active':''}" id="mode-normal">Normal</button>
       <button class="mode-btn ${HARD_MODE?'active':''}" id="mode-hard">Hard Mode 🔒</button>
     </div>
-    <p style="font-size:11px;color:var(--text3);margin-bottom:1.25rem">${HARD_MODE ? 'Hard mode: no scores shown. Draft on instinct.' : 'Normal mode: scores visible on every card.'}</p>
-    <button class="btn" id="start-btn" style="max-width:240px;margin:0 auto;display:block">Start Drafting →</button>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:1.25rem;text-align:center">${HARD_MODE ? 'Hard mode: no scores. Draft on instinct.' : 'Normal mode: scores visible on every card.'}</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--text3);margin-bottom:1.25rem">
+      <span>🎲 1 Round skip</span><span>·</span><span>🔀 1 Option reroll</span><span>·</span><span>⚡ Synergy bonuses</span><span>·</span><span>🏆 10 achievements</span>
+    </div>
+    <button class="btn" id="start-btn" style="max-width:240px;margin:0 auto;display:block">Start Free Draft →</button>
   </div>`;
 }
-
 function renderRolling() {
   const cat = CATEGORIES[S.round];
   return `${scoreBar()}${progressBar()}
-  <div class="round-row"><span class="round-badge">Round ${S.round+1} of ${CATEGORIES.length}</span></div>
+  <div class="round-row"><span class="round-badge">${DAILY_MODE?"📅 Daily · ":""}Round ${S.round+1} of ${CATEGORIES.length}</span></div>
   ${picksSoFar()}
   ${S.lastPickFeedback ? `<div class="pick-feedback">Industry reaction: ${S.lastPickFeedback}</div>` : ''}
+  ${S.chaosEvent ? `<div class="chaos-banner">${S.chaosEvent.msg}</div>` : ''}
   <div class="card">
     <div class="slot-hdr">Rolling for your next crew member…</div>
     <div class="slot-display">
@@ -1898,7 +2012,7 @@ function renderChoosing() {
 }
 
 function renderResult() {
-  const { boNorm, osNorm, synergies } = calcScores(S.picks);
+  const { boNorm, osNorm, synergies, greenlightBonus } = calcScores(S.picks);
   const boM    = boToM(boNorm);
   const noms   = osNoms(osNorm);
   const wins   = osWins(noms);
@@ -2014,9 +2128,13 @@ function renderResult() {
 
   const syn = S.synopsis;
 
+  const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
+  const hardBadge  = HARD_MODE  ? ' <span style="background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🔒 Blind Draft</span>' : '';
+  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ Greenlight Bonus - elite lineup detected (+12% score multiplier)</div>` : '';
   return `<div class="result">
-    <div class="result-title">${v.title}</div>
+    <div class="result-title">${v.title}${dailyBadge}${hardBadge}</div>
     <div class="result-sub">"${syn ? syn.title : 'Untitled'}" is in the can.</div>
+    ${glBanner}
     ${synHtml}
     <div class="result-grid">
       <div class="result-big">
@@ -2054,23 +2172,24 @@ function renderResult() {
     <div class="share-panel">
       <div class="share-panel-lbl">Share your result</div>
       <div class="share-row">
-        <button class="share-btn" id="share-copy-btn">
-          <span class="share-btn-icon">🔗</span>
-          <span class="share-btn-label">Copy Result</span>
+        <button class="share-btn" id="share-native-btn">
+          <span class="share-btn-icon">📤</span>
+          <span class="share-btn-label">Share</span>
         </button>
-        <button class="share-btn" id="share-screenshot-btn">
-          <span class="share-btn-icon">📸</span>
-          <span class="share-btn-label">Screenshot</span>
+        <button class="share-btn" id="share-card-btn">
+          <span class="share-btn-icon">🖼️</span>
+          <span class="share-btn-label">Save Card</span>
         </button>
         <button class="share-btn" id="share-twitter-btn">
           <span class="share-btn-icon">𝕏</span>
           <span class="share-btn-label">Post to X</span>
         </button>
-        <button class="share-btn share-btn-ig" id="share-instagram-btn">
-          <span class="share-btn-icon">📸</span>
-          <span class="share-btn-label">Instagram</span>
+        <button class="share-btn" id="share-copy-btn">
+          <span class="share-btn-icon">📋</span>
+          <span class="share-btn-label">Copy Text</span>
         </button>
       </div>
+      <div id="share-card-preview" style="display:none;margin-top:12px"></div>
     </div>
     <div class="breakdown">
       <div class="breakdown-lbl">Full Cast &amp; Crew</div>
@@ -2089,16 +2208,23 @@ function renderResult() {
 
 function bind() {
   const $= id => document.getElementById(id);
-  $("mode-normal")?.addEventListener("click", ()=>{ HARD_MODE=false; render();
-renderWalkOfFame(); });
-  $("mode-hard")?.addEventListener("click", ()=>{ HARD_MODE=true; render(); });
-  $("start-btn")?.addEventListener("click", ()=>{ S.phase="rolling"; render(); });
+  $("mode-normal")?.addEventListener("click", ()=>{ HARD_MODE=false; DAILY_MODE=false; render(); });
+  $("mode-hard")?.addEventListener("click", ()=>{ HARD_MODE=true; DAILY_MODE=false; render(); });
+  $("start-btn")?.addEventListener("click", ()=>{ DAILY_MODE=false; S=fresh(); S.phase="rolling"; render(); });
+  $("daily-start-btn")?.addEventListener("click", ()=>{
+    DAILY_MODE=true; S=fresh(); S.dailyRng=mulberry32(getDailySeed()); S.phase="rolling"; render();
+  });
+  $("share-daily-btn")?.addEventListener("click", ()=>{
+    const r=JSON.parse(localStorage.getItem(getDailyKey())||"{}");
+    const txt="🎬 Daily Draft - "+getTodayString()+"\n\n"+(r.verdict||"")+"\n💰 $"+(r.boM||0)+"M · 🏆 "+(r.noms||0)+" noms · 🥇 "+(r.wins||0)+" wins\n\nPlay at lights-camera-action.app";
+    navigator.clipboard.writeText(txt).then(()=>showToast("Daily result copied!")).catch(()=>showToast("Copied!"));
+  });
   $("roll-btn")?.addEventListener("click", ()=>{
     S.spinning=true; render();
     setTimeout(()=>{
       const cat = CATEGORIES[S.round];
-      S.opts    = getRandom(DATA[cat.key], cat.opts);
-      S.selIdx  = null; S.spinning=false; S.phase="choosing"; render();
+      S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(DATA[cat.key], cat.opts, S.dailyRng) : getRandom(DATA[cat.key], cat.opts);
+      S.selIdx=null; S.spinning=false; S.phase="choosing"; render();
     }, 650);
   });
   $("skip-btn")?.addEventListener("click", ()=>{
@@ -2113,7 +2239,14 @@ renderWalkOfFame(); });
     if(S.skipCat<=0) return;
     S.skipCat--;
     const cat = CATEGORIES[S.round];
-    S.opts = getRandom(DATA[cat.key], cat.opts);
+    const personCats = ["director","lead","supporting","composer"];
+    const usedNames = new Set(
+      S.picks.filter((p,i) => personCats.includes(CATEGORIES[i]?.key)).map(p => p.name)
+    );
+    const pool = personCats.includes(cat.key)
+      ? DATA[cat.key].filter(p => !usedNames.has(p.name))
+      : DATA[cat.key];
+    S.opts = getRandom(pool, cat.opts);
     S.selIdx=null; render();
   });
   document.querySelectorAll(".choice").forEach(el=>{
@@ -2125,20 +2258,42 @@ renderWalkOfFame(); });
     S.picks.push(picked);
     S.lastPickFeedback = getPickFeedback(picked, S.round);
     S.round++; S.selIdx=null;
+    if (!DAILY_MODE) {
+      const ev = CHAOS_EVENTS.find(e => e.round===S.round && Math.random()<e.chance);
+      if (ev) { S.chaosEvent=ev; S.chaosModBO+=(ev.penaltyBO||0); S.chaosModOS+=(ev.penaltyOS||0); }
+      else { S.chaosEvent=null; }
+    }
     S.phase = S.round>=CATEGORIES.length ? "result" : "rolling";
     render();
     if (S.phase === 'result') setTimeout(wireShareButtons, 50);
   });
   $("again-btn")?.addEventListener("click", ()=>{ S=fresh(); render(); });
-  // Check achievements when result is shown
-  if (S.phase === "result") setTimeout(() => checkAchievements(S), 500);
+  if (S.phase === "result") setTimeout(() => { checkAchievements(S); if (DAILY_MODE) saveDailyResult(S.boM, S.noms, S.wins, S.verdict?.title||""); }, 500);
   // Wire share buttons whenever result is rendered
   if (S.phase === 'result') setTimeout(wireShareButtons, 50);
-  $("submit-wof-btn")?.addEventListener("click", ()=>{
+  $("submit-wof-btn")?.addEventListener("click", async ()=>{
     if (!S.synopsis) return;
-    saveToWalkOfFame(S.picks, S.synopsis.title, S.synopsis, S.boM, S.noms, S.wins, S.verdict);
     const btn = document.getElementById("submit-wof-btn");
-    if (btn) { btn.textContent = "✅ Submitted to Walk of Fame!"; btn.disabled = true; btn.style.opacity = "0.6"; }
+    if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
+
+    // Save locally
+    saveToWalkOfFame(S.picks, S.synopsis.title, S.synopsis, S.boM, S.noms, S.wins, S.verdict);
+
+    // Push to Supabase global board
+    const result = await submitToSupabase(
+      S.picks, S.synopsis, S.boM, S.noms, S.wins, S.verdict, S.rtCritic, S.rtAudience
+    );
+
+    if (btn) {
+      if (result) {
+        btn.textContent = "✅ On the Global Walk of Fame!";
+        showToast("Your film is on the global board!");
+      } else {
+        btn.textContent = "✅ Saved locally (offline mode)";
+        showToast("Saved locally - check your connection for global board");
+      }
+      btn.style.opacity = "0.6";
+    }
   });
 }
 
@@ -2154,7 +2309,7 @@ function switchTab(tab) {
   if (wp) wp.classList.toggle('active', tab==='wof');
   if (lp) lp.classList.toggle('active', tab==='lb');
   if (tab==='wof') renderWalkOfFame();
-  if (tab==='lb') renderLeaderboard();
+  if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
 }
 
 // ── Leaderboard storage (localStorage) ──
@@ -2253,83 +2408,194 @@ function buildShareText() {
   return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\n💰 $${S.boM}M worldwide · 🏆 ${S.noms} Oscar noms · 🥇 ${S.wins} wins\n\n${crew}\n\n🎬 Play at lights-camera-action.app`;
 }
 
-// ── Screenshot via canvas ──
-function populateScreenshotCard() {
-  if (!S.synopsis || !S.verdict) return;
-  document.getElementById('sc-verdict').textContent = S.verdict.title;
-  document.getElementById('sc-tagline').textContent = '"' + S.synopsis.title + '" · ' + S.synopsis.tagline;
-  document.getElementById('sc-bo').textContent = '$' + S.boM + 'M';
-  document.getElementById('sc-noms').textContent = S.noms;
-  document.getElementById('sc-wins').textContent = S.wins;
-  const rtC = document.getElementById('sc-rt-critic');
-  const rtA = document.getElementById('sc-rt-audience');
-  if (rtC && S.rtCritic) rtC.textContent = S.rtCritic + '%';
-  if (rtA && S.rtAudience) rtA.textContent = S.rtAudience + '%';
-  const crew = S.picks.map((p,i)=>`<div class="sc-crew-row"><span class="sc-crew-cat">${CATEGORIES[i].label}</span><span class="sc-crew-name">${p.name}</span></div>`).join('');
-  document.getElementById('sc-crew').innerHTML = crew;
+// ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
+function buildShareCardSVG() {
+  if (!S.synopsis || !S.verdict) return '';
+  const v = S.verdict;
+  const title = (S.synopsis.title || 'Untitled').slice(0, 36);
+  const tagline = (S.synopsis.tagline || '').slice(0, 60);
+  const director = S.picks[0]?.name || '';
+  const lead = S.picks[1]?.name || '';
+  const genre = S.picks[5]?.name || '';
+  const verdict = (v.title || '').replace(/[^ -~]/g, '').trim();
+  const emojiVerdict = v.title || '';
+
+  // Escape XML chars
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="280" viewBox="0 0 400 280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a08"/>
+      <stop offset="100%" stop-color="#141412"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="50%" stop-color="#FFA500"/>
+      <stop offset="100%" stop-color="#FFD700"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="280" fill="url(#bg)" rx="16"/>
+  <rect width="400" height="280" fill="none" stroke="#2a2a20" stroke-width="1" rx="16"/>
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="400" height="3" fill="url(#gold)" rx="2"/>
+  <!-- Eyebrow -->
+  <text x="24" y="26" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="3">LIGHTS CAMERA ACTION</text>
+  <!-- Film title -->
+  <text x="24" y="58" font-family="system-ui,-apple-system,sans-serif" font-size="22" font-weight="900" font-style="italic" fill="url(#gold)">${esc(title)}</text>
+  <!-- Tagline -->
+  <text x="24" y="78" font-family="system-ui,-apple-system,sans-serif" font-size="11" fill="#8a7a50" font-style="italic">${esc(tagline.slice(0,55))}</text>
+  <!-- Divider -->
+  <line x1="24" y1="90" x2="376" y2="90" stroke="#2a2a20" stroke-width="1"/>
+  <!-- Stats row -->
+  <text x="24" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
+  <text x="24" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">BOX OFFICE</text>
+  <text x="120" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms}</text>
+  <text x="120" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">OSCAR NOMS</text>
+  <text x="210" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic || 0}%</text>
+  <text x="210" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">TOMATOMETER</text>
+  <text x="310" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience || 0}%</text>
+  <text x="310" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">AUDIENCE</text>
+  <!-- Crew -->
+  <line x1="24" y1="138" x2="376" y2="138" stroke="#2a2a20" stroke-width="1"/>
+  <text x="24" y="157" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">DIRECTOR</text>
+  <text x="24" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
+  <text x="200" y="157" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">LEAD ACTOR</text>
+  <text x="200" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
+  <text x="24" y="193" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">GENRE</text>
+  <text x="24" y="207" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(genre)}</text>
+  <!-- Verdict badge -->
+  <rect x="22" y="222" width="${Math.min(350, verdict.length * 9 + 24)}" height="26" fill="#1e1e1c" rx="6"/>
+  <text x="34" y="239" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#FFD700">${esc(emojiVerdict)}</text>
+  <!-- Footer -->
+  <text x="376" y="267" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
+</svg>`;
 }
 
-async function doScreenshot() {
-  populateScreenshotCard();
-  const card = document.getElementById('screenshot-card');
-  // Move on-screen temporarily for html2canvas
-  card.style.top = '-9999px';
-  card.style.left = '0';
-  card.style.zIndex = '-1';
-  try {
-    if (typeof html2canvas === 'undefined') {
-      // Fallback: copy text instead
-      await navigator.clipboard.writeText(buildShareText());
-      showToast('Screenshot lib not loaded  -  result copied as text instead!');
-      return;
-    }
-    const canvas = await html2canvas(card, { backgroundColor: '#1a1a18', scale: 2, logging: false });
-    card.style.top = '-9999px';
-    canvas.toBlob(async blob => {
-      try {
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob],'film.png',{type:'image/png'})] })) {
-          await navigator.share({ files: [new File([blob],'film.png',{type:'image/png'})], title: S.synopsis.title });
-          showToast('Shared!');
-        } else {
-          // Download
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = (S.synopsis.title || 'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.png';
-          a.click();
-          showToast('Screenshot saved!');
-        }
-      } catch { showToast('Screenshot saved!'); }
-    }, 'image/png');
-  } catch(e) {
-    await navigator.clipboard.writeText(buildShareText()).catch(()=>{});
-    showToast('Result copied as text!');
-  }
+async function svgToBlob(svgStr) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const svgBlob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 800; canvas.height = 560; // 2x for retina
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 800, 560);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => resolve(blob), 'image/png', 0.95);
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
 }
 
-// ── Share handlers (attached in bind, but also wired via IDs after render) ──
+function showShareCardPreview() {
+  const el = document.getElementById('share-card-preview');
+  if (!el) return;
+  const svg = buildShareCardSVG();
+  el.style.display = 'block';
+  el.innerHTML = '<div style="border-radius:12px;overflow:hidden;border:0.5px solid var(--border)">' + svg + '</div>'
+    + '<p style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">Long-press the card above to save it, then share anywhere.</p>';
+}
+
+// ── Share handlers ──
 function wireShareButtons() {
   const $ = id => document.getElementById(id);
 
+  // Native share  -  best experience on mobile (iOS share sheet, Android share sheet)
+  // Tries to share as image first, falls back to text
+  $('share-native-btn')?.addEventListener('click', async () => {
+    const svg = buildShareCardSVG();
+    const blob = await svgToBlob(svg);
+    const filename = ((S.synopsis?.title || 'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase()) + '.png';
+
+    // Try native image share (works on iOS Safari, Android Chrome)
+    if (blob && navigator.share && navigator.canShare) {
+      const file = new File([blob], filename, {type:'image/png'});
+      if (navigator.canShare({files:[file]})) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: S.synopsis?.title || 'My Film',
+            text: buildShareText(),
+          });
+          showToast('Shared!');
+          return;
+        } catch(e) {
+          if (e.name !== 'AbortError') console.warn('Share failed:', e);
+          else return; // user cancelled
+        }
+      }
+      // Try text-only native share (Android)
+      try {
+        await navigator.share({ title: S.synopsis?.title, text: buildShareText(), url: 'https://lights-camera-action.app' });
+        showToast('Shared!');
+        return;
+      } catch(e) { if (e.name === 'AbortError') return; }
+    }
+
+    // Desktop fallback: show card + copy text
+    showShareCardPreview();
+    try {
+      await navigator.clipboard.writeText(buildShareText());
+      showToast('Card shown below. Text copied to clipboard!');
+    } catch { showToast('Card shown below. Save and share!'); }
+  });
+
+  // Save card  -  renders SVG card and downloads as PNG
+  $('share-card-btn')?.addEventListener('click', async () => {
+    const svg = buildShareCardSVG();
+    // Show preview immediately
+    showShareCardPreview();
+    const blob = await svgToBlob(svg);
+    if (!blob) { showToast('Card shown below - save it with long press'); return; }
+
+    // Try native share with image on mobile
+    if (navigator.share && navigator.canShare) {
+      const filename = ((S.synopsis?.title||'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase())+'.png';
+      const file = new File([blob], filename, {type:'image/png'});
+      if (navigator.canShare({files:[file]})) {
+        try {
+          await navigator.share({ files:[file], title: S.synopsis?.title });
+          showToast('Image shared!');
+          return;
+        } catch(e) { if (e.name==='AbortError') return; }
+      }
+    }
+
+    // Desktop: download the PNG
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = ((S.synopsis?.title||'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase())+'.png';
+    a.click();
+    showToast('Card saved! Share it anywhere.');
+  });
+
+  // Post to X  -  opens Twitter with pre-filled text
+  $('share-twitter-btn')?.addEventListener('click', () => {
+    const text = encodeURIComponent(buildShareText().slice(0,260));
+    window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
+  });
+
+  // Copy text  -  clean fallback for everything else
   $('share-copy-btn')?.addEventListener('click', async () => {
     const text = buildShareText();
     try {
       await navigator.clipboard.writeText(text);
-      showToast('Result copied to clipboard!');
+      showToast('Copied to clipboard!');
     } catch {
-      prompt('Copy this:', text);
+      // Last resort for browsers that block clipboard
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied!');
     }
-  });
-
-  $('share-screenshot-btn')?.addEventListener('click', doScreenshot);
-
-  $('share-twitter-btn')?.addEventListener('click', () => {
-    const text = encodeURIComponent(buildShareText().slice(0,240));
-    window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
-  });
-
-  $('share-whatsapp-btn')?.addEventListener('click', () => {
-    const text = encodeURIComponent(buildShareText());
-    window.open('https://wa.me/?text=' + text, '_blank');
   });
 
   $('submit-wof-btn')?.removeEventListener('click', handleSubmitWof);
@@ -2574,7 +2840,17 @@ const ACHIEVEMENTS = [
   { id:"cronenberg",  label:"Body of Work",           check: (S) => S.picks.some(p => p.name && p.name.includes("Cronenberg")), icon:"🧬" },
   { id:"cage_curry",  label:"Unhinged Casting",       check: (S) => S.picks.some(p=>p.name&&p.name.includes("Cage")) && S.picks.some(p=>p.name&&p.name.includes("Curry")), icon:"🤪" },
   { id:"a24_sweep",   label:"Letterboxd Bait",        check: (S) => S.picks.some(p=>p.name==="A24") && S.picks.some(p=>p.oscar>=17), icon:"🎨" },
-  { id:"no_budget",   label:"Zero Dollar Dream",      check: (S) => S.picks.some(p=>p.name&&p.name.includes("Zero Budget")), icon:"📱" },
+  { id:"no_budget",        label:"Zero Dollar Dream",         check: (S) => S.picks.some(p=>p.name&&p.name.includes("Zero Budget")), icon:"📱" },
+  { id:"greenlit",         label:"Greenlit",                  check: (S) => !!S.greenlightBonus, icon:"✅" },
+  { id:"eyes_closed",      label:"Eyes Closed",               check: (S) => HARD_MODE && S.picks.length===9, icon:"🔒" },
+  { id:"daily_done",       label:"Daily Regular",             check: (S) => DAILY_MODE && S.picks.length===9, icon:"📅" },
+  { id:"on_a_roll",        label:"On a Roll",                 check: () => getDailyStreak() >= 5, icon:"🔥" },
+  { id:"golden_age",       label:"Golden Age",                check: (S) => S.picks.some(p=>p.name&&p.name.includes("Hitchcock")) && S.picks.some(p=>p.name&&(p.name.includes("Grant")||p.name.includes("Stewart"))), icon:"🎩" },
+  { id:"max_chaos",        label:"Maximum Chaos",             check: (S) => S.picks.filter(p=>p.bo<=7).length>=4, icon:"🌀" },
+  { id:"ip_maximalist",    label:"IP Maximalist",             check: (S) => S.picks.filter(p=>p.bo>=19).length>=4, icon:"🦸" },
+  { id:"film_school",      label:"Film School Darling",       check: (S) => ["Lynch","Malick","Godard","Bergman","Fellini","Herzog"].some(n=>S.picks.some(p=>p.name&&p.name.includes(n))) && S.picks.some(p=>p.name==="A24"), icon:"🎞️" },
+  { id:"mcu_sweep",        label:"Phase Unknown",             check: (S) => S.picks.some(p=>p.name&&p.name.includes("Marvel")) && S.picks.some(p=>p.bo>=20), icon:"🦾" },
+  { id:"chaos_survivor",   label:"Chaos Survivor",            check: (S) => (S.chaosModBO||0)<0 && (S.boM||0)>=400, icon:"🌪️" },
 ];
 
 let unlockedAchievements = JSON.parse(localStorage.getItem('lca_achievements') || '[]');
@@ -2595,6 +2871,104 @@ function showAchievement(ach) {
   el.textContent = `${ach.icon} Achievement unlocked: ${ach.label}`;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ── Supabase Walk of Fame ────────────────────────────────────────────────────
+const SB_URL = "https://vebndlyvfrxbrwsiwtbj.supabase.co";
+const SB_KEY = "sb_publishable_pTol2PH_vGH7sNg9ACIBCw_JLUF6kv_";
+
+async function sbInsert(row) {
+  try {
+    const res = await fetch(SB_URL + "/rest/v1/walk_of_fame", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SB_KEY,
+        "Authorization": "Bearer " + SB_KEY,
+        "Prefer": "return=representation"
+      },
+      body: JSON.stringify(row)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn("Supabase insert error:", err);
+      return null;
+    }
+    return await res.json();
+  } catch(e) {
+    console.warn("Supabase insert failed:", e);
+    return null;
+  }
+}
+
+async function sbFetch(limit = 50) {
+  try {
+    const res = await fetch(
+      SB_URL + "/rest/v1/walk_of_fame?select=*&order=bo_m.desc&limit=" + limit,
+      {
+        headers: {
+          "apikey": SB_KEY,
+          "Authorization": "Bearer " + SB_KEY
+        }
+      }
+    );
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) {
+    console.warn("Supabase fetch failed:", e);
+    return [];
+  }
+}
+
+async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCritic, rtAudience) {
+  const row = {
+    film_title:  synopsis?.title  || "Untitled",
+    tagline:     synopsis?.tagline || "",
+    verdict:     verdict?.title   || "",
+    bo_m:        boM   || 0,
+    noms:        noms  || 0,
+    wins:        wins  || 0,
+    rt_critic:   rtCritic   || 0,
+    rt_audience: rtAudience || 0,
+    director:    picks[0]?.name || "",
+    lead_actor:  picks[1]?.name || "",
+    supporting:  picks[2]?.name || "",
+    studio:      picks[3]?.name || "",
+    genre:       picks[5]?.name || "",
+  };
+  return await sbInsert(row);
+}
+
+// ── Global leaderboard tab renderer ──────────────────────────────────────────
+async function renderGlobalLeaderboard() {
+  const list = document.getElementById("global-lb-list");
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading global board...</div>';
+
+  const entries = await sbFetch(30);
+
+  if (!entries || !entries.length) {
+    list.innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🏅</div>No films on the global board yet.<br>Complete a draft and submit it to Walk of Fame.</div>';
+    return;
+  }
+
+  const medals = ["🥇","🥈","🥉"];
+  const rankClass = ["gold","silver","bronze"];
+
+  list.innerHTML = entries.map((e, i) => `
+    <div class="lb-entry">
+      <div class="lb-rank-num ${rankClass[i] || ""}">${medals[i] || i+1}</div>
+      <div class="lb-info">
+        <div class="lb-title">${e.film_title || "Untitled"}</div>
+        <div class="lb-verdict">${e.verdict || ""} &nbsp;·&nbsp; ${e.director || ""} &nbsp;·&nbsp; ${e.lead_actor || ""}</div>
+      </div>
+      <div class="lb-scores">
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m || 0}M</div>
+        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms || 0} noms</div>
+        <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins || 0} wins</div>
+      </div>
+    </div>
+  `).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Global leaderboard · ranked by box office</div>';
 }
 
 render();
