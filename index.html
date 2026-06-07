@@ -297,7 +297,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div class="lb-filters" id="lb-filters">
       <button class="lb-filter active" data-sort="bo" onclick="setGlobalSort('bo')">💰 Box Office</button>
       <button class="lb-filter" data-sort="oscar" onclick="setGlobalSort('oscar')">🏆 Oscar Noms</button>
-      <button class="lb-filter" data-sort="wins" onclick="setGlobalSort('wins')">🥇 Oscar Wins</button>
+      <button class="lb-filter" data-sort="wins" onclick="setGlobalSort('wins')">🥇 Wins</button>
+      <button class="lb-filter" data-sort="rt" onclick="setGlobalSort('rt')">🍅 Tomatometer</button>
+      <button class="lb-filter" data-sort="audience" onclick="setGlobalSort('audience')">🍿 Audience</button>
       <button class="lb-filter" data-sort="recent" onclick="setGlobalSort('recent')">🕐 Recent</button>
     </div>
     <div id="global-lb-list">
@@ -525,6 +527,8 @@ const WOF_KEY = 'lca_your_cuts';
 let WALK_OF_FAME = JSON.parse(localStorage.getItem(WOF_KEY) || '[]');
 
 function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) {
+  const rtC = S.rtCritic || 0;
+  const rtA = S.rtAudience || 0;
   const entry = {
     id: Date.now(),
     filmTitle,
@@ -532,8 +536,10 @@ function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) 
     boM,
     noms,
     wins,
+    rtCritic: rtC,
+    rtAudience: rtA,
     verdict: verdict?.title || '',
-    score: boM + (noms * 15) + (wins * 25),
+    score: boM + (noms * 15) + (wins * 25) + Math.round((rtC + rtA) / 2),
     crew: picks.map((p, i) => ({ cat: CATEGORIES[i].label, icon: CATEGORIES[i].icon, name: p.name })),
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   };
@@ -557,6 +563,8 @@ function setWofSort(s) {
   renderWalkOfFame();
 }
 
+let wofExpanded = false;
+
 function renderWalkOfFame() {
   const container = document.getElementById("wof-list");
   if (!container) return;
@@ -568,28 +576,38 @@ function renderWalkOfFame() {
     </div>`;
     return;
   }
-  let sorted = [...WALK_OF_FAME];
+  let sorted = [...WALK_OF_FAME].slice(0, 50);
   if (wofSort === 'score')  sorted.sort((a,b) => b.score - a.score);
   if (wofSort === 'bo')     sorted.sort((a,b) => b.boM - a.boM);
   if (wofSort === 'oscar')  sorted.sort((a,b) => b.noms - a.noms);
   if (wofSort === 'recent') sorted.sort((a,b) => b.id - a.id);
+  const visible = wofExpanded ? sorted : sorted.slice(0, 10);
   const medals = ["🥇","🥈","🥉"];
-  container.innerHTML = sorted.map((e, i) => `
-    <div class="wof-entry" id="wof-${e.id}">
+  const entries = visible.map((e, i) => {
+    const rt = (e.rtCritic || e.rtAudience) ? `<span class="pill" style="background:var(--red-bg);color:var(--red)">🍅 ${e.rtCritic||0}%</span><span class="pill" style="background:var(--coral-bg,#FAECE7);color:var(--coral,#D85A30)">🍿 ${e.rtAudience||0}%</span>` : '';
+    return `<div class="wof-entry" id="wof-${e.id}">
       <div class="wof-rank">
         <span>${medals[i] || '#'+(i+1)} &nbsp; ${e.date}</span>
-        <button class="wof-delete" onclick="removeFromWoF(${e.id})">✕ Remove</button>
+        <button class="wof-delete" onclick="removeFromWoF(${e.id})">✕</button>
       </div>
       <div class="wof-film-title">"${e.filmTitle}"</div>
-      <div class="wof-tagline">${e.synopsis.tagline}</div>
+      <div class="wof-tagline">${e.synopsis?.tagline || ''}</div>
       <div class="wof-stats">
-        <span class="pill pill-bo">💰 $${e.boM}M</span>
-        <span class="pill pill-oscar">🏆 ${e.noms} noms · ${e.wins} wins</span>
+        <span class="pill pill-bo">$${e.boM}M</span>
+        <span class="pill pill-oscar">🏆 ${e.noms} noms</span>
         <span class="pill" style="background:var(--green-bg);color:var(--green)">⭐ ${e.score}</span>
+        ${rt}
       </div>
-      <div class="wof-crew">${e.crew.map(c => `${c.icon} <strong>${c.cat}:</strong> ${c.name}`).join(" &nbsp;·&nbsp; ")}</div>
-    </div>
-  `).join("");
+      <div class="wof-crew">${(e.crew||[]).map(cr => `${cr.icon} <strong>${cr.cat}:</strong> ${cr.name}`).join(" &nbsp;·&nbsp; ")}</div>
+    </div>`;
+  }).join("");
+  const expandBtn = sorted.length > 10 ? `
+    <div style="text-align:center;padding:10px 0">
+      <button class="btn-sm" onclick="wofExpanded=!wofExpanded;renderWalkOfFame()">
+        ${wofExpanded ? 'Show less' : 'Show all ' + sorted.length + ' films'}
+      </button>
+    </div>` : '';
+  container.innerHTML = entries + expandBtn;
 }
 
 
@@ -1815,6 +1833,58 @@ const SYNERGIES = [
   { names:["Biopic","Awards Season (Nov to Dec)"],   boBonus:0, osBonus:4, label:"Biopic Awards",         msg:"The most predictable sentence in Hollywood: biopic plus awards season equals nominations." },
 
   // ── WILD PAIRINGS AND CHAOS ──
+  { names:["LeBron James","Elvis (Austin Butler)"],   boBonus:2, osBonus:1, label:"Woah Mama The Kings",  msg:"Woah Mama, the Kings! Two icons, one film. The internet has already crashed twice and filming has not begun." },
+  { names:["Awkwafina","Nicolas Cage"],               boBonus:1, osBonus:2, label:"What Is You Talmbout",  msg:"What is you talmbout? The chemistry is completely unhinged. Critics will not have a framework. Audiences will not care." },
+  { names:["Brendan Fraser","A24"],                  boBonus:0, osBonus:3, label:"Fraser x A24",          msg:"The comeback arc plus the prestige studio is the most emotionally loaded combination in current Hollywood." },
+  { names:["Ke Huy Quan","Michelle Yeoh"],            boBonus:1, osBonus:4, label:"Everything Everywhere Again", msg:"The Everything Everywhere reunion. The internet has been waiting for this since the last frame of the first film." },
+
+  // ── MORE DIRECTOR x ACTOR HISTORY ─────────────────────────────────────────
+  { names:["Steven Spielberg","Tom Hanks"],           boBonus:2, osBonus:3, label:"Spielberg x Hanks",         msg:"The most reliable combination in cinema history reunites. The tracking numbers moved before the announcement finished." },
+  { names:["Steven Spielberg","Leonardo DiCaprio"],   boBonus:2, osBonus:3, label:"Spielberg x DiCaprio",      msg:"Catch Me If You Can energy. The film will be enormous and entertaining and awards-adjacent all at once." },
+  { names:["Christopher Nolan","Tom Hardy"],          boBonus:2, osBonus:2, label:"Nolan x Hardy",             msg:"The Dark Knight Rises. Inception. Dunkirk. A physical and psychological performer for the most demanding director alive." },
+  { names:["Ridley Scott","Russell Crowe"],           boBonus:2, osBonus:3, label:"Scott x Crowe",             msg:"Gladiator energy. The most spectacular pairing in epic filmmaking reunites. Maximus approves from the afterlife." },
+  { names:["Wes Anderson","Tilda Swinton"],           boBonus:1, osBonus:3, label:"Anderson x Swinton",        msg:"She has been in six of his films. Each one she is a completely different person. This one will be no different." },
+  { names:["Sofia Coppola","Bill Murray"],            boBonus:1, osBonus:3, label:"Coppola x Murray",          msg:"Lost in Translation reunion. A sadness and lightness that no other combination in cinema can replicate." },
+  { names:["Martin Scorsese","Joe Pesci"],            boBonus:1, osBonus:3, label:"Scorsese x Pesci",          msg:"Goodfellas. Casino. The Irishman. The three-way reunion with De Niro is already being discussed by every film journalist alive." },
+  { names:["Quentin Tarantino","Samuel L. Jackson"],  boBonus:2, osBonus:2, label:"QT x Jackson",              msg:"Their seventh collaboration. The dialogue will be extraordinary. The cultural moment will be enormous." },
+  { names:["David Fincher","Brad Pitt"],              boBonus:2, osBonus:3, label:"Fincher x Pitt",            msg:"Se7en. Fight Club. The chemistry is one of the most electric in modern cinema. The result will be cold and extraordinary." },
+  { names:["Paul Thomas Anderson","Daniel Day-Lewis"],boBonus:0, osBonus:5, label:"PTA x Day-Lewis",           msg:"There Will Be Blood. The greatest actor and the most demanding director. The Academy has already cancelled its plans." },
+  { names:["Greta Gerwig","Saoirse Ronan"],           boBonus:1, osBonus:4, label:"Gerwig x Ronan",            msg:"Lady Bird reunion. The most affecting actress-director relationship of the decade. Whatever they make will matter." },
+  { names:["Barry Jenkins","Stephan James"],          boBonus:0, osBonus:3, label:"Jenkins x James",           msg:"If Beale Street Could Talk energy. Jenkins writes roles that actors describe as the most alive they have ever felt on screen." },
+
+  // ── MORE NEGATIVE HISTORY ─────────────────────────────────────────────────
+  { names:["Michael Bay","Megan Fox"],                boBonus:2, osBonus:-3, label:"Bay x Fox Reunion",        msg:"The reunion generated significant press coverage. Almost none of it was about the film." },
+  { names:["Johnny Depp","Tim Burton"],               boBonus:1, osBonus:1, label:"Depp x Burton Reunion",     msg:"Their eighth film together. The gothic visual language is established. The discourse will be significant." },
+  { names:["James Cameron","Arnold Schwarzenegger"],  boBonus:3, osBonus:0, label:"Cameron x Arnold",          msg:"T2 energy. The commercial result will be enormous. The Academy will send a polite note." },
+  { names:["Rob Zombie","Action Blockbuster"],        boBonus:-3, osBonus:-1, label:"Zombie Blockbuster",      msg:"The studio saw the rough cut and called seven separate meetings. The release date has been moved." },
+  { names:["Lars von Trier","Comedy"],                boBonus:-2, osBonus:1, label:"von Trier Comedy",         msg:"He was asked to make something lighter. The resulting film contains fourteen minutes of unbroken silence." },
+
+  // ── STUDIO x DIRECTOR DEEPER HISTORY ─────────────────────────────────────
+  { names:["Universal Pictures","Jordan Peele"],      boBonus:2, osBonus:3, label:"Universal x Peele",         msg:"Get Out. Us. Nope. Universal backed his entire run. The fourth film in this partnership carries serious expectation." },
+  { names:["Warner Bros.","Christopher Nolan"],       boBonus:2, osBonus:2, label:"WB x Nolan",                msg:"Their long partnership produced some of the most commercially successful prestige films ever made. One more chapter." },
+  { names:["A24","Yorgos Lanthimos"],                 boBonus:0, osBonus:4, label:"A24 x Lanthimos",           msg:"Poor Things energy. The Favourite energy. A24 and Lanthimos produce something no other combination could." },
+  { names:["Blumhouse","Jordan Peele"],               boBonus:3, osBonus:3, label:"Blumhouse x Peele",         msg:"Get Out was made for $4.5M and made $255M. The formula has a name now and the name is Jordan Peele." },
+  { names:["Apple Original Films","Martin Scorsese"], boBonus:1, osBonus:4, label:"Apple x Scorsese",          msg:"Killers of the Flower Moon energy. Apple's chequebook opens for no one more generously than Scorsese." },
+
+  // ── COMPOSER x DIRECTOR SPECIFIC ─────────────────────────────────────────
+  { names:["Ennio Morricone","Quentin Tarantino"],    boBonus:1, osBonus:3, label:"Morricone x QT",            msg:"The Hateful Eight. The composer who invented the Western sound scoring QT's Western deconstruction. The Academy wept." },
+  { names:["Danny Elfman","Tim Burton"],              boBonus:1, osBonus:2, label:"Elfman x Burton",           msg:"Their twelfth collaboration. The score will be recognisably Elfman and recognisably Burton and exactly right." },
+  { names:["Howard Shore","Peter Jackson"],           boBonus:2, osBonus:3, label:"Shore x Jackson",           msg:"The Lord of the Rings trilogy. The score became the mythology. The reunion carries the weight of that history." },
+  { names:["Michael Giacchino","J.J. Abrams"],        boBonus:2, osBonus:1, label:"Giacchino x Abrams",        msg:"Their eighth collaboration. The themes build on twenty years of shared musical vocabulary." },
+  { names:["Jonny Greenwood","Paul Thomas Anderson"], boBonus:0, osBonus:4, label:"Greenwood x PTA",           msg:"The Master. Inherent Vice. Phantom Thread. There Will Be Blood. The score will be studied as a standalone text." },
+  { names:["Thomas Newman","Sam Mendes"],             boBonus:1, osBonus:3, label:"Newman x Mendes",           msg:"American Beauty. Road to Perdition. The score will find the ache inside the spectacle. It always does." },
+  { names:["Cliff Martinez","Nicolas Winding Refn"], boBonus:1, osBonus:2, label:"Martinez x Refn",           msg:"Drive energy. The score is more character than the characters. The neon will be earned." },
+
+  // ── FUN / CHAOS COMBOS ───────────────────────────────────────────────────
+  { names:["Steven Seagal","Awards Season (Nov to Dec)"], boBonus:-3, osBonus:-4, label:"Seagal Awards Season", msg:"The screener arrived at Academy voters' homes. Several have confirmed they watched at least twelve minutes." },
+  { names:["Chuck Norris","A24"],                    boBonus:-2, osBonus:0, label:"Norris x A24",              msg:"A24 issued a statement. It was respectful. The Letterboxd community was not." },
+  { names:["Mr. T","Epic Drama"],                    boBonus:-1, osBonus:-2, label:"T x Drama",                msg:"He pities the foo who expected something different. The Academy also pitied them." },
+  { names:["Jean-Claude Van Damme","Musical"],        boBonus:-1, osBonus:-2, label:"JCVD Musical",            msg:"The splits were incorporated into the choreography. The Academy's music branch was not prepared." },
+  { names:["Dolph Lundgren","Prestige Western"],      boBonus:-1, osBonus:-2, label:"Dolph Western",           msg:"He apparently learned the role entirely in three days. The director has described the experience as unique." },
+  { names:["Nicolas Cage","Prestige Western"],        boBonus:1, osBonus:2, label:"Cage Western",              msg:"Cage in a Western is the sentence nobody wrote but everyone wanted. The method commitment will be total." },
+  { names:["Bad Bunny","Action Blockbuster"],         boBonus:2, osBonus:0, label:"Bad Bunny Action",          msg:"Bullet Train proved the instinct was correct. The demographic crossover in the tracking data is extraordinary." },
+  { names:["LeBron James","Sports Drama"],            boBonus:3, osBonus:1, label:"LeBron x Sports",           msg:"Space Jam. Trainwreck. He is not an actor who plays basketball. He is an athlete who has learned what cameras are for." },
+
   { names:["Nicolas Cage","Tim Curry"],              boBonus:1, osBonus:1, label:"Cage x Curry",          msg:"The two most unpredictable performers alive in the same film. The set was reportedly transcendent." },
   { names:["Mark Borchardt","All-In ($350M+)"],      boBonus:-1, osBonus:3, label:"Borchardt Goes Big",   msg:"The studio gave Borchardt $350M. This is either the bravest or most insane call in film history." },
   { names:["Mark Borchardt","A24"],                  boBonus:0, osBonus:3, label:"Borchardt x A24",       msg:"A24 found the one director more committed to the vision than they are. Somehow this works." },
@@ -1841,6 +1911,64 @@ const SYNERGIES = [
   { names:["Son Lux","A24"],                         boBonus:0, osBonus:3, label:"Son Lux x A24",         msg:"Everything Everywhere energy. The score will be as maximalist and strange as the film deserves." },
   { names:["Jonny Greenwood","Ari Aster"],           boBonus:0, osBonus:4, label:"Greenwood x Aster",     msg:"Two of cinema's most unsettling sensibilities combined. The Academy will be unsettled. In a good way." },
   { names:["Hildur Gudnadottir","Psychological Thriller"], boBonus:1, osBonus:3, label:"Hildur Thriller",  msg:"The composer who made silence feel violent is scoring a psychological thriller. Perfect alignment." },
+  // ── DIRECTOR + GENRE DYNAMIC SYNERGIES ──────────────────────────────────
+  // Cronenberg
+  { names:["David Cronenberg","Body Horror"],      boBonus:2, osBonus:4, label:"Cronenberg x Body Horror", msg:"His natural habitat. The human body as metaphor has never been more precisely articulated." },
+  { names:["David Cronenberg","Romantic Comedy"],  boBonus:-3, osBonus:-2, label:"Cronenberg Misfire",     msg:"The test screening audience left confused. The marketing team filed several complaints." },
+  { names:["David Cronenberg","Animated Feature"], boBonus:-4, osBonus:-1, label:"Wrong Cronenberg",       msg:"The children were not prepared. Neither were their parents. Nobody was prepared." },
+  // Ari Aster
+  { names:["Ari Aster","Elevated Horror"],         boBonus:2, osBonus:3, label:"Aster x Elevated Horror",  msg:"This is what he was born to make. The dread arrives in the first frame and never leaves." },
+  { names:["Ari Aster","Romantic Comedy"],         boBonus:-2, osBonus:1, label:"Aster Goes Light",         msg:"Reportedly the most unsettling romantic comedy in cinema history. The flowers mean something terrible." },
+  { names:["Ari Aster","Holiday / Family"],        boBonus:-3, osBonus:0, label:"Aster Family Film",        msg:"The family film that traumatised a generation of children who hadn't seen Hereditary yet." },
+  // Wes Anderson
+  { names:["Wes Anderson","A24-style Arthouse"],   boBonus:2, osBonus:3, label:"Anderson x Arthouse",       msg:"Every frame is a painting. Every line is poetry. The discourse will run for decades." },
+  { names:["Wes Anderson","Action Blockbuster"],   boBonus:-3, osBonus:-1, label:"Anderson Action Miss",    msg:"The action sequences are technically precise and beautifully framed. The audience wanted something louder." },
+  { names:["Wes Anderson","Kaiju / Monster Epic"], boBonus:-4, osBonus:1, label:"Anderson Kaiju",           msg:"The most symmetrical monster film ever made. The monster has a pastel colour palette. Critics are divided." },
+  // Michael Bay
+  { names:["Michael Bay","Action Blockbuster"],    boBonus:3, osBonus:-1, label:"Bay x Action",             msg:"Explosions. Lens flares. $800M. The formula is not subtle. It does not need to be." },
+  { names:["Michael Bay","A24-style Arthouse"],    boBonus:-4, osBonus:-3, label:"Bay x Arthouse Disaster",  msg:"A24's most confusing release. The explosions interrupted the contemplative silence repeatedly." },
+  { names:["Michael Bay","Musical"],               boBonus:-2, osBonus:-3, label:"Bay Musical",             msg:"The choreography is relentless. The songs are very loud. The Academy has declined to comment." },
+  // Jordan Peele
+  { names:["Jordan Peele","Horror"],               boBonus:2, osBonus:3, label:"Peele x Horror",            msg:"He reinvented the genre twice. The third time will be no different. The subtext is already being decoded." },
+  { names:["Jordan Peele","Romantic Comedy"],      boBonus:-1, osBonus:-1, label:"Peele Rom-Com",            msg:"Contains one scene that recontextualises the entire film as a horror movie. The marketing did not prepare anyone." },
+  // Robert Eggers
+  { names:["Robert Eggers","Folk Horror"],         boBonus:2, osBonus:3, label:"Eggers x Folk Horror",       msg:"The Witch energy. Period-accurate dread, wool costumes, and an ending that will not leave you." },
+  { names:["Robert Eggers","Gross-Out Comedy"],    boBonus:-4, osBonus:-2, label:"Eggers Comedy Disaster",   msg:"The jokes are historically accurate. The audience did not find the Middle English wordplay funny." },
+  { names:["Robert Eggers","Holiday / Family"],    boBonus:-4, osBonus:-1, label:"Eggers Family Film",       msg:"The most bleak Christmas film ever made. The Yule Goat was not a metaphor the children understood." },
+  // Bong Joon-ho
+  { names:["Bong Joon-ho","Crime Drama"],          boBonus:2, osBonus:4, label:"Bong x Crime",               msg:"Parasite-adjacent energy. The class commentary is already being written about by academics." },
+  { names:["Bong Joon-ho","Gross-Out Comedy"],     boBonus:1, osBonus:1, label:"Bong x Comedy",              msg:"Somehow works. The social satire is embedded so deeply that the comedy arrives before the horror." },
+  // Denis Villeneuve
+  { names:["Denis Villeneuve","Sci-Fi Epic"],      boBonus:2, osBonus:3, label:"Villeneuve x Sci-Fi",        msg:"Arrival. Blade Runner. Dune. He does this better than anyone alive. IMAX screens are spiritually ready." },
+  { names:["Denis Villeneuve","Stoner Comedy"],    boBonus:-4, osBonus:-2, label:"Villeneuve Comedy Miss",   msg:"Two and a half hours. No jokes. The audience was expecting something different from the trailer." },
+  // Tim Burton
+  { names:["Tim Burton","Dark Comedy"],            boBonus:2, osBonus:2, label:"Burton x Dark Comedy",       msg:"His natural register. Strange, sad, funny, and beautiful in equal measure." },
+  { names:["Tim Burton","War Film"],               boBonus:-3, osBonus:-2, label:"Burton War Miss",          msg:"The Tim Burton approach to a war film produced something unprecedented. Not in a good way." },
+  // Quentin Tarantino
+  { names:["Quentin Tarantino","Crime Drama"],     boBonus:2, osBonus:3, label:"QT x Crime",                 msg:"Reservoir Dogs. Pulp Fiction. Jackie Brown. He owns this genre. The dialogue alone is worth the ticket." },
+  { names:["Quentin Tarantino","Animated Feature"],boBonus:-3, osBonus:-1, label:"QT Animation Problem",    msg:"The violence content in an animated film generated discussion at the MPAA that is still ongoing." },
+  // ── ACTOR + GENRE DYNAMIC SYNERGIES ──────────────────────────────────────
+  // Dwayne Johnson
+  { names:["Dwayne Johnson","Action Blockbuster"], boBonus:3, osBonus:-1, label:"Rock x Action",             msg:"The most reliable commercial equation in Hollywood. He will also produce the sequel before this opens." },
+  { names:["Dwayne Johnson","Period Romance"],     boBonus:-3, osBonus:-3, label:"Rock Period Miss",         msg:"The chemistry with the corset did not convince the Academy. Or the audience. Or anyone." },
+  { names:["Dwayne Johnson","A24-style Arthouse"], boBonus:-2, osBonus:-2, label:"Rock x A24 Disaster",     msg:"The first A24 film with a mid-credits scene. It was not received as a positive development." },
+  // Nicolas Cage
+  { names:["Nicolas Cage","Elevated Horror"],      boBonus:1, osBonus:3, label:"Cage x Horror",             msg:"Mandy energy. He commits completely to something the genre has never seen. The Academy takes note." },
+  { names:["Nicolas Cage","Romantic Comedy"],      boBonus:1, osBonus:1, label:"Cage Rom-Com Surprise",     msg:"Nobody expected it to work. The chemistry is unhinged and perfect. Twitter cannot decide how to feel." },
+  // Adam Sandler
+  { names:["Adam Sandler","Sports Drama"],         boBonus:2, osBonus:2, label:"Sandler x Sports",          msg:"Hustle energy. He brings something vulnerable to athletic films that most actors cannot access." },
+  { names:["Adam Sandler","War Film"],             boBonus:-1, osBonus:-2, label:"Sandler War Miss",         msg:"The sand between his toes gag did not land in the context of Normandy. The studio had notes." },
+  // Cate Blanchett
+  { names:["Cate Blanchett","A24-style Arthouse"], boBonus:0, osBonus:4, label:"Blanchett x Arthouse",      msg:"Tar energy. She makes arthouse films feel like events. The Academy already knows the category." },
+  { names:["Cate Blanchett","Gross-Out Comedy"],   boBonus:-1, osBonus:-2, label:"Blanchett Comedy Miss",   msg:"She is technically perfect in every scene. The material did not deserve her. The reviews noticed." },
+  // ── STUDIO + GENRE DYNAMIC SYNERGIES ──────────────────────────────────────
+  { names:["A24","Folk Horror"],                   boBonus:1, osBonus:4, label:"A24 x Folk Horror",         msg:"A24 releasing a folk horror film is the most inevitable sentence in cinema." },
+  { names:["A24","Action Blockbuster"],            boBonus:-2, osBonus:-1, label:"A24 Action Misfire",      msg:"A24's attempt at mainstream action produced something genuinely strange. This is not a compliment." },
+  { names:["Blumhouse","Romantic Comedy"],         boBonus:-1, osBonus:-2, label:"Blumhouse Rom-Com",        msg:"There is a twist at the end. The twist is tonal. The audience did not appreciate it." },
+  { names:["Disney / Marvel","A24-style Arthouse"],boBonus:-3, osBonus:1, label:"Disney Arthouse Problem",  msg:"The Disney+ algorithm was not designed for this. The film found no audience on either side of the divide." },
+  { names:["Neon","True Crime Drama"],             boBonus:1, osBonus:3, label:"Neon x True Crime",         msg:"Their track record with difficult material is unmatched. The subject is already the subject of three podcasts." },
+
+
   { names:["John Williams","Steven Spielberg"],      boBonus:2, osBonus:2, label:"Williams x Spielberg",  msg:"The most iconic partnership in film history reunites. The theme will be in your head for thirty years." },
   { names:["Alfred Hitchcock","Cary Grant"],          boBonus:2, osBonus:3, label:"Hitchcock x Grant",      msg:"The defining thriller pairing of Hollywood golden era. The tension starts before the camera rolls." },
   { names:["Alfred Hitchcock","James Stewart"],       boBonus:2, osBonus:3, label:"Hitchcock x Stewart",    msg:"Rear Window. Vertigo. The collaboration that defined psychological cinema. Another chapter begins." },
@@ -2022,6 +2150,17 @@ function scoreBar() {
   const scores = calcScores(S.picks);
   const boP    = Math.round((scores.boNorm || 0) * 100);
   const osP    = Math.round((scores.osNorm || 0) * 100);
+  const projRT = Math.min(99, Math.max(10, Math.round(40 + osP * 0.55)));
+  const projAud = Math.min(99, Math.max(10, Math.round(35 + boP * 0.55)));
+  const tColor = projRT  >= 60 ? '#FA320A' : '#888780';
+  const aColor = projAud >= 60 ? '#FA8C00' : '#888780';
+  // Greenlight indicator
+  const avgBO = S.picks.reduce((s,p)=>s+(p.bo||0),0)/Math.max(S.picks.length,1);
+  const avgOS = S.picks.reduce((s,p)=>s+(p.oscar||0),0)/Math.max(S.picks.length,1);
+  const glStatus = avgBO >= 19 && avgOS >= 17 ? '⚡ Unanimous Greenlight trajectory' :
+                   avgBO >= 17 && avgOS >= 15 ? '✅ Greenlit trajectory' :
+                   avgBO >= 15 && avgOS >= 18 ? '🏆 Awards powerhouse trajectory' :
+                   avgBO >= 20 && avgOS >= 10 ? '💰 Box office machine trajectory' : '';
   return `<div class="score-bar">
     <div class="score-card">
       <div class="score-lbl">💰 Box Office</div>
@@ -2033,7 +2172,18 @@ function scoreBar() {
       <div class="score-val" style="color:var(--amber)">${osP}<span style="font-size:13px">%</span></div>
       <div class="score-sub">strength</div>
     </div>
-  </div>`;
+    <div class="score-card">
+      <div class="score-lbl">🍅 Projected RT</div>
+      <div class="score-val" style="color:${tColor}">${projRT}<span style="font-size:13px">%</span></div>
+      <div class="score-sub">tomatometer</div>
+    </div>
+    <div class="score-card">
+      <div class="score-lbl">🍿 Projected Aud</div>
+      <div class="score-val" style="color:${aColor}">${projAud}<span style="font-size:13px">%</span></div>
+      <div class="score-sub">audience</div>
+    </div>
+  </div>
+  ${glStatus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:6px 12px;font-size:11px;font-weight:600;color:var(--amber);text-align:center;margin-bottom:8px">${glStatus}</div>` : ''}`;
 }
 
 function picksSoFar() {
@@ -2109,7 +2259,14 @@ function renderRolling() {
 
 function statsHtml(o) {
   if (HARD_MODE) return '<span style="font-size:10px;color:var(--text3);font-style:italic">Scores hidden 🔒</span>';
-  return `<span class="pill pill-bo">💰 BO: ${o.bo}/22</span><span class="pill pill-oscar"> 🏆 Oscar: ${o.oscar}/20</span>`;
+  // Derive approximate RT scores from bo/oscar values
+  const tomato   = Math.min(99, Math.max(10, Math.round(22 + (o.oscar / 20) * 68)));
+  const audience = Math.min(99, Math.max(10, Math.round(18 + (o.bo / 22) * 68)));
+  const tColor   = tomato   >= 60 ? '#FA320A' : '#888780';
+  const aColor   = audience >= 60 ? '#FA8C00' : '#888780';
+  const tIcon    = tomato   >= 60 ? '🍅' : '🤢';
+  const aIcon    = audience >= 60 ? '🍿' : '💀';
+  return `<span class="pill pill-bo">💰 ${o.bo}/22</span><span class="pill pill-oscar">🏆 ${o.oscar}/20</span><span class="pill" style="background:var(--red-bg);color:${tColor}">${tIcon} ${tomato}%</span><span class="pill" style="background:var(--amber-bg);color:${aColor}">${aIcon} ${audience}%</span>`;
 }
 
 function renderChoosing() {
@@ -2336,14 +2493,24 @@ function renderResult() {
     </div>
     <div class="breakdown">
       <div class="breakdown-lbl">Full Cast &amp; Crew</div>
-      ${S.picks.map((p,i)=>`<div class="breakdown-row">
+      ${S.picks.map((p,i)=>{
+        const tomato   = Math.min(99, Math.max(10, Math.round(22 + (p.oscar / 20) * 68)));
+        const audience = Math.min(99, Math.max(10, Math.round(18 + (p.bo / 22) * 68)));
+        const tIcon = tomato   >= 60 ? '🍅' : '🤢';
+        const aIcon = audience >= 60 ? '🍿' : '💀';
+        const tColor = tomato   >= 60 ? '#FA320A' : '#888780';
+        const aColor = audience >= 60 ? '#FA8C00' : '#888780';
+        return `<div class="breakdown-row">
         <span class="breakdown-cat">${CATEGORIES[i].icon} ${CATEGORIES[i].label}</span>
         <span class="breakdown-name">${p.name}</span>
         <div class="breakdown-pills">
           <span class="pill pill-bo">💰${p.bo}</span>
           <span class="pill pill-oscar">🏆${p.oscar}</span>
+          <span class="pill" style="color:${tColor}">${tIcon}${tomato}%</span>
+          <span class="pill" style="color:${aColor}">${aIcon}${audience}%</span>
         </div>
-      </div>`).join("")}
+      </div>`;
+      }).join("")}
     </div>
     <button class="btn" id="again-btn">🎬 Greenlight Another Film</button>
   </div>`;
@@ -2640,64 +2807,69 @@ function buildShareText() {
 function buildShareCardSVG() {
   if (!S.synopsis || !S.verdict) return '';
   const v = S.verdict;
-  const title = (S.synopsis.title || 'Untitled').slice(0, 36);
-  const tagline = (S.synopsis.tagline || '').slice(0, 60);
-  const director = S.picks[0]?.name || '';
-  const lead = S.picks[1]?.name || '';
-  const genre = S.picks[5]?.name || '';
-  const verdict = (v.title || '').replace(/[^ -~]/g, '').trim();
+  const title    = (S.synopsis.title || 'Untitled').slice(0, 34);
+  const tagline  = (S.synopsis.tagline || '').slice(0, 52);
+  const director = (S.picks[0]?.name || '').slice(0,24);
+  const lead     = (S.picks[1]?.name || '').slice(0,24);
+  const support  = (S.picks[2]?.name || '').slice(0,24);
+  const studio   = (S.picks[3]?.name || '').slice(0,22);
+  const genre    = (S.picks[5]?.name || '').slice(0,22);
+  const composer = (S.picks[6]?.name || '').slice(0,22);
+  const verdict  = (v.title || '').replace(/[^ -~]/g, '').trim();
   const emojiVerdict = v.title || '';
+  // Recent unlocked achievement
+  const recentAch = unlockedAchievements.length
+    ? (unlockedAchievements[unlockedAchievements.length-1].icon + ' ' + unlockedAchievements[unlockedAchievements.length-1].label).replace(/[^ -~]/g,'').trim()
+    : '';
+  const achLine = recentAch ? recentAch.slice(0,30) : '';
 
-  // Escape XML chars
-  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="280" viewBox="0 0 400 280">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="340" viewBox="0 0 400 340">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0a0a08"/>
       <stop offset="100%" stop-color="#141412"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="gold2" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#FFD700"/>
       <stop offset="50%" stop-color="#FFA500"/>
       <stop offset="100%" stop-color="#FFD700"/>
     </linearGradient>
   </defs>
-  <!-- Background -->
-  <rect width="400" height="280" fill="url(#bg)" rx="16"/>
-  <rect width="400" height="280" fill="none" stroke="#2a2a20" stroke-width="1" rx="16"/>
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="400" height="3" fill="url(#gold)" rx="2"/>
-  <!-- Eyebrow -->
-  <text x="24" y="26" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="3">LIGHTS CAMERA ACTION</text>
-  <!-- Film title -->
-  <text x="24" y="58" font-family="system-ui,-apple-system,sans-serif" font-size="22" font-weight="900" font-style="italic" fill="url(#gold)">${esc(title)}</text>
-  <!-- Tagline -->
-  <text x="24" y="78" font-family="system-ui,-apple-system,sans-serif" font-size="11" fill="#8a7a50" font-style="italic">${esc(tagline.slice(0,55))}</text>
-  <!-- Divider -->
-  <line x1="24" y1="90" x2="376" y2="90" stroke="#2a2a20" stroke-width="1"/>
-  <!-- Stats row -->
-  <text x="24" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
-  <text x="24" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">BOX OFFICE</text>
-  <text x="120" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms}</text>
-  <text x="120" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">OSCAR NOMS</text>
-  <text x="210" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic || 0}%</text>
-  <text x="210" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">TOMATOMETER</text>
-  <text x="310" y="112" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience || 0}%</text>
-  <text x="310" y="124" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#5a5a40" letter-spacing="1">AUDIENCE</text>
-  <!-- Crew -->
-  <line x1="24" y1="138" x2="376" y2="138" stroke="#2a2a20" stroke-width="1"/>
-  <text x="24" y="157" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">DIRECTOR</text>
-  <text x="24" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
-  <text x="200" y="157" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">LEAD ACTOR</text>
-  <text x="200" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
-  <text x="24" y="193" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#5a5a40" letter-spacing="1">GENRE</text>
-  <text x="24" y="207" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(genre)}</text>
-  <!-- Verdict badge -->
-  <rect x="22" y="222" width="${Math.min(350, verdict.length * 9 + 24)}" height="26" fill="#1e1e1c" rx="6"/>
-  <text x="34" y="239" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#FFD700">${esc(emojiVerdict)}</text>
-  <!-- Footer -->
-  <text x="376" y="267" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
+  <rect width="400" height="340" fill="url(#bg2)" rx="16"/>
+  <rect width="400" height="340" fill="none" stroke="#2a2a20" stroke-width="1" rx="16"/>
+  <rect x="0" y="0" width="400" height="3" fill="url(#gold2)" rx="2"/>
+  <text x="24" y="22" font-family="system-ui,sans-serif" font-size="8" fill="#5a5a40" letter-spacing="3">LIGHTS CAMERA ACTION</text>
+  <text x="24" y="52" font-family="Georgia,serif" font-size="20" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
+  <text x="24" y="68" font-family="system-ui,sans-serif" font-size="10" fill="#8a7a50" font-style="italic">${esc(tagline)}</text>
+  <line x1="24" y1="78" x2="376" y2="78" stroke="#2a2a20" stroke-width="1"/>
+  <text x="24"  y="97"  font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
+  <text x="24"  y="108" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">BOX OFFICE</text>
+  <text x="110" y="97"  font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#FAC775">${S.noms}</text>
+  <text x="110" y="108" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">OSCAR NOMS</text>
+  <text x="190" y="97"  font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
+  <text x="190" y="108" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">TOMATOMETER</text>
+  <text x="295" y="97"  font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
+  <text x="295" y="108" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">AUDIENCE</text>
+  <line x1="24" y1="118" x2="376" y2="118" stroke="#2a2a20" stroke-width="1"/>
+  <text x="24"  y="133" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">DIRECTOR</text>
+  <text x="24"  y="146" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(director)}</text>
+  <text x="200" y="133" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">LEAD ACTOR</text>
+  <text x="200" y="146" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
+  <text x="24"  y="162" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">SUPPORTING</text>
+  <text x="24"  y="175" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(support)}</text>
+  <text x="200" y="162" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">STUDIO</text>
+  <text x="200" y="175" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
+  <text x="24"  y="191" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">GENRE</text>
+  <text x="24"  y="204" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(genre)}</text>
+  <text x="200" y="191" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">COMPOSER</text>
+  <text x="200" y="204" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(composer)}</text>
+  <line x1="24" y1="216" x2="376" y2="216" stroke="#2a2a20" stroke-width="1"/>
+  <rect x="22" y="224" width="${Math.min(240, verdict.length * 8 + 20)}" height="24" fill="#1e1e1c" rx="5"/>
+  <text x="32" y="240" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(emojiVerdict)}</text>
+  ${achLine ? '<rect x="22" y="255" width="356" height="18" fill="#1a1a16" rx="4"/><text x="32" y="267" font-family="system-ui,sans-serif" font-size="9" fill="#FAC775" letter-spacing="1">REEL AWARD: ' + esc(achLine) + '</text>' : ''}
+  <text x="376" y="325" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
 </svg>`;
 }
 
@@ -2810,6 +2982,29 @@ function getPickFeedback(chosen, roundIdx) {
   const cat = CATEGORIES[roundIdx];
   if (!cat) return null;
   const name = chosen.name || "";
+  // Check if this pick pushes us onto greenlight trajectory
+  const allPicks = [...S.picks, chosen];
+  const avgBO = allPicks.reduce((s,p)=>s+(p.bo||0),0)/allPicks.length;
+  const avgOS = allPicks.reduce((s,p)=>s+(p.oscar||0),0)/allPicks.length;
+  if (avgBO >= 19 && avgOS >= 17 && roundIdx >= 3) {
+    const greenMsgs = [
+      "You just got the greenlight. The unanimous kind. Every person in the room said yes without looking at each other.",
+      "GREENLIGHTED. The studio president called personally. That does not happen. It is happening.",
+      "The room just went quiet and then everyone started talking at once. That is what a greenlight feels like.",
+      "The greenlight is on. Not a conditional greenlight. Not a soft greenlight. The real one.",
+      "Every executive in the building just forwarded the deck to someone else. That is the greenlight signal.",
+    ];
+    return pick(greenMsgs);
+  }
+  if (avgBO >= 17 && avgOS >= 15 && roundIdx >= 4) {
+    const softMsgs = [
+      "The studio is very interested. That phrase means something specific in Hollywood. It means yes.",
+      "Pre-production has quietly begun. Nobody announced it. Everyone knows.",
+      "The trades are calling this a passion project. That is code. The code means awards.",
+      "The financing conversation lasted eleven minutes. That is a very short financing conversation.",
+    ];
+    return pick(softMsgs);
+  }
   const isHighBO = chosen.bo >= 18;
   const isHighOscar = chosen.oscar >= 17;
   const isMidOscar = chosen.oscar >= 13 && chosen.oscar < 17;
@@ -2841,11 +3036,11 @@ function getPickFeedback(chosen, roundIdx) {
     if (lines) return lines[Math.floor(Math.random() * lines.length)];
 
     // Score-based fallbacks for directors
-    if (isHighBO && isHighOscar) return pick(["This director operates in the space where spectacle and substance are the same thing. The industry is taking notes.","The tracking numbers and the Awards circuit are both already interested. That combination is vanishingly rare."]);
-    if (isHighOscar) return pick(["Oscar prognosticators just opened a dedicated tab. This is a director the Academy has been waiting to celebrate.","The trades are calling it a passion project. That is code for awards bait. The Academy knows the code."]);
-    if (isHighBO) return pick(["The sequel is being discussed in a conference room right now. The film hasn't been made. This director's name is that powerful.","Every trailer slot in America just got more expensive. This hire moves box office mountains."]);
-    if (isChaos) return pick(["A genuinely unorthodox choice. The studio is either visionary or desperate. History will determine which.","The crew has a look in their eyes that suggests they know something is either brilliant or catastrophic. Possibly both."]);
-    return pick(["Solid hire. The trades will approve. No fireworks, no fires, no drama. Just a very good film.","A director who knows exactly what they are doing. The studio exhales."]);
+    if (isHighBO && isHighOscar) return pick(["The greenlight meeting lasted four minutes. Everyone in the room knew. This is a director who makes studios feel safe and critics feel understood simultaneously.","Tracking numbers up. Awards circuit interested. The trades are already calling it event cinema. The studio just exhaled for the first time in months.","GREENLIGHTED. The call sheet went out before the ink was dry. Everyone in Hollywood wanted to be on this one."]);
+    if (isHighOscar) return pick(["Oscar prognosticators just opened a dedicated tab. This is a director the Academy has been waiting to celebrate.","The trades are calling it a passion project. That is code for awards bait. The Academy knows the code.","Development hell is over. The script that circulated for seven years has finally found its director. The Academy has been notified."]);
+    if (isHighBO) return pick(["The sequel is being discussed in a conference room right now. The film has not been made. This director's name is that powerful.","Every trailer slot in America just got more expensive. This hire moves box office mountains.","The studio marketing team just sent a cake to the director's agent. That is not standard procedure. That is what a greenlight looks like."]);
+    if (isChaos) return pick(["A genuinely unorthodox choice. The studio is either visionary or desperate. History will determine which.","The crew has a look in their eyes that suggests they know something is either brilliant or catastrophic. Possibly both.","This is either the bravest greenlight in Hollywood history or the most expensive mistake. The trades will have opinions either way."]);
+    return pick(["Solid hire. The trades will approve. No fireworks, no fires, no drama. Just a very good film.","A director who knows exactly what they are doing. The studio exhales.","The greenlight was quiet and professional. Exactly as it should be. The film will speak for itself."]);
   }
 
   // ── Lead Actor-specific ──
@@ -3082,7 +3277,7 @@ function checkAchievements(S) {
 function showAchievement(ach) {
   const el = document.getElementById('achievement-popup');
   if (!el) return;
-  el.textContent = `${ach.icon} Achievement unlocked: ${ach.label}`;
+  el.textContent = `${ach.icon} Reel Award unlocked: ${ach.label}`;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3500);
 }
@@ -3091,7 +3286,7 @@ function renderAchievementsPanel() {
   const unlocked = unlockedAchievements;
   const locked = ACHIEVEMENTS.filter(a => !unlocked.find(u => u.id === a.id));
   return `<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
-    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">🏅 Achievements (${unlocked.length}/${ACHIEVEMENTS.length})</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">🏅 The Reel Awards (${unlocked.length}/${ACHIEVEMENTS.length})</div>
     ${unlocked.length ? unlocked.map(a => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:18px">${a.icon}</span><div><div style="font-size:12px;font-weight:600;color:var(--text)">${a.label}</div><div style="font-size:10px;color:var(--text3)">Unlocked ${a.date}</div></div></div>`).join('') : '<div style="font-size:12px;color:var(--text3);padding:8px 0">No achievements yet. Keep drafting.</div>'}
     ${locked.length ? `<div style="font-size:11px;color:var(--text3);margin-top:10px">${locked.map(a => `<span style="opacity:0.4;margin-right:8px">${a.icon} ${a.label}</span>`).join('')}</div>` : ''}
   </div>`;
@@ -3138,7 +3333,7 @@ async function sbFetch(limit = 50) {
 
 async function sbFetchDaily(limit = 30) {
   try {
-    const seed = getDailySeed().toString();
+    const seed = getDailySeed();
     const res = await fetch(
       SB_URL + "/rest/v1/daily_leaderboard?select=*&daily_seed=eq." + seed + "&order=score.desc&limit=" + limit,
       { headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY } }
@@ -3194,10 +3389,12 @@ function renderGlobalEntries() {
   const list = document.getElementById("global-lb-list");
   if (!list || !globalEntries.length) return;
   let sorted = [...globalEntries];
-  if (globalSort === 'bo')     sorted.sort((a,b) => (b.bo_m||0) - (a.bo_m||0));
-  if (globalSort === 'oscar')  sorted.sort((a,b) => (b.noms||0) - (a.noms||0));
-  if (globalSort === 'wins')   sorted.sort((a,b) => (b.wins||0) - (a.wins||0));
-  if (globalSort === 'recent') sorted.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+  if (globalSort === 'bo')       sorted.sort((a,b) => (b.bo_m||0) - (a.bo_m||0));
+  if (globalSort === 'oscar')    sorted.sort((a,b) => (b.noms||0) - (a.noms||0));
+  if (globalSort === 'wins')     sorted.sort((a,b) => (b.wins||0) - (a.wins||0));
+  if (globalSort === 'rt')       sorted.sort((a,b) => (b.rt_critic||0) - (a.rt_critic||0));
+  if (globalSort === 'audience') sorted.sort((a,b) => (b.rt_audience||0) - (a.rt_audience||0));
+  if (globalSort === 'recent')   sorted.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
   const medals = ["🥇","🥈","🥉"];
   const rankClass = ["gold","silver","bronze"];
   list.innerHTML = sorted.map((e, i) => {
@@ -3213,7 +3410,8 @@ function renderGlobalEntries() {
       <div class="lb-scores">
         <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
-        <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins||0} wins</div>
+        ${e.rt_critic ? `<div class="lb-score-row" style="color:#FA320A">🍅 ${e.rt_critic}%</div>` : ''}
+        ${e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rt_audience}%</div>` : ''}
       </div>
     </div>`;
   }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Global Walk of Fame · lights-camera-action.app</div>';
