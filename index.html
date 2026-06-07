@@ -254,36 +254,46 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   </div>
   <div class="tab-bar">
     <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">🎬 Draft</button>
-    <button class="tab-btn" id="tab-wof" onclick="switchTab('wof')">⭐ Fame</button>
-    <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">🏅 Board</button>
+    <button class="tab-btn" id="tab-wof" onclick="switchTab('wof')">⭐ Your Cuts</button>
+    <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">🌍 Walk of Fame</button>
   </div>
   <div class="game-page" id="page-game">
     <div id="app"></div>
   </div>
   <div class="wof-page" id="page-wof">
+    <div style="margin-bottom:1rem">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">🎬 Your Cuts</div>
+      <div style="font-size:12px;color:var(--text2)">Every film you have drafted. Your personal archive. Stored on this device.</div>
+    </div>
+    <div class="lb-filters" id="wof-filters">
+      <button class="lb-filter active" data-sort="score" onclick="setWofSort('score')">⭐ Best Score</button>
+      <button class="lb-filter" data-sort="bo" onclick="setWofSort('bo')">💰 Box Office</button>
+      <button class="lb-filter" data-sort="oscar" onclick="setWofSort('oscar')">🏆 Oscar Noms</button>
+      <button class="lb-filter" data-sort="recent" onclick="setWofSort('recent')">🕐 Recent</button>
+    </div>
     <div id="wof-list"></div>
   </div>
 
-  <!-- Leaderboard page -->
+  <!-- Walk of Fame page -->
   <div class="lb-page" id="lb-page">
     <div style="margin-bottom:1rem">
-      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">🏅 Leaderboard</div>
-      <div style="font-size:12px;color:var(--text2)">Your top films ranked by box office and Oscar performance. Stored locally on your device.</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">🌍 Global Walk of Fame</div>
+      <div style="font-size:12px;color:var(--text2)">Films drafted by players worldwide. Submit yours to appear here.</div>
     </div>
     <div class="lb-filters" id="lb-filters">
-      <button class="lb-filter active" data-sort="bo" onclick="setLbSort('bo')">💰 Box Office</button>
-      <button class="lb-filter" data-sort="oscar" onclick="setLbSort('oscar')">🏆 Oscar Noms</button>
-      <button class="lb-filter" data-sort="wins" onclick="setLbSort('wins')">🥇 Oscar Wins</button>
-      <button class="lb-filter" data-sort="recent" onclick="setLbSort('recent')">🕐 Recent</button>
+      <button class="lb-filter active" data-sort="bo" onclick="setGlobalSort('bo')">💰 Box Office</button>
+      <button class="lb-filter" data-sort="oscar" onclick="setGlobalSort('oscar')">🏆 Oscar Noms</button>
+      <button class="lb-filter" data-sort="wins" onclick="setGlobalSort('wins')">🥇 Oscar Wins</button>
+      <button class="lb-filter" data-sort="recent" onclick="setGlobalSort('recent')">🕐 Recent</button>
     </div>
-    <div id="lb-list"></div>
-  <div style="margin-top:1.5rem">
-    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">🌍 Global Walk of Fame</div>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Films submitted by all players worldwide, ranked by box office.</div>
     <div id="global-lb-list">
-      <div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Switch to this tab to load the global board.</div>
+      <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>
     </div>
-  </div>
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📽️ Your Submissions</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Films you have submitted to the global board from this device.</div>
+      <div id="lb-list"></div>
+    </div>
   </div>
 
   <!-- Share card now built via SVG in JS -->
@@ -512,22 +522,35 @@ function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) 
   renderWalkOfFame();
 }
 
+let wofSort = 'score';
+
+function setWofSort(s) {
+  wofSort = s;
+  document.querySelectorAll('#wof-filters .lb-filter').forEach(b => b.classList.toggle('active', b.dataset.sort === s));
+  renderWalkOfFame();
+}
+
 function renderWalkOfFame() {
   const container = document.getElementById("wof-list");
   if (!container) return;
   if (WALK_OF_FAME.length === 0) {
     container.innerHTML = `<div class="wof-empty">
       <div class="wof-empty-icon">🌟</div>
-      <strong>No films yet.</strong><br>
-      Complete a draft and submit your film<br>to earn a star on the Walk of Fame.
+      <strong>No cuts yet.</strong><br>
+      Complete a draft and submit your film<br>to add it to your personal archive.
     </div>`;
     return;
   }
+  let sorted = [...WALK_OF_FAME];
+  if (wofSort === 'score')  sorted.sort((a,b) => b.score - a.score);
+  if (wofSort === 'bo')     sorted.sort((a,b) => b.boM - a.boM);
+  if (wofSort === 'oscar')  sorted.sort((a,b) => b.noms - a.noms);
+  if (wofSort === 'recent') sorted.sort((a,b) => b.id - a.id);
   const medals = ["🥇","🥈","🥉"];
-  container.innerHTML = WALK_OF_FAME.map((e, i) => `
+  container.innerHTML = sorted.map((e, i) => `
     <div class="wof-entry" id="wof-${e.id}">
       <div class="wof-rank">
-        <span>${medals[i] || `#${i+1}`} &nbsp;<span class="wof-medal"></span> ${e.date}</span>
+        <span>${medals[i] || '#'+(i+1)} &nbsp; ${e.date}</span>
         <button class="wof-delete" onclick="removeFromWoF(${e.id})">✕ Remove</button>
       </div>
       <div class="wof-film-title">"${e.filmTitle}"</div>
@@ -535,9 +558,8 @@ function renderWalkOfFame() {
       <div class="wof-stats">
         <span class="pill pill-bo">💰 $${e.boM}M</span>
         <span class="pill pill-oscar">🏆 ${e.noms} noms · ${e.wins} wins</span>
-        <span class="pill" style="background:var(--green-bg);color:var(--green)">⭐ Score: ${e.score}</span>
+        <span class="pill" style="background:var(--green-bg);color:var(--green)">⭐ ${e.score}</span>
       </div>
-      <div class="wof-synopsis">${e.synopsis.body}</div>
       <div class="wof-crew">${e.crew.map(c => `${c.icon} <strong>${c.cat}:</strong> ${c.name}`).join(" &nbsp;·&nbsp; ")}</div>
     </div>
   `).join("");
@@ -2937,39 +2959,56 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
   return await sbInsert(row);
 }
 
-// ── Global leaderboard tab renderer ──────────────────────────────────────────
+// ── Global Walk of Fame renderer ─────────────────────────────────────────────
+let globalSort = 'bo';
+let globalEntries = [];
+
+function setGlobalSort(s) {
+  globalSort = s;
+  document.querySelectorAll('#lb-filters .lb-filter').forEach(b => b.classList.toggle('active', b.dataset.sort === s));
+  renderGlobalEntries();
+}
+
+function renderGlobalEntries() {
+  const list = document.getElementById("global-lb-list");
+  if (!list || !globalEntries.length) return;
+  let sorted = [...globalEntries];
+  if (globalSort === 'bo')     sorted.sort((a,b) => (b.bo_m||0) - (a.bo_m||0));
+  if (globalSort === 'oscar')  sorted.sort((a,b) => (b.noms||0) - (a.noms||0));
+  if (globalSort === 'wins')   sorted.sort((a,b) => (b.wins||0) - (a.wins||0));
+  if (globalSort === 'recent') sorted.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+  const medals = ["🥇","🥈","🥉"];
+  const rankClass = ["gold","silver","bronze"];
+  list.innerHTML = sorted.map((e, i) => {
+    const byLine = (e.submitted_by && e.submitted_by !== "Anonymous")
+      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    return `<div class="lb-entry">
+      <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
+      <div class="lb-info">
+        <div class="lb-title">${e.film_title||"Untitled"}</div>
+        <div class="lb-verdict">${e.verdict||""}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||""} &nbsp;·&nbsp; ${e.lead_actor||""}${byLine}</div>
+      </div>
+      <div class="lb-scores">
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
+        <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins||0} wins</div>
+      </div>
+    </div>`;
+  }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Global Walk of Fame · lights-camera-action.app</div>';
+}
+
 async function renderGlobalLeaderboard() {
   const list = document.getElementById("global-lb-list");
   if (!list) return;
-  list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading global board...</div>';
-
-  const entries = await sbFetch(30);
-
+  list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>';
+  const entries = await sbFetch(50);
   if (!entries || !entries.length) {
-    list.innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🏅</div>No films on the global board yet.<br>Complete a draft and submit it to Walk of Fame.</div>';
+    list.innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🌍</div>No films yet.<br>Be the first to submit!</div>';
     return;
   }
-
-  const medals = ["🥇","🥈","🥉"];
-  const rankClass = ["gold","silver","bronze"];
-
-  list.innerHTML = entries.map((e, i) => {
-    const byLine = (e.submitted_by && e.submitted_by !== "Anonymous") ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
-    return `
-    <div class="lb-entry">
-      <div class="lb-rank-num ${rankClass[i] || ""}">${medals[i] || i+1}</div>
-      <div class="lb-info">
-        <div class="lb-title">${e.film_title || "Untitled"}</div>
-        <div class="lb-verdict">${e.verdict || ""}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director || ""} &nbsp;·&nbsp; ${e.lead_actor || ""}${byLine}</div>
-      </div>
-      <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m || 0}M</div>
-        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms || 0} noms</div>
-        <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins || 0} wins</div>
-      </div>
-    </div>`;
-  }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Global leaderboard · ranked by box office</div>';
+  globalEntries = entries;
+  renderGlobalEntries();
 }
 
 render();
