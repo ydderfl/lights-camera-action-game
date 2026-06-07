@@ -285,6 +285,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <button class="lb-filter" data-sort="recent" onclick="setWofSort('recent')">🕐 Recent</button>
     </div>
     <div id="wof-list"></div>
+    <div id="wof-achievements"></div>
   </div>
 
   <!-- Walk of Fame page -->
@@ -303,6 +304,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>
     </div>
     <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📅 Today's Daily Draft Board</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Global rankings for today's seeded draft. Everyone plays the same 8 options.</div>
+      <div id="daily-lb-list"><div style="font-size:12px;color:var(--text3);padding:1rem 0">Play today's daily draft to appear here.</div></div>
+    </div>
+    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📽️ Your Submissions</div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Films you have submitted to the global board from this device.</div>
       <div id="lb-list"></div>
@@ -515,7 +521,8 @@ function generateTagline(genre, isBlockbuster, isAwardsBait, isFlop) {
 }
 
 // ── Walk of Fame Storage ────────────────────────────────────────────────────
-let WALK_OF_FAME = [];
+const WOF_KEY = 'lca_your_cuts';
+let WALK_OF_FAME = JSON.parse(localStorage.getItem(WOF_KEY) || '[]');
 
 function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) {
   const entry = {
@@ -525,13 +532,20 @@ function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) 
     boM,
     noms,
     wins,
-    verdict: verdict.title,
+    verdict: verdict?.title || '',
     score: boM + (noms * 15) + (wins * 25),
     crew: picks.map((p, i) => ({ cat: CATEGORIES[i].label, icon: CATEGORIES[i].icon, name: p.name })),
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   };
-  WALK_OF_FAME.push(entry);
-  WALK_OF_FAME.sort((a, b) => b.score - a.score);
+  WALK_OF_FAME.unshift(entry);
+  if (WALK_OF_FAME.length > 50) WALK_OF_FAME = WALK_OF_FAME.slice(0, 50);
+  localStorage.setItem(WOF_KEY, JSON.stringify(WALK_OF_FAME));
+  renderWalkOfFame();
+}
+
+function removeFromWoF(id) {
+  WALK_OF_FAME = WALK_OF_FAME.filter(e => e.id !== id);
+  localStorage.setItem(WOF_KEY, JSON.stringify(WALK_OF_FAME));
   renderWalkOfFame();
 }
 
@@ -578,10 +592,6 @@ function renderWalkOfFame() {
   `).join("");
 }
 
-function removeFromWoF(id) {
-  WALK_OF_FAME = WALK_OF_FAME.filter(e => e.id !== id);
-  renderWalkOfFame();
-}
 
 function switchTab(tab) {
   document.getElementById("page-game").classList.toggle("hidden", tab !== "game");
@@ -1378,82 +1388,98 @@ const DATA = {
     { name:"First-Time Filmmaker",  bo:4,  oscar:12, era:"Debut",        known:"No prior credits. Sheer audacity and a Sundance slot." },
     { name:"Bad Robot Productions", bo:16, oscar:10, era:"Blockbuster",  known:"Mission: Impossible, Cloverfield, Star Wars sequel trilogy" },
     { name:"Toho International",    bo:13, oscar:10, era:"Japanese",     known:"Godzilla franchise, Spirited Away, Your Name" },
+    { name:"Lionsgate",             bo:14, oscar:10, era:"Genre",        known:"John Wick, Hunger Games, Saw franchise" },
+    { name:"Focus Features",        bo:8,  oscar:16, era:"Prestige",     known:"Brokeback Mountain, Atonement, Downton Abbey" },
+    { name:"FilmNation",            bo:7,  oscar:15, era:"Indie",        known:"The Imitation Game, Arrival (co-prod), Promising Young Woman" },
+    { name:"Amazon MGM Studios",    bo:15, oscar:15, era:"Streaming",    known:"Air, Saltburn, Being the Ricardos" },
+    { name:"Paramount Pictures",    bo:17, oscar:13, era:"Blockbuster",  known:"Mission: Impossible, Top Gun, Transformers" },
+    { name:"Sony Pictures",         bo:17, oscar:12, era:"Mainstream",   known:"Spider-Man, Jumanji, Ghostbusters" },
+    { name:"Universal Pictures",    bo:18, oscar:12, era:"Blockbuster",  known:"Oppenheimer, Fast and Furious, Jurassic Park" },
+    { name:"DreamWorks",            bo:16, oscar:13, era:"Mainstream",   known:"Gladiator, American Beauty, Saving Private Ryan" },
+    { name:"Amblin Entertainment",  bo:15, oscar:13, era:"Blockbuster",  known:"Schindler's List, Jurassic Park, E.T." },
+    { name:"Plan B Entertainment",  bo:9,  oscar:18, era:"Prestige",     known:"12 Years a Slave, Moonlight, World War Z" },
+    { name:"GK Films",              bo:7,  oscar:14, era:"Indie",        known:"The Departed (co), Hugo, The Tourist" },
+    { name:"Miramax",               bo:11, oscar:17, era:"Prestige",     known:"Pulp Fiction, Shakespeare in Love, Good Will Hunting" },
+    { name:"Orion Pictures",        bo:12, oscar:14, era:"Classic",      known:"Silence of the Lambs, Platoon, RoboCop" },
+    { name:"TriStar Pictures",      bo:12, oscar:12, era:"Classic",      known:"Terminator 2, Jerry Maguire, Philadelphia" },
+    { name:"Canal+ Originals",      bo:7,  oscar:14, era:"European",     known:"A Prophet, The Class, Blue Is the Warmest Colour" },
   ],
 
   screenplay: [
-    { name:"Original Screenplay",       bo:12, oscar:18, era:"Original" },
-    { name:"Sequel / Franchise Part 2",  bo:21, oscar:7,  era:"Franchise" },
-    { name:"Comic Book Adaptation",     bo:20, oscar:7,  era:"IP" },
-    { name:"Novel Adaptation",          bo:13, oscar:17, era:"Literary" },
-    { name:"True Story / Biopic",       bo:12, oscar:19, era:"Prestige" },
-    { name:"Remake / Reboot",           bo:15, oscar:8,  era:"Nostalgia" },
-    { name:"Video Game Adaptation",     bo:14, oscar:6,  era:"IP" },
-    { name:"Stage Play Adaptation",     bo:9,  oscar:17, era:"Theatre" },
-    { name:"Foreign Film Remake",       bo:10, oscar:15, era:"World" },
-    { name:"Graphic Novel",             bo:16, oscar:12, era:"IP" },
-    { name:"Podcast / True Crime",      bo:11, oscar:14, era:"Media" },
-    { name:"Prequel",                   bo:17, oscar:8,  era:"Franchise" },
-    { name:"Toy / Boardgame IP",        bo:18, oscar:5,  era:"IP" },
-    { name:"Short Film Expanded",       bo:8,  oscar:14, era:"Indie" },
-    { name:"Memoir Adaptation",         bo:10, oscar:17, era:"Prestige" },
-    { name:"Musical Stage to Screen",   bo:14, oscar:16, era:"Theatre" },
-    { name:"Spinoff",                   bo:16, oscar:7,  era:"Franchise" },
-    { name:"Shared Universe Entry",     bo:19, oscar:5,  era:"Franchise" },
-    { name:"Mockumentary Script",       bo:10, oscar:11, era:"Comedy" },
-    { name:"Journalist Investigation",  bo:9,  oscar:16, era:"Prestige" },
-    { name:"Children's Book Adapted",   bo:16, oscar:10, era:"Family" },
-    { name:"AI-Assisted Script",        bo:7,  oscar:5,  era:"Experimental" },
+    { name:"Original Screenplay",            bo:12, oscar:18, era:"Original" },
+    { name:"Novel Adaptation",               bo:13, oscar:17, era:"Literary" },
+    { name:"Memoir / Autobiography",         bo:10, oscar:17, era:"Prestige" },
+    { name:"True Story",                     bo:12, oscar:16, era:"Prestige" },
+    { name:"Stage Play Adaptation",          bo:9,  oscar:17, era:"Theatre" },
+    { name:"Foreign Film Remake",            bo:10, oscar:14, era:"World" },
+    { name:"Short Story Expanded",           bo:8,  oscar:15, era:"Indie" },
+    { name:"Comic Book (New Hero)",          bo:18, oscar:8,  era:"IP" },
+    { name:"Comic Book (Established Hero)",  bo:22, oscar:5,  era:"IP" },
+    { name:"Existing Franchise Entry",       bo:21, oscar:6,  era:"Franchise" },
+    { name:"Reboot / Reimagining",           bo:15, oscar:8,  era:"Nostalgia" },
+    { name:"Spinoff",                        bo:16, oscar:7,  era:"Franchise" },
+    { name:"Prequel",                        bo:17, oscar:8,  era:"Franchise" },
+    { name:"Video Game Adaptation",          bo:14, oscar:6,  era:"IP" },
+    { name:"Toy / Board Game IP",            bo:18, oscar:5,  era:"IP" },
+    { name:"Podcast / True Crime Source",    bo:11, oscar:14, era:"Media" },
+    { name:"Journalist Investigation",       bo:9,  oscar:16, era:"Prestige" },
+    { name:"Children's Book Adapted",        bo:16, oscar:10, era:"Family" },
+    { name:"Graphic Novel (Non-Superhero)",  bo:14, oscar:13, era:"IP" },
+    { name:"AI-Assisted Script",             bo:7,  oscar:5,  era:"Experimental" },
+    { name:"Spec Script (Unknown Writer)",   bo:9,  oscar:14, era:"Original" },
+    { name:"Docudrama Hybrid",               bo:10, oscar:15, era:"Prestige" },
   ],
 
   genre: [
-    { name:"Epic Drama",                bo:14, oscar:18, era:"Prestige" },
-    { name:"Epic Drama: Sequel",        bo:16, oscar:14, era:"Prestige Sequel" },
-    { name:"Action Blockbuster",        bo:21, oscar:6,  era:"Blockbuster" },
-    { name:"Action Blockbuster: Sequel",bo:22, oscar:5,  era:"Franchise" },
-    { name:"Superhero",                 bo:22, oscar:5,  era:"Franchise" },
-    { name:"Superhero: Sequel",         bo:21, oscar:4,  era:"Franchise" },
-    { name:"Biopic",                    bo:11, oscar:19, era:"Prestige" },
-    { name:"Biopic: Part 2",            bo:10, oscar:16, era:"Prestige" },
-    { name:"Psychological Thriller",    bo:15, oscar:14, era:"Thriller" },
-    { name:"Psych Thriller: Sequel",    bo:14, oscar:10, era:"Thriller" },
-    { name:"Romantic Comedy",           bo:13, oscar:9,  era:"Mainstream" },
-    { name:"Rom-Com: Part 2",           bo:12, oscar:7,  era:"Mainstream" },
-    { name:"Animated Feature",          bo:18, oscar:14, era:"Family" },
-    { name:"Animated: Sequel",          bo:19, oscar:11, era:"Family Franchise" },
-    { name:"Horror",                    bo:16, oscar:10, era:"Genre" },
-    { name:"Horror: Sequel",            bo:15, oscar:6,  era:"Franchise" },
-    { name:"Musical",                   bo:14, oscar:18, era:"Prestige" },
-    { name:"Musical: Sequel",           bo:13, oscar:13, era:"Prestige" },
-    { name:"Sci-Fi Epic",               bo:19, oscar:12, era:"Blockbuster" },
-    { name:"Sci-Fi Epic: Sequel",       bo:20, oscar:10, era:"Franchise" },
-    { name:"Crime Drama",               bo:12, oscar:17, era:"Prestige" },
-    { name:"Crime Drama: Sequel",       bo:13, oscar:12, era:"Prestige" },
-    { name:"War Film",                  bo:13, oscar:17, era:"Prestige" },
-    { name:"Sports Drama",              bo:13, oscar:15, era:"Mainstream" },
-    { name:"Heist Thriller",            bo:15, oscar:12, era:"Crowd Pleaser" },
-    { name:"A24-style Arthouse",        bo:7,  oscar:18, era:"Arthouse" },
-    { name:"Comedy",                    bo:14, oscar:9,  era:"Mainstream" },
-    { name:"Holiday / Family",          bo:17, oscar:8,  era:"Family" },
-    { name:"Buddy Comedy",               bo:14, oscar:7,  era:"Mainstream" },
-    { name:"Coming-of-Age Drama",        bo:11, oscar:16, era:"Indie" },
-    { name:"Romantic Drama",             bo:12, oscar:15, era:"Drama" },
-    { name:"Body Horror",                bo:12, oscar:11, era:"Genre" },
-    { name:"Cosmic Horror",              bo:10, oscar:13, era:"Genre" },
-    { name:"Spy Comedy",                 bo:14, oscar:7,  era:"Mainstream" },
-    { name:"True Crime Drama",           bo:11, oscar:15, era:"Prestige" },
-    { name:"Nature Epic",                bo:11, oscar:13, era:"Prestige" },
-    { name:"Pandemic Thriller",          bo:13, oscar:12, era:"Drama" },
-    { name:"Mockumentary",               bo:10, oscar:10, era:"Comedy" },
-    { name:"Anthology Horror",           bo:10, oscar:11, era:"Genre" },
-    { name:"Superhero Deconstruction",   bo:15, oscar:13, era:"Prestige" },
-    { name:"Folk Horror",                bo:9,  oscar:14, era:"Arthouse" },
-    { name:"Slasher Revival",            bo:14, oscar:6,  era:"Genre" },
-    { name:"Existential Sci-Fi",         bo:9,  oscar:15, era:"Cerebral" },
-    { name:"Gross-Out Comedy",           bo:14, oscar:4,  era:"Mainstream" },
-    { name:"Kaiju / Monster Epic",       bo:16, oscar:7,  era:"Blockbuster" },
-    { name:"Prestige Western",           bo:12, oscar:16, era:"Prestige" },
-    { name:"Romantic Horror",            bo:11, oscar:12, era:"Genre" },
-    { name:"Dance Drama",                bo:12, oscar:13, era:"Drama" },
+    { name:"Epic Drama",                  bo:14, oscar:18, era:"Prestige" },
+    { name:"Action Blockbuster",          bo:21, oscar:6,  era:"Blockbuster" },
+    { name:"Psychological Thriller",      bo:15, oscar:14, era:"Thriller" },
+    { name:"Romantic Comedy",             bo:13, oscar:9,  era:"Mainstream" },
+    { name:"Animated Feature",            bo:18, oscar:14, era:"Family" },
+    { name:"Horror",                      bo:16, oscar:10, era:"Genre" },
+    { name:"Elevated Horror",             bo:13, oscar:15, era:"Arthouse" },
+    { name:"Musical",                     bo:14, oscar:18, era:"Prestige" },
+    { name:"Sci-Fi Epic",                 bo:19, oscar:12, era:"Blockbuster" },
+    { name:"Crime Drama",                 bo:12, oscar:17, era:"Prestige" },
+    { name:"War Film",                    bo:13, oscar:17, era:"Prestige" },
+    { name:"Sports Drama",                bo:13, oscar:15, era:"Mainstream" },
+    { name:"Heist Thriller",              bo:15, oscar:12, era:"Crowd Pleaser" },
+    { name:"A24-style Arthouse",          bo:7,  oscar:18, era:"Arthouse" },
+    { name:"Comedy",                      bo:14, oscar:9,  era:"Mainstream" },
+    { name:"Holiday / Family",            bo:17, oscar:8,  era:"Family" },
+    { name:"Buddy Comedy",                bo:14, oscar:7,  era:"Mainstream" },
+    { name:"Coming-of-Age Drama",         bo:11, oscar:16, era:"Indie" },
+    { name:"Romantic Drama",              bo:12, oscar:15, era:"Drama" },
+    { name:"Body Horror",                 bo:12, oscar:11, era:"Genre" },
+    { name:"Cosmic Horror",               bo:10, oscar:13, era:"Genre" },
+    { name:"Spy Comedy",                  bo:14, oscar:7,  era:"Mainstream" },
+    { name:"True Crime Drama",            bo:11, oscar:15, era:"Prestige" },
+    { name:"Nature Epic",                 bo:11, oscar:13, era:"Prestige" },
+    { name:"Superhero Deconstruction",    bo:15, oscar:13, era:"Prestige" },
+    { name:"Folk Horror",                 bo:9,  oscar:14, era:"Arthouse" },
+    { name:"Slasher Revival",             bo:14, oscar:6,  era:"Genre" },
+    { name:"Existential Sci-Fi",          bo:9,  oscar:15, era:"Cerebral" },
+    { name:"Gross-Out Comedy",            bo:14, oscar:4,  era:"Mainstream" },
+    { name:"Kaiju / Monster Epic",        bo:16, oscar:7,  era:"Blockbuster" },
+    { name:"Prestige Western",            bo:12, oscar:16, era:"Prestige" },
+    { name:"Romantic Horror",             bo:11, oscar:12, era:"Genre" },
+    { name:"Dance Drama",                 bo:12, oscar:13, era:"Drama" },
+    { name:"Pandemic Thriller",           bo:13, oscar:12, era:"Drama" },
+    { name:"Anthology Horror",            bo:10, oscar:11, era:"Genre" },
+    { name:"Legal Thriller",              bo:12, oscar:14, era:"Prestige" },
+    { name:"Political Satire",            bo:10, oscar:14, era:"Prestige" },
+    { name:"Surrealist Drama",            bo:7,  oscar:15, era:"Arthouse" },
+    { name:"Road Movie",                  bo:9,  oscar:13, era:"Indie" },
+    { name:"Survival Thriller",           bo:14, oscar:11, era:"Mainstream" },
+    { name:"Disaster Film",               bo:16, oscar:6,  era:"Blockbuster" },
+    { name:"Dark Comedy",                 bo:11, oscar:13, era:"Indie" },
+    { name:"Revenge Thriller",            bo:13, oscar:11, era:"Genre" },
+    { name:"Period Romance",              bo:12, oscar:15, era:"Prestige" },
+    { name:"Sci-Fi Horror",               bo:13, oscar:10, era:"Genre" },
+    { name:"Martial Arts Epic",           bo:14, oscar:10, era:"Action" },
+    { name:"Found Footage",               bo:10, oscar:7,  era:"Genre" },
+    { name:"Neo-Noir",                    bo:11, oscar:14, era:"Thriller" },
+    { name:"Stoner Comedy",               bo:12, oscar:5,  era:"Mainstream" },
   ],
 
   composer: [
@@ -1539,32 +1565,51 @@ const DATA = {
     { name:"International Co-Production", bo:11, oscar:14, era:"Global" },
     { name:"Passion Project (Self-Funded)",bo:5, oscar:15, era:"Indie" },
     { name:"Tax Incentive Patchwork",     bo:8,  oscar:10, era:"Indie" },
+    { name:"Celebrity-Backed ($10M to $25M)",  bo:10, oscar:9,  era:"Indie" },
+    { name:"Superhero Scale ($300M to $400M)", bo:21, oscar:6,  era:"Franchise" },
+    { name:"Prestige Mid ($40M to $70M)",      bo:12, oscar:15, era:"Prestige" },
+    { name:"Netflix Cheque ($80M to $150M)",   bo:14, oscar:12, era:"Streaming" },
+    { name:"Guerrilla ($500K to $2M)",         bo:7,  oscar:13, era:"Indie" },
+    { name:"Kickstarter ($200K to $1M)",       bo:5,  oscar:12, era:"Grassroots" },
+    { name:"Studio Micro ($5M to $12M)",       bo:8,  oscar:14, era:"Indie" },
+    { name:"Overseas Co-Finance ($50M to $100M)", bo:13, oscar:13, era:"Global" },
   ],
 
   season: [
-    { name:"Summer Tentpole (May to Jul)",  bo:20, oscar:6,  era:"Peak" },
-    { name:"Awards Season (Nov to Dec)",    bo:11, oscar:20, era:"Prestige" },
-    { name:"Spring Sleeper (Mar to Apr)",   bo:12, oscar:13, era:"Indie" },
-    { name:"Holiday (Thanksgiving)",     bo:17, oscar:14, era:"Mainstream" },
-    { name:"IMAX Global Event",          bo:21, oscar:9,  era:"Event" },
-    { name:"Film Festival → Wide",       bo:8,  oscar:19, era:"Festival" },
-    { name:"Straight to Streaming",      bo:5,  oscar:12, era:"Streaming" },
-    { name:"Prestige Jan Platform",      bo:7,  oscar:17, era:"Platform" },
-    { name:"August Dump Month",          bo:8,  oscar:4,  era:"Dump" },
-    { name:"Valentine's Day",            bo:14, oscar:8,  era:"Event" },
-    { name:"Halloween Season",           bo:15, oscar:9,  era:"Genre" },
-    { name:"Super Bowl Trailer Launch",  bo:19, oscar:7,  era:"Marketing" },
-    // 10 new strategies
-    { name:"TikTok Viral Campaign",      bo:15, oscar:6,  era:"Social" },
-    { name:"Surprise Drop (No Marketing)",bo:10, oscar:9,  era:"Viral" },
-    { name:"Cannes Premiere to Wide",    bo:9,  oscar:18, era:"Festival" },
-    { name:"Limited NYC/LA Then Wide",   bo:12, oscar:15, era:"Platform" },
-    { name:"Streaming Day-and-Date",     bo:8,  oscar:10, era:"Hybrid" },
-    { name:"China Wide Release Push",    bo:18, oscar:5,  era:"Global" },
-    { name:"Midnight Screening Circuit", bo:9,  oscar:8,  era:"Cult" },
-    { name:"SXSW Breakout",             bo:11, oscar:13, era:"Festival" },
-    { name:"Influencer Screening First", bo:13, oscar:6,  era:"Social" },
-    { name:"Re-Release 4K Restoration",  bo:8,  oscar:12, era:"Legacy" },
+    { name:"Summer Tentpole (May to Jul)",    bo:20, oscar:6,  era:"Peak" },
+    { name:"Awards Season (Nov to Dec)",      bo:11, oscar:20, era:"Prestige" },
+    { name:"Spring Sleeper (Mar to Apr)",     bo:12, oscar:13, era:"Indie" },
+    { name:"Holiday (Thanksgiving)",          bo:17, oscar:14, era:"Mainstream" },
+    { name:"IMAX Global Event",               bo:21, oscar:9,  era:"Event" },
+    { name:"Film Festival to Wide",           bo:8,  oscar:19, era:"Festival" },
+    { name:"Straight to Streaming",           bo:5,  oscar:12, era:"Streaming" },
+    { name:"Prestige Jan Platform",           bo:7,  oscar:17, era:"Platform" },
+    { name:"August Dump Month",               bo:8,  oscar:4,  era:"Dump" },
+    { name:"Valentine's Day",                 bo:14, oscar:8,  era:"Event" },
+    { name:"Halloween Season",                bo:15, oscar:9,  era:"Genre" },
+    { name:"Super Bowl Weekend",              bo:19, oscar:7,  era:"Event" },
+    { name:"TikTok Viral Campaign",           bo:14, oscar:6,  era:"Social" },
+    { name:"Surprise Drop (No Marketing)",    bo:10, oscar:9,  era:"Viral" },
+    { name:"Cannes Premiere to Wide",         bo:9,  oscar:18, era:"Festival" },
+    { name:"Limited NYC/LA Then Wide",        bo:12, oscar:15, era:"Platform" },
+    { name:"Streaming Day-and-Date",          bo:8,  oscar:10, era:"Hybrid" },
+    { name:"China Wide Release Push",         bo:18, oscar:5,  era:"Global" },
+    { name:"Midnight Screening Circuit",      bo:9,  oscar:8,  era:"Cult" },
+    { name:"SXSW Breakout",                   bo:11, oscar:13, era:"Festival" },
+    { name:"Influencer Screening First",      bo:13, oscar:6,  era:"Social" },
+    { name:"Re-Release 4K Restoration",       bo:8,  oscar:12, era:"Legacy" },
+    { name:"Sundance to Streaming",           bo:7,  oscar:14, era:"Festival" },
+    { name:"Netflix Day-One Drop",            bo:6,  oscar:12, era:"Streaming" },
+    { name:"Two-Week Oscar Qualifying Run",   bo:5,  oscar:19, era:"Prestige" },
+    { name:"Martin Luther King Weekend",      bo:14, oscar:13, era:"Prestige" },
+    { name:"Memorial Day Weekend",            bo:18, oscar:7,  era:"Peak" },
+    { name:"Christmas Day Release",           bo:15, oscar:16, era:"Prestige" },
+    { name:"Exclusive IMAX Pre-Release",      bo:16, oscar:10, era:"Event" },
+    { name:"Roadshow Engagement Run",         bo:9,  oscar:17, era:"Prestige" },
+    { name:"Drive-In Revival Tour",           bo:7,  oscar:9,  era:"Cult" },
+    { name:"Amazon Prime Day Drop",           bo:8,  oscar:8,  era:"Streaming" },
+    { name:"Venice Premiere to Arthouse",     bo:6,  oscar:18, era:"Festival" },
+    { name:"Theatrical then Apple TV+",       bo:10, oscar:13, era:"Hybrid" },
   ],
 };
 
@@ -1698,12 +1743,21 @@ function getVerdict(boM, noms, picks) {
 }
 
 const CHAOS_EVENTS = [
-  { round:2, chance:0.18, msg:"🚨 Studio Notes: The studio wants a bigger name. You can reroll your lead this round.", penaltyBO:0,  penaltyOS:0 },
-  { round:3, chance:0.15, msg:"📰 Tabloid Scandal: Your lead actor is front page news for the wrong reasons. Box office takes a hit.", penaltyBO:-1, penaltyOS:0 },
-  { round:4, chance:0.15, msg:"💰 Budget Cut: Finance pulled 30% of your budget. Choose carefully.", penaltyBO:-1, penaltyOS:0 },
-  { round:5, chance:0.12, msg:"🎤 Director Drama: The director publicly disagreed with the studio. Tension on set.", penaltyBO:-1, penaltyOS:-1 },
-  { round:6, chance:0.14, msg:"🏆 Festival Buzz: An early cut screened at a festival. Critics are whispering awards.", penaltyBO:0,  penaltyOS:2 },
-  { round:7, chance:0.10, msg:"🎵 Score Leak: The composer's score leaked online. Reaction is divided.", penaltyBO:1,  penaltyOS:-1 },
+  { round:1, chance:0.12, msg:"🎬 Director Last Minute: Your first-choice director just dropped out for a Netflix deal. Reroll your director.", reroll:true, penaltyBO:0,  penaltyOS:0 },
+  { round:2, chance:0.15, msg:"🚨 Studio Notes: The studio wants a bigger name in the lead. Reroll your lead actor.", reroll:true,  penaltyBO:0,  penaltyOS:0 },
+  { round:2, chance:0.10, msg:"📰 Lead Actor Tabloid: Your lead is front page news for the wrong reasons. Box office hit.", reroll:false, penaltyBO:-2, penaltyOS:0 },
+  { round:3, chance:0.12, msg:"💰 Budget Cut: Finance pulled 35% of funding mid-production. A shadow hangs over the film.", reroll:false, penaltyBO:-2, penaltyOS:-1 },
+  { round:3, chance:0.10, msg:"📝 Script Leak: The screenplay leaked online. Reactions are mixed. Anticipation is lower.", reroll:false, penaltyBO:-1, penaltyOS:-1 },
+  { round:4, chance:0.12, msg:"🎤 Director Drama: The director gave an incendiary interview. The studio issued a statement.", reroll:false, penaltyBO:-1, penaltyOS:-2 },
+  { round:4, chance:0.08, msg:"⚡ Bidding War: Three studios competed for this crew combination. Momentum is building.", reroll:false, penaltyBO:2,  penaltyOS:1 },
+  { round:5, chance:0.12, msg:"🏆 Festival Buzz: An early assembly cut screened privately. Critics are already talking awards.", reroll:false, penaltyBO:0,  penaltyOS:3 },
+  { round:5, chance:0.10, msg:"🔄 Reshoots Ordered: The studio saw the rough cut and ordered significant reshoots.", reroll:true,  penaltyBO:-1, penaltyOS:-1 },
+  { round:6, chance:0.10, msg:"🎵 Score Controversy: The composer's approach divided the studio. Three cues were replaced.", reroll:false, penaltyBO:0,  penaltyOS:-1 },
+  { round:6, chance:0.08, msg:"💥 Release Date Clash: A major franchise film announced the same weekend. The studio is nervous.", reroll:false, penaltyBO:-2, penaltyOS:0 },
+  { round:7, chance:0.08, msg:"🌟 Awards Precursor Win: The film just won at a major precursor ceremony. The campaign activates.", reroll:false, penaltyBO:1,  penaltyOS:3 },
+  { round:7, chance:0.08, msg:"📱 Trailer Backlash: The first trailer dropped to a mixed response. Marketing is rethinking.", reroll:false, penaltyBO:-2, penaltyOS:-1 },
+  { round:8, chance:0.08, msg:"🎟️ Test Screening Disaster: The first test screening scored in the bottom 10%. Panic in the editing room.", reroll:false, penaltyBO:-3, penaltyOS:-2 },
+  { round:8, chance:0.08, msg:"✨ Test Screening Triumph: The test screening scored 98. Every executive is suddenly very friendly.", reroll:false, penaltyBO:3,  penaltyOS:2 },
 ];
 
 function getRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
@@ -1802,6 +1856,33 @@ const SYNERGIES = [
   { names:["Dwayne Johnson","A24"],                   boBonus:1, osBonus:-1, label:"Rock x A24",            msg:"The most confusing press release of the decade. A24 sent a statement. It raised more questions." },
   { names:["Gaspar Noe","Disney / Marvel"],           boBonus:-2, osBonus:2, label:"Noe x Disney",          msg:"Someone made this happen. Someone will lose their job over it. The film will be extraordinary and wrong." },
   { names:["Kelly Reichardt","All-In ($350M+)"],      boBonus:-2, osBonus:3, label:"Reichardt $350M",       msg:"The studio gave Reichardt $350M. She will spend $12M of it. The other $338M will confuse everyone." },
+
+  // ── BAD BLOOD / NOTORIOUS FLOPS ──
+  { names:["Vin Diesel","Action Blockbuster"],        boBonus:-2, osBonus:-3, label:"Diesel Franchise Fatigue", msg:"The fourteenth film in a franchise nobody asked to continue. The Rock filed a statement. It was not complementary." },
+  { names:["Dwayne Johnson","Vin Diesel"],             boBonus:-3, osBonus:-2, label:"Diesel vs The Rock",       msg:"They reportedly refused to film scenes together. The editing required six additional months. The studio is not commenting." },
+  { names:["Dwayne Johnson","Sequel / Franchise Part 2"], boBonus:-1, osBonus:-3, label:"Rock Sequel Fatigue",  msg:"The third franchise entry with Johnson. The audience remembers the first one fondly. This one tests that fondness." },
+  { names:["Adam Sandler","Awards Season (Nov to Dec)"], boBonus:-1, osBonus:-2, label:"Sandler Awards Miss",   msg:"The Academy did not extend this invitation. The marketing team is choosing a different angle." },
+  { names:["Adam Sandler","Uncut Gems"],               boBonus:1,  osBonus:3,  label:"Sandler Serious Mode",    msg:"When Sandler commits, the result is extraordinary. The Academy did not nominate him for Uncut Gems. He has not forgiven them." },
+  { names:["Michael Bay","Awards Season (Nov to Dec)"], boBonus:-2, osBonus:-4, label:"Bay Awards Disaster",   msg:"A Michael Bay film opening in awards season. The Academy has received the screener. They have not responded." },
+  { names:["Michael Bay","A24"],                       boBonus:-1, osBonus:-2, label:"Bay x A24",              msg:"The most confusing partnership announcement of the decade. Both sides issued statements. Neither was reassuring." },
+  { names:["Brett Ratner","Any"],                      boBonus:-3, osBonus:-3, label:"Ratner Effect",           msg:"The press coverage has already eclipsed the film. The studio is reconsidering the partnership." },
+
+  // ── SPECIFIC RIVALRIES AND HISTORY ──
+  { names:["Francis Ford Coppola","Paramount Pictures"], boBonus:-1, osBonus:2, label:"Coppola vs Paramount",  msg:"Their relationship is historically complex. Coppola has strong opinions about studio interference. The studio has strong opinions about budgets." },
+  { names:["Terry Gilliam","Major Tentpole ($180M to $250M)"], boBonus:-3, osBonus:2, label:"Gilliam Goes Big", msg:"A Terry Gilliam film with a nine-figure budget. The insurance company is already on set. This always ends one way." },
+  { names:["Orson Welles","Any"],                      boBonus:-2, osBonus:4,  label:"Welles Problem",         msg:"The studio has received the cut. They have notes. All of the notes. Welles has responded. None of the notes will be addressed." },
+  { names:["Nicolas Cage","Straight-to-Streaming"],    boBonus:-1, osBonus:0,  label:"Cage VOD Era",           msg:"2012 Cage energy. He will still be extraordinary in three scenes. The other ninety minutes are negotiable." },
+  { names:["Johnny Depp","Disney / Marvel"],           boBonus:-2, osBonus:-1, label:"Depp x Disney Split",    msg:"Their professional relationship ended publicly. The announcement has generated coverage. None of it is about the film." },
+
+  // ── SURPRISE POSITIVE WILDCARDS ──
+  { names:["Adam Sandler","Barry Jenkins"],            boBonus:0,  osBonus:4,  label:"Sandler x Jenkins",      msg:"An unprecedented pairing. Jenkins apparently wrote the role specifically for Sandler. The Academy is confused but intrigued." },
+  { names:["Nicolas Cage","Ari Aster"],                boBonus:0,  osBonus:3,  label:"Cage x Aster",           msg:"Beau Is Afraid energy but louder. Aster apparently cried reading Cage's audition tape. He is not sure why." },
+  { names:["Dwayne Johnson","Bong Joon-ho"],           boBonus:2,  osBonus:2,  label:"Rock x Bong",            msg:"Nobody predicted this. Bong needed Johnson specifically for a scene nobody can talk about yet. The trailer broke the internet." },
+  { names:["Two-Week Oscar Qualifying Run","Awards Season (Nov to Dec)"], boBonus:0, osBonus:4, label:"Awards Precision", msg:"A two-week qualifying run followed by a full awards rollout. This is not an accident. The campaign has been in motion for months." },
+  { names:["Goblin","Horror"],                         boBonus:1,  osBonus:2,  label:"Goblin Horror Reunion",  msg:"The Italian prog-rock collective scoring a horror film is the most correct sentence in cinema. Argento nods from afar." },
+  { names:["Disasterpeace","Horror"],                  boBonus:1,  osBonus:2,  label:"It Follows Energy",      msg:"The score to It Follows is one of the greatest horror scores ever made. Another horror film. Another chance." },
+  { names:["Mica Levi","Arthouse"],                    boBonus:0,  osBonus:3,  label:"Levi Arthouse",          msg:"Under the Skin. Jackie. The score that sounds like the film's subconscious finally speaking." },
+  { names:["Oneohtrix Point Never","A24"],             boBonus:1,  osBonus:3,  label:"OPN x A24",              msg:"Uncut Gems energy. The score will feel like a financial anxiety attack. That is a compliment." },
 ];
 
 function detectSynergies(picks) {
@@ -1845,14 +1926,25 @@ function calcScores(picks) {
   const { boAdj, osAdj, active } = applySynergies(boNorm, osNorm, picks);
   const avgBO = picks.reduce((s,p)=>s+(p.bo||0),0) / Math.max(picks.length,1);
   const avgOS = picks.reduce((s,p)=>s+(p.oscar||0),0) / Math.max(picks.length,1);
-  const greenlightBonus = avgBO >= 17 && avgOS >= 15;
-  const multiplier = greenlightBonus ? 1.12 : 1.0;
+  // Multiple greenlight bonus tiers
+  let greenlightBonus = false;
+  let greenlightLabel = '';
+  let multiplier = 1.0;
+  if (avgBO >= 19 && avgOS >= 17) {
+    greenlightBonus = true; greenlightLabel = 'Unanimous Greenlight'; multiplier = 1.20;
+  } else if (avgBO >= 17 && avgOS >= 15) {
+    greenlightBonus = true; greenlightLabel = 'Greenlit'; multiplier = 1.12;
+  } else if (avgBO >= 15 && avgOS >= 18) {
+    greenlightBonus = true; greenlightLabel = 'Awards Powerhouse'; multiplier = 1.10;
+  } else if (avgBO >= 20 && avgOS >= 10) {
+    greenlightBonus = true; greenlightLabel = 'Box Office Machine'; multiplier = 1.10;
+  }
   const chaosBoAdj = (S.chaosModBO || 0) / 22;
   const chaosOsAdj = (S.chaosModOS || 0) / 20;
   return {
     boNorm: Math.max(0, Math.min(1, boAdj * multiplier + chaosBoAdj)),
     osNorm: Math.max(0, Math.min(1, osAdj * multiplier + chaosOsAdj)),
-    synergies: active, greenlightBonus,
+    synergies: active, greenlightBonus, greenlightLabel,
   };
 }
 
@@ -1987,7 +2079,7 @@ function renderIntro() {
     </div>
     <p style="font-size:11px;color:var(--text3);margin-bottom:1.25rem;text-align:center">${HARD_MODE ? 'Hard mode: no scores. Draft on instinct.' : 'Normal mode: scores visible on every card.'}</p>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--text3);margin-bottom:1.25rem">
-      <span>🎲 1 Round skip</span><span>·</span><span>🔀 1 Option reroll</span><span>·</span><span>⚡ Synergy bonuses</span><span>·</span><span>🏆 10 achievements</span>
+      <span>🎲 1 Round skip</span><span>·</span><span>🔀 1 Option reroll</span><span>·</span><span>⚡ Synergy bonuses</span><span>·</span><span>🏆 Earn all achievements</span>
     </div>
     <button class="btn" id="start-btn" style="max-width:240px;margin:0 auto;display:block">Action! Start Directing →</button>
   </div>`;
@@ -2043,7 +2135,7 @@ function renderChoosing() {
 }
 
 function renderResult() {
-  const { boNorm, osNorm, synergies, greenlightBonus } = calcScores(S.picks);
+  const { boNorm, osNorm, synergies, greenlightBonus, greenlightLabel } = calcScores(S.picks);
   const boM    = boToM(boNorm);
   const noms   = osNoms(osNorm);
   const wins   = osWins(noms);
@@ -2147,6 +2239,13 @@ function renderResult() {
   const lbReview = lbPool[Math.floor(Math.random() * lbPool.length)];
 
   // Synergy panel
+  // Chaos event log
+  const chaosList = [];
+  if (S.chaosModBO !== 0 || S.chaosModOS !== 0) {
+    chaosList.push(`<div class="chaos-banner" style="font-size:11px;margin-bottom:6px">🌪️ Chaos affected this production (BO ${S.chaosModBO>=0?'+':''}${S.chaosModBO} · Oscar ${S.chaosModOS>=0?'+':''}${S.chaosModOS})</div>`);
+  }
+  const chaosHtml = chaosList.join('');
+
   const synHtml = S.activeSynergies && S.activeSynergies.length ? `
     <div class="synergy-panel">
       <div class="synergy-lbl">⚡ Chemistry detected</div>
@@ -2161,11 +2260,13 @@ function renderResult() {
 
   const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
   const hardBadge  = HARD_MODE  ? ' <span style="background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🔒 Blind Draft</span>' : '';
-  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ Greenlight Bonus - elite lineup detected (+12% score multiplier)</div>` : '';
+  const glMultiplier = S.greenlightLabel === 'Unanimous Greenlight' ? '+20%' : S.greenlightLabel === 'Greenlit' ? '+12%' : '+10%';
+  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ ${greenlightLabel}  -  ${glMultiplier} score multiplier applied</div>` : '';
   return `<div class="result">
     <div class="result-title">${v.title}${dailyBadge}${hardBadge}</div>
     <div class="result-sub">"${syn ? syn.title : 'Untitled'}" is in the can.</div>
     ${glBanner}
+    ${chaosHtml}
     ${synHtml}
     <div class="result-grid">
       <div class="result-big">
@@ -2265,7 +2366,58 @@ function bind() {
     S.spinning=true; render();
     setTimeout(()=>{
       const cat = CATEGORIES[S.round];
-      S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(DATA[cat.key], cat.opts, S.dailyRng) : getRandom(DATA[cat.key], cat.opts);
+      const personCats2 = ["director","lead","supporting","composer"];
+      const usedNames2 = new Set(
+        S.picks.filter((p,i) => personCats2.includes(CATEGORIES[i]?.key)).map(p => p.name)
+      );
+      let basePool = personCats2.includes(cat.key)
+        ? DATA[cat.key].filter(p => !usedNames2.has(p.name))
+        : DATA[cat.key];
+      // Studio restrictions
+      if ((cat.key === 'budget' || cat.key === 'season') && basePool.length) {
+        const studioPick2 = S.picks[3];
+        if (studioPick2) {
+          const arthouseList = ['A24','Neon','IFC','Magnolia','Annapurna','First-Time','Canal+'];
+          const isArtS = arthouseList.some(a => studioPick2.name.includes(a));
+          if (isArtS && cat.key === 'budget') {
+            const f = basePool.filter(p => !/Mega|All-In|\$350M|\$300M|\$250M|Tentpole|Superhero Scale/.test(p.name));
+            if (f.length >= cat.opts) basePool = f;
+          }
+          if (isArtS && cat.key === 'season') {
+            const f = basePool.filter(p => !/IMAX Global|Summer Tentpole|Super Bowl/.test(p.name));
+            if (f.length >= cat.opts) basePool = f;
+          }
+        }
+      }
+      // Screenplay locks genre
+      if (cat.key === 'genre' && S.picks[4]) {
+        const sp2 = S.picks[4].name;
+        if (/Original|Novel|Memoir|True Story|Stage Play|Short Story|Journalist|Children|Graphic Novel/.test(sp2)) {
+          const f = basePool.filter(p => !/^Superhero$/.test(p.name));
+          if (f.length >= cat.opts) basePool = f;
+        }
+        if (sp2.includes('Established Hero')) {
+          const f = basePool.filter(p => !/Arthouse|Folk Horror|Surrealist|Existential|Neo-Noir|Period Romance|Road Movie/.test(p.name));
+          if (f.length >= cat.opts) basePool = f;
+        }
+        if (/Prequel|Spinoff|Franchise|Reboot/.test(sp2)) {
+          const f = basePool.filter(p => !/A24-style|Folk Horror|Surrealist|Existential/.test(p.name));
+          if (f.length >= cat.opts) basePool = f;
+        }
+      }
+      // Genre locks budget/season
+      if ((cat.key === 'budget' || cat.key === 'season') && S.picks[5]) {
+        const gn2 = S.picks[5].name;
+        if (/Arthouse|Folk Horror|Surrealist|Existential|Found Footage|Road Movie/.test(gn2)) {
+          const f = basePool.filter(p => !/Mega|All-In|Tentpole|\$350M|\$300M|Superhero Scale/.test(p.name));
+          if (f.length >= cat.opts) basePool = f;
+        }
+        if (/Kaiju|Disaster|Sci-Fi Epic|Action Blockbuster/.test(gn2) && cat.key === 'budget') {
+          const f = basePool.filter(p => !/Zero Budget|Micro-Budget|Guerrilla|Kickstarter/.test(p.name));
+          if (f.length >= cat.opts) basePool = f;
+        }
+      }
+      S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(basePool, cat.opts, S.dailyRng) : getRandom(basePool, cat.opts);
       S.selIdx=null; S.spinning=false; S.phase="choosing"; render();
     }, 650);
   });
@@ -2301,9 +2453,20 @@ function bind() {
     S.lastPickFeedback = getPickFeedback(picked, S.round);
     S.round++; S.selIdx=null;
     if (!DAILY_MODE) {
-      const ev = CHAOS_EVENTS.find(e => e.round===S.round && Math.random()<e.chance);
-      if (ev) { S.chaosEvent=ev; S.chaosModBO+=(ev.penaltyBO||0); S.chaosModOS+=(ev.penaltyOS||0); }
-      else { S.chaosEvent=null; }
+      const eligible = CHAOS_EVENTS.filter(e => e.round===S.round);
+      const ev = eligible.find(e => Math.random()<e.chance);
+      if (ev) {
+        S.chaosEvent=ev;
+        S.chaosModBO += (ev.penaltyBO||0);
+        S.chaosModOS += (ev.penaltyOS||0);
+        if (ev.reroll) {
+          // Force a reroll of the current round by rolling back
+          S.picks.pop();
+          S.round--;
+          S.phase = 'rolling';
+          S.lastPickFeedback = null;
+        }
+      } else { S.chaosEvent=null; }
     }
     S.phase = S.round>=CATEGORIES.length ? "result" : "rolling";
     render();
@@ -2319,6 +2482,7 @@ function bind() {
     const nameEl   = document.getElementById("wof-director-name");
     const optInEl  = document.getElementById("wof-opt-in");
     const dirName  = (nameEl?.value || "").trim() || "Anonymous";
+    if (dirName !== 'Anonymous') localStorage.setItem('lca_player_name', dirName);
     const optIn    = optInEl ? optInEl.checked : true;
 
     if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
@@ -2363,8 +2527,12 @@ function switchTab(tab) {
   if (gp) gp.classList.toggle('hidden', tab!=='game');
   if (wp) wp.classList.toggle('active', tab==='wof');
   if (lp) lp.classList.toggle('active', tab==='lb');
-  if (tab==='wof') renderWalkOfFame();
-  if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
+  if (tab==='wof') {
+    renderWalkOfFame();
+    const ap = document.getElementById('wof-achievements');
+    if (ap) ap.innerHTML = renderAchievementsPanel();
+  }
+  if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); renderDailyLeaderboard(); }
 }
 
 // ── Leaderboard storage (localStorage) ──
@@ -2456,11 +2624,16 @@ function showToast(msg) {
 }
 
 // ── Build share text ──
+function safeEncode(str) {
+  try { return encodeURIComponent(str); }
+  catch(e) { return encodeURIComponent(str.replace(/[^\x00-\x7F]/g, '')); }
+}
+
 function buildShareText() {
   if (!S.synopsis || !S.verdict) return '';
   const v = S.verdict;
-  const crew = S.picks.map((p,i)=>`${CATEGORIES[i].icon} ${p.name}`).join(' · ');
-  return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\n💰 $${S.boM}M worldwide · 🏆 ${S.noms} Oscar noms · 🥇 ${S.wins} wins\n\n${crew}\n\n🎬 Play at lights-camera-action.app`;
+  const crew = S.picks.map((p,i)=>`${CATEGORIES[i].icon} ${p.name}`).join(' - ');
+  return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\nBox Office: $${S.boM}M worldwide - Oscar noms: ${S.noms} - Wins: ${S.wins}\n\n${crew}\n\nPlay at lights-camera-action.app`;
 }
 
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
@@ -2622,7 +2795,7 @@ function wireShareButtons() {
   // ── X link  -  update href dynamically so it carries the current film text ──
   const twitterLink = document.getElementById('share-twitter-link');
   if (twitterLink) {
-    const tweetText = encodeURIComponent(buildShareText().slice(0, 260));
+    const tweetText = safeEncode(buildShareText().slice(0, 260));
     twitterLink.href = 'https://twitter.com/intent/tweet?text=' + tweetText;
   }
 
@@ -2678,6 +2851,9 @@ function getPickFeedback(chosen, roundIdx) {
   // ── Lead Actor-specific ──
   if (cat.key === "lead") {
     const leadLines = {
+      "Nicole Kidman":        ["They will come to this place for magic. AMC Theatres knew it. The internet never forgot it. She arrives on set and the atmosphere changes.", "She transforms for every role so completely that costumers and makeup artists describe the experience as uncanny. The film is already different."],
+      "Margot Robbie":        ["She produced Barbie and starred in it and it made $1.4 billion. She is not an actress. She is a phenomenon.", "The cultural moment she creates around a film is as important as the film itself. Both are extraordinary."],
+      "Cate Blanchett":       ["She is incapable of a bad performance. She is frequently capable of the best performance in any given year. Tar energy.", "The role will be described as transformative in every review. The description will be accurate."],
       "Meryl Streep":         ["Her 22nd Oscar nomination is already being written about. The film has not started shooting. This is simply how it works.","Every performance she gives is described as career-best. Somehow each time it is true."],
       "Leonardo DiCaprio":    ["He did not make a film for four years. He waited for this. The tracking numbers just moved noticeably upward.","The internet will have opinions about whether he deserves the Oscar before the film is released. He will deserve it."],
       "Tom Hanks":            ["The most likeable human being in the history of cinema is now attached to your film. The marketing writes itself. The awards follow.","He makes every film feel important without trying to. The audience trusts him unconditionally."],
@@ -2881,15 +3057,25 @@ const ACHIEVEMENTS = [
   { id:"chaos_survivor",   label:"Chaos Survivor",            check: (S) => (S.chaosModBO||0)<0 && (S.boM||0)>=400, icon:"🌪️" },
 ];
 
-let unlockedAchievements = JSON.parse(localStorage.getItem('lca_achievements') || '[]');
+const ACH_KEY = 'lca_achievements_v2';
+let unlockedAchievements = JSON.parse(localStorage.getItem(ACH_KEY) || '[]');
 
 function checkAchievements(S) {
+  let newlyUnlocked = [];
   for (const ach of ACHIEVEMENTS) {
-    if (!unlockedAchievements.includes(ach.id) && ach.check(S)) {
-      unlockedAchievements.push(ach.id);
-      localStorage.setItem('lca_achievements', JSON.stringify(unlockedAchievements));
-      showAchievement(ach);
+    if (!unlockedAchievements.find(a => a.id === ach.id)) {
+      try {
+        if (ach.check(S)) {
+          const entry = { id: ach.id, label: ach.label, icon: ach.icon, date: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) };
+          unlockedAchievements.push(entry);
+          newlyUnlocked.push(entry);
+        }
+      } catch(e) {}
     }
+  }
+  if (newlyUnlocked.length) {
+    localStorage.setItem(ACH_KEY, JSON.stringify(unlockedAchievements));
+    newlyUnlocked.forEach((ach, i) => setTimeout(() => showAchievement(ach), i * 800));
   }
 }
 
@@ -2899,6 +3085,16 @@ function showAchievement(ach) {
   el.textContent = `${ach.icon} Achievement unlocked: ${ach.label}`;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function renderAchievementsPanel() {
+  const unlocked = unlockedAchievements;
+  const locked = ACHIEVEMENTS.filter(a => !unlocked.find(u => u.id === a.id));
+  return `<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">🏅 Achievements (${unlocked.length}/${ACHIEVEMENTS.length})</div>
+    ${unlocked.length ? unlocked.map(a => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:18px">${a.icon}</span><div><div style="font-size:12px;font-weight:600;color:var(--text)">${a.label}</div><div style="font-size:10px;color:var(--text3)">Unlocked ${a.date}</div></div></div>`).join('') : '<div style="font-size:12px;color:var(--text3);padding:8px 0">No achievements yet. Keep drafting.</div>'}
+    ${locked.length ? `<div style="font-size:11px;color:var(--text3);margin-top:10px">${locked.map(a => `<span style="opacity:0.4;margin-right:8px">${a.icon} ${a.label}</span>`).join('')}</div>` : ''}
+  </div>`;
 }
 
 // ── Supabase Walk of Fame ────────────────────────────────────────────────────
@@ -2933,19 +3129,35 @@ async function sbFetch(limit = 50) {
   try {
     const res = await fetch(
       SB_URL + "/rest/v1/walk_of_fame?select=*&order=bo_m.desc&limit=" + limit,
-      {
-        headers: {
-          "apikey": SB_KEY,
-          "Authorization": "Bearer " + SB_KEY
-        }
-      }
+      { headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY } }
     );
     if (!res.ok) return [];
     return await res.json();
-  } catch(e) {
-    console.warn("Supabase fetch failed:", e);
-    return [];
-  }
+  } catch(e) { return []; }
+}
+
+async function sbFetchDaily(limit = 30) {
+  try {
+    const seed = getDailySeed().toString();
+    const res = await fetch(
+      SB_URL + "/rest/v1/daily_leaderboard?select=*&daily_seed=eq." + seed + "&order=score.desc&limit=" + limit,
+      { headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY } }
+    );
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
+async function sbInsertDaily(row) {
+  try {
+    const res = await fetch(SB_URL + "/rest/v1/daily_leaderboard", {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Prefer":"return=representation" },
+      body: JSON.stringify(row)
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
 }
 
 async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCritic, rtAudience, directorName) {
@@ -3005,6 +3217,34 @@ function renderGlobalEntries() {
       </div>
     </div>`;
   }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Global Walk of Fame · lights-camera-action.app</div>';
+}
+
+async function renderDailyLeaderboard() {
+  const list = document.getElementById('daily-lb-list');
+  if (!list) return;
+  list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:.5rem 0">Loading...</div>';
+  const entries = await sbFetchDaily(20);
+  if (!entries || !entries.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:.5rem 0">No entries yet today. Play the daily draft to be first on the board.</div>';
+    return;
+  }
+  const medals = ["🥇","🥈","🥉"];
+  const rankClass = ["gold","silver","bronze"];
+  list.innerHTML = entries.map((e,i) => {
+    const by = e.submitted_by && e.submitted_by !== 'Anonymous' ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    return `<div class="lb-entry">
+      <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
+      <div class="lb-info">
+        <div class="lb-title">${e.film_title||'Untitled'}</div>
+        <div class="lb-verdict">${e.verdict||''}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.lead_actor||''}${by}</div>
+      </div>
+      <div class="lb-scores">
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
+      </div>
+    </div>`;
+  }).join('') + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Daily board resets at midnight</div>';
 }
 
 async function renderGlobalLeaderboard() {
