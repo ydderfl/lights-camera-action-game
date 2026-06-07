@@ -2188,16 +2188,17 @@ function renderResult() {
         </button>
         <button class="share-btn" id="share-card-btn">
           <span class="share-btn-icon">🖼️</span>
-          <span class="share-btn-label">Save Card</span>
-        </button>
-        <button class="share-btn" id="share-twitter-btn">
-          <span class="share-btn-icon">𝕏</span>
-          <span class="share-btn-label">Post to X</span>
+          <span class="share-btn-label">Copy Card</span>
         </button>
         <button class="share-btn" id="share-copy-btn">
           <span class="share-btn-icon">📋</span>
           <span class="share-btn-label">Copy Text</span>
         </button>
+      </div>
+      <div style="text-align:center;padding:6px 0 2px">
+        <a href="https://lights-camera-action.app" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none">🎬 lights-camera-action.app</a>
+        &nbsp;·&nbsp;
+        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent ? '' : ''}" id="share-twitter-link" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none">Post to 𝕏</a>
       </div>
       <div id="share-card-preview" style="display:none;margin-top:12px"></div>
     </div>
@@ -2527,89 +2528,55 @@ function showShareCardPreview() {
 function wireShareButtons() {
   const $ = id => document.getElementById(id);
 
-  // Native share  -  best experience on mobile (iOS share sheet, Android share sheet)
-  // Tries to share as image first, falls back to text
+  // ── Share (📤)  -  native share sheet on mobile, card + text on desktop ──
   $('share-native-btn')?.addEventListener('click', async () => {
-    const svg = buildShareCardSVG();
-    const blob = await svgToBlob(svg);
-    const filename = ((S.synopsis?.title || 'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase()) + '.png';
-
-    // Try native image share (works on iOS Safari, Android Chrome)
-    if (blob && navigator.share && navigator.canShare) {
-      const file = new File([blob], filename, {type:'image/png'});
-      if (navigator.canShare({files:[file]})) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: S.synopsis?.title || 'My Film',
-            text: buildShareText(),
-          });
-          showToast('Shared!');
-          return;
-        } catch(e) {
-          if (e.name !== 'AbortError') console.warn('Share failed:', e);
-          else return; // user cancelled
-        }
-      }
-      // Try text-only native share (Android)
+    if (navigator.share) {
       try {
-        await navigator.share({ title: S.synopsis?.title, text: buildShareText(), url: 'https://lights-camera-action.app' });
+        await navigator.share({
+          title: S.synopsis?.title || 'My Film',
+          text: buildShareText(),
+          url: 'https://lights-camera-action.app'
+        });
         showToast('Shared!');
         return;
       } catch(e) { if (e.name === 'AbortError') return; }
     }
-
-    // Desktop fallback: show card + copy text
+    // Desktop fallback: show card and copy text
     showShareCardPreview();
     try {
       await navigator.clipboard.writeText(buildShareText());
-      showToast('Card shown below. Text copied to clipboard!');
-    } catch { showToast('Card shown below. Save and share!'); }
+      showToast('Card shown below  -  text copied!');
+    } catch { showToast('Card shown below  -  save it!'); }
   });
 
-  // Save card  -  renders SVG card and downloads as PNG
+  // ── Copy Card (🖼️)  -  renders card inline, copies image to clipboard ──
+  // On mobile: shows card for long-press save. On desktop: copies PNG to clipboard.
   $('share-card-btn')?.addEventListener('click', async () => {
-    const svg = buildShareCardSVG();
-    // Show preview immediately
     showShareCardPreview();
+    const svg = buildShareCardSVG();
     const blob = await svgToBlob(svg);
-    if (!blob) { showToast('Card shown below - save it with long press'); return; }
+    if (!blob) { showToast('Card shown below  -  long-press to save'); return; }
 
-    // Try native share with image on mobile
-    if (navigator.share && navigator.canShare) {
-      const filename = ((S.synopsis?.title||'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase())+'.png';
-      const file = new File([blob], filename, {type:'image/png'});
-      if (navigator.canShare({files:[file]})) {
-        try {
-          await navigator.share({ files:[file], title: S.synopsis?.title });
-          showToast('Image shared!');
-          return;
-        } catch(e) { if (e.name==='AbortError') return; }
+    // Try clipboard image copy (works in Chrome desktop, some Android)
+    try {
+      if (window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+        showToast('Card image copied to clipboard!');
+        return;
       }
-    }
+    } catch(e) { /* fall through */ }
 
-    // Desktop: download the PNG
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = ((S.synopsis?.title||'my-film').replace(/[^a-z0-9]/gi,'-').toLowerCase())+'.png';
-    a.click();
-    showToast('Card saved! Share it anywhere.');
+    // Mobile: card is shown above for long-press save to camera roll
+    showToast('Card shown below  -  long-press to save to camera roll');
   });
 
-  // Post to X  -  opens Twitter with pre-filled text
-  $('share-twitter-btn')?.addEventListener('click', () => {
-    const text = encodeURIComponent(buildShareText().slice(0,260));
-    window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
-  });
-
-  // Copy text  -  clean fallback for everything else
+  // ── Copy Text (📋) ──
   $('share-copy-btn')?.addEventListener('click', async () => {
     const text = buildShareText();
     try {
       await navigator.clipboard.writeText(text);
       showToast('Copied to clipboard!');
     } catch {
-      // Last resort for browsers that block clipboard
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
@@ -2620,6 +2587,13 @@ function wireShareButtons() {
       showToast('Copied!');
     }
   });
+
+  // ── X link  -  update href dynamically so it carries the current film text ──
+  const twitterLink = document.getElementById('share-twitter-link');
+  if (twitterLink) {
+    const tweetText = encodeURIComponent(buildShareText().slice(0, 260));
+    twitterLink.href = 'https://twitter.com/intent/tweet?text=' + tweetText;
+  }
 
   $('submit-wof-btn')?.removeEventListener('click', handleSubmitWof);
   $('submit-wof-btn')?.addEventListener('click', handleSubmitWof);
@@ -2979,20 +2953,23 @@ async function renderGlobalLeaderboard() {
   const medals = ["🥇","🥈","🥉"];
   const rankClass = ["gold","silver","bronze"];
 
-  list.innerHTML = entries.map((e, i) => `
+  list.innerHTML = entries.map((e, i) => {
+    const byLine = (e.submitted_by && e.submitted_by !== "Anonymous") ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    return `
     <div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i] || ""}">${medals[i] || i+1}</div>
       <div class="lb-info">
         <div class="lb-title">${e.film_title || "Untitled"}</div>
-        <div class="lb-verdict">${e.verdict || ""} &nbsp;·&nbsp; ${e.director || ""} &nbsp;·&nbsp; ${e.lead_actor || ""}</div>
+        <div class="lb-verdict">${e.verdict || ""}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director || ""} &nbsp;·&nbsp; ${e.lead_actor || ""}${byLine}</div>
       </div>
       <div class="lb-scores">
         <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m || 0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms || 0} noms</div>
         <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins || 0} wins</div>
       </div>
-    </div>
-  `).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Global leaderboard · ranked by box office</div>';
+    </div>`;
+  }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Global leaderboard · ranked by box office</div>';
 }
 
 render();
