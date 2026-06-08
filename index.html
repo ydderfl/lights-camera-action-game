@@ -2495,6 +2495,18 @@ const SYNERGIES = [
   { names:["Disasterpeace","Horror"],                  boBonus:1,  osBonus:2,  label:"It Follows Energy",      msg:"The score to It Follows is one of the greatest horror scores ever made. Another horror film. Another chance." },
   { names:["Mica Levi","Arthouse"],                    boBonus:0,  osBonus:3,  label:"Levi Arthouse",          msg:"Under the Skin. Jackie. The score that sounds like the film's subconscious finally speaking." },
   { names:["Oneohtrix Point Never","A24"],             boBonus:1,  osBonus:3,  label:"OPN x A24",              msg:"Uncut Gems energy. The score will feel like a financial anxiety attack. That is a compliment." },
+  { names:["Justin Hurwitz","Musical"],               boBonus:2, osBonus:4, label:"Hurwitz x Musical",        msg:"La La Land. Babylon. He writes melodies that lodge in the subconscious and stay there for years. The Academy knows this score already." },
+  { names:["Justin Hurwitz","Romantic Drama"],        boBonus:1, osBonus:3, label:"Hurwitz x Romance",         msg:"The romantic drama is where Hurwitz operates best. The ache in the strings will be unbearable in the best possible way." },
+  { names:["Justin Hurwitz","A24-style Arthouse"],    boBonus:1, osBonus:3, label:"Hurwitz x Arthouse",        msg:"Babylon showed he can go dark and sprawling. The arthouse context will let him go somewhere even more unexpected." },
+  { names:["Ludwig Goransson","Sci-Fi Epic"],         boBonus:2, osBonus:3, label:"Goransson x Sci-Fi",        msg:"Oppenheimer. Tenet. He makes the cosmic feel personal and the personal feel cosmic." },
+  { names:["Ludwig Goransson","Action Blockbuster"],  boBonus:2, osBonus:2, label:"Goransson x Action",         msg:"Black Panther established the template. The score is the culture. The culture moves the box office." },
+  { names:["Hildur Gudnadottir","Psychological Thriller"], boBonus:1, osBonus:3, label:"Hildur x Thriller",    msg:"Joker. Chernobyl. She finds the humanity inside the horror and makes it the most devastating thing in the room." },
+  { names:["Hildur Gudnadottir","Horror"],            boBonus:1, osBonus:3, label:"Hildur x Horror",           msg:"Women Talking energy. The dread she builds is not jump-scare dread. It is the kind that lives with you for weeks." },
+  { names:["Trent Reznor and Atticus Ross","Neo-Noir"], boBonus:2, osBonus:3, label:"Reznor x Neo-Noir",       msg:"The Social Network. Gone Girl. The score as psychological pressure. The city sounds like it is watching you back." },
+  { names:["Daft Punk","Sci-Fi Epic"],                boBonus:2, osBonus:2, label:"Daft Punk x Sci-Fi",        msg:"TRON: Legacy redefined what an electronic score could do in a mainstream film. The sequel energy is already present." },
+  { names:["Alexandre Desplat","Prestige Drama"],     boBonus:1, osBonus:3, label:"Desplat x Prestige",        msg:"The Grand Budapest Hotel. The Shape of Water. He scores prestige cinema with the lightness of a master." },
+  { names:["Max Richter","Epic Drama"],               boBonus:0, osBonus:3, label:"Richter x Drama",           msg:"On the Nature of Daylight became the unofficial theme of thoughtful cinema for a decade. His instinct for grief is unmatched." },
+  { names:["Gustavo Santaolalla","Prestige Drama"],   boBonus:1, osBonus:3, label:"Santaolalla x Drama",        msg:"Brokeback Mountain. Babel. The sparse guitar carries more emotional weight than a full orchestra. The Academy agrees." },
 ];
 
 function detectSynergies(picks) {
@@ -2675,7 +2687,12 @@ function getTodayString() {
 function getDailyKey() { return 'lca_daily_' + getDailySeed(); }
 function hasDoneDaily() { return !!localStorage.getItem(getDailyKey()); }
 function saveDailyResult(boM, noms, wins, verdict) {
-  localStorage.setItem(getDailyKey(), JSON.stringify({ boM, noms, wins, verdict, ts: Date.now() }));
+  localStorage.setItem(getDailyKey(), JSON.stringify({
+    boM, noms, wins,
+    verdict: typeof verdict === 'object' ? verdict?.title : verdict,
+    filmTitle: S.synopsis?.title || '',
+    ts: Date.now()
+  }));
 }
 function getDailyStreak() {
   let streak = 0;
@@ -3141,7 +3158,9 @@ function bind() {
   });
   $("share-daily-btn")?.addEventListener("click", ()=>{
     const r=JSON.parse(localStorage.getItem(getDailyKey())||"{}");
-    const txt="🎬 Daily Draft - "+getTodayString()+"\n\n"+(r.verdict||"")+"\n💰 $"+(r.boM||0)+"M · 🏆 "+(r.noms||0)+" noms · 🥇 "+(r.wins||0)+" wins\n\nPlay at lights-camera-action.app";
+    const txt = "🎬 Daily Draft  -  " + getTodayString() + "\n\n"
+      + "I greenlighted \"" + (r.filmTitle||"a film") + "\"  -  $" + (r.boM||0) + "M, " + (r.noms||0) + " Oscar noms. " + (r.verdict||"") + ".\n\n"
+      + "Can you beat my score? Play: lights-camera-action.app";
     navigator.clipboard.writeText(txt).then(()=>showToast("Daily result copied!")).catch(()=>showToast("Copied!"));
   });
   $("roll-btn")?.addEventListener("click", ()=>{
@@ -3517,13 +3536,24 @@ async function svgToBlob(svgStr) {
   });
 }
 
-function showShareCardPreview() {
+async function showShareCardPreview() {
   const el = document.getElementById('share-card-preview');
   if (!el) return;
-  const svg = buildShareCardSVG();
   el.style.display = 'block';
-  el.innerHTML = '<div style="border-radius:12px;overflow:hidden;border:0.5px solid var(--border)">' + svg + '</div>'
-    + '<p style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">Long-press the card above to save it, then share anywhere.</p>';
+  el.innerHTML = '<div style="text-align:center;padding:1rem;font-size:12px;color:var(--text3)">Building card...</div>';
+  const svg  = buildShareCardSVG();
+  const blob = await svgToBlob(svg);
+  if (blob) {
+    const url = URL.createObjectURL(blob);
+    el.innerHTML = `<img src="${url}" style="width:100%;border-radius:12px;display:block;-webkit-user-select:none;user-select:none" alt="Share card"/>
+      <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">
+        On mobile: <strong>long-press the image</strong> to save to camera roll, then share anywhere.
+      </p>`;
+  } else {
+    // SVG fallback
+    el.innerHTML = '<div style="border-radius:12px;overflow:hidden;border:0.5px solid var(--border);pointer-events:none;-webkit-user-select:none;user-select:none">' + svg + '</div>'
+      + '<p style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">Screenshot this card to share.</p>';
+  }
 }
 
 // ── Share handlers ──
