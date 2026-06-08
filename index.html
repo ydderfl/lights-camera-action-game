@@ -269,6 +269,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">🎬 Draft</button>
     <button class="tab-btn" id="tab-wof" onclick="switchTab('wof')">⭐ Your Cuts</button>
     <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">🌍 Walk of Fame</button>
+    <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">📅 Daily</button>
   </div>
   <div class="game-page" id="page-game">
     <div id="app"></div>
@@ -279,13 +280,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div style="font-size:12px;color:var(--text2)">Every film you have drafted. Your personal archive. Stored on this device.</div>
     </div>
     <div class="lb-filters" id="wof-filters">
-      <button class="lb-filter active" data-sort="score" onclick="setWofSort('score')">⭐ Best Score</button>
+      <button class="lb-filter active" data-sort="score" onclick="setWofSort('score')">⭐ Score</button>
       <button class="lb-filter" data-sort="bo" onclick="setWofSort('bo')">💰 Box Office</button>
-      <button class="lb-filter" data-sort="oscar" onclick="setWofSort('oscar')">🏆 Oscar Noms</button>
+      <button class="lb-filter" data-sort="oscar" onclick="setWofSort('oscar')">🏆 Noms</button>
+      <button class="lb-filter" data-sort="wins" onclick="setWofSort('wins')">🥇 Wins</button>
+      <button class="lb-filter" data-sort="rt" onclick="setWofSort('rt')">🍅 RT</button>
+      <button class="lb-filter" data-sort="audience" onclick="setWofSort('audience')">🍿 Audience</button>
       <button class="lb-filter" data-sort="recent" onclick="setWofSort('recent')">🕐 Recent</button>
     </div>
     <div id="wof-list"></div>
     <div id="wof-achievements"></div>
+  </div>
+
+  <!-- Daily Board page -->
+  <div class="lb-page" id="daily-page" style="display:none">
+    <div style="margin-bottom:1rem">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">📅 Today's Daily Draft</div>
+      <div style="font-size:12px;color:var(--text2)">Everyone gets the same 8 options today. How does your lineup rank?</div>
+    </div>
+    <div id="daily-lb-standalone">
+      <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>
+    </div>
   </div>
 
   <!-- Walk of Fame page -->
@@ -305,18 +320,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
     <div id="global-lb-list">
       <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>
     </div>
-    <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
-      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDailyBoard()">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">📅 Today's Daily Board</div>
-          <div style="font-size:11px;color:var(--text3)">Same draft, global rankings</div>
-        </div>
-        <span id="daily-board-chevron" style="font-size:16px;color:var(--text3);padding:4px 8px">▼</span>
-      </div>
-      <div id="daily-lb-list" style="display:none;margin-top:10px">
-        <div style="font-size:12px;color:var(--text3);padding:.5rem 0">Play today's daily draft to appear here.</div>
-      </div>
-    </div>
+
     <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📽️ Your Submissions</div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Films you have submitted to the global board from this device.</div>
@@ -987,10 +991,13 @@ function renderWalkOfFame() {
   // Ensure all entries have a score
   WALK_OF_FAME.forEach(e => { if (!e.score) e.score = (e.boM||0) + ((e.noms||0)*15) + ((e.wins||0)*25); });
   let sorted = [...WALK_OF_FAME].slice(0, 50);
-  if (wofSort === 'score')  sorted.sort((a,b) => b.score - a.score);
-  if (wofSort === 'bo')     sorted.sort((a,b) => b.boM - a.boM);
-  if (wofSort === 'oscar')  sorted.sort((a,b) => b.noms - a.noms);
-  if (wofSort === 'recent') sorted.sort((a,b) => b.id - a.id);
+  if (wofSort === 'score')    sorted.sort((a,b) => (b.score||0)-(a.score||0));
+  if (wofSort === 'bo')       sorted.sort((a,b) => (b.boM||0)-(a.boM||0));
+  if (wofSort === 'oscar')    sorted.sort((a,b) => (b.noms||0)-(a.noms||0));
+  if (wofSort === 'wins')     sorted.sort((a,b) => (b.wins||0)-(a.wins||0));
+  if (wofSort === 'rt')       sorted.sort((a,b) => (b.rtCritic||0)-(a.rtCritic||0));
+  if (wofSort === 'audience') sorted.sort((a,b) => (b.rtAudience||0)-(a.rtAudience||0));
+  if (wofSort === 'recent')   sorted.sort((a,b) => (b.id||0)-(a.id||0));
   const visible = wofExpanded ? sorted : sorted.slice(0, 10);
   const medals = ["🥇","🥈","🥉"];
   const entries = visible.map((e, i) => {
@@ -1005,6 +1012,7 @@ function renderWalkOfFame() {
       <div class="wof-stats">
         <span class="pill pill-bo">$${e.boM}M</span>
         <span class="pill pill-oscar">🏆 ${e.noms} noms</span>
+        <span class="pill" style="background:var(--green-bg);color:var(--green)">🥇 ${e.wins||0}w</span>
         <span class="pill" style="background:var(--green-bg);color:var(--green)">⭐ ${e.score}</span>
         ${rt}
       </div>
@@ -2826,6 +2834,20 @@ function renderIntro() {
       <span>🎲 1 Round skip</span><span>·</span><span>🔀 1 Option reroll</span><span>·</span><span>⚡ Synergy bonuses</span><span>·</span><span>🏆 Earn all achievements</span>
     </div>
     <button class="btn" id="start-btn" style="max-width:240px;margin:0 auto;display:block">Action! Start Directing →</button>
+    <div style="text-align:center;margin-top:12px">
+      <button id="how-to-play-btn" style="background:none;border:none;color:var(--text3);font-size:12px;text-decoration:underline;cursor:pointer">How to Play</button>
+    </div>
+    <div id="how-to-play-panel" style="display:none;background:var(--surface2);border-radius:var(--r-lg);padding:1.1rem;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
+      <div style="margin-bottom:8px"><strong>9 rounds.</strong> Each round you spin for a category  -  Director, Lead Actor, Supporting Actor, Studio, Screenplay, Genre, Composer, Budget, and Release Strategy.</div>
+      <div style="margin-bottom:8px"><strong>Choose one of 4-8 options</strong> in each round. Every pick has a Box Office score and an Oscar score. Higher is better  -  but not always safer.</div>
+      <div style="margin-bottom:8px"><strong>Synergies fire automatically.</strong> Certain combinations of picks unlock bonus or penalty modifiers. Jonny Greenwood + Paul Thomas Anderson. A24 + Awards Season. Michael Bay + Arthouse. Draft smart.</div>
+      <div style="margin-bottom:8px"><strong>Chaos events</strong> can hit at any time (max 2 per draft). A director walks out. The script leaks. A test screening goes catastrophically wrong. Roll with it.</div>
+      <div style="margin-bottom:8px"><strong>Production Bonuses</strong> are awarded at the end for exceptional draft patterns  -  All-Star Draft, Prestige Sweep, Cultural Crossover, and more.</div>
+      <div style="margin-bottom:8px"><strong>Your result</strong> combines box office gross, Oscar nominations and wins, Tomatometer, Audience Score, and any bonuses into a final score and verdict.</div>
+      <div style="margin-bottom:8px"><strong>You get:</strong> 1 round skip · 1 option reroll · Hard Mode (no scores visible)</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">Submit your film to Walk of Fame to appear on the global leaderboard. Play the Daily Draft to compete with everyone worldwide on the same picks.</div>
+    </div>
   </div>`;
 }
 function renderRolling() {
@@ -3160,6 +3182,10 @@ function bind() {
   $("mode-normal")?.addEventListener("click", ()=>{ HARD_MODE=false; DAILY_MODE=false; render(); });
   $("mode-hard")?.addEventListener("click", ()=>{ HARD_MODE=true; DAILY_MODE=false; render(); });
   $("start-btn")?.addEventListener("click", ()=>{ DAILY_MODE=false; S=fresh(); S.phase="rolling"; render(); });
+  $("how-to-play-btn")?.addEventListener("click", ()=>{
+    const p = document.getElementById("how-to-play-panel");
+    if (p) p.style.display = p.style.display === "none" ? "block" : "none";
+  });
   $("daily-start-btn")?.addEventListener("click", ()=>{
     DAILY_MODE=true; S=fresh(); S.dailyRng=mulberry32(getDailySeed()); S.phase="rolling"; render();
   });
@@ -3334,6 +3360,10 @@ function switchTab(tab) {
   document.getElementById('tab-game').classList.toggle('active', tab==='game');
   document.getElementById('tab-wof').classList.toggle('active', tab==='wof');
   document.getElementById('tab-lb').classList.toggle('active', tab==='lb');
+  const tabDaily = document.getElementById('tab-daily');
+  if (tabDaily) tabDaily.classList.toggle('active', tab==='daily');
+  const dpEl = document.getElementById('daily-page');
+  if (dpEl) dpEl.style.display = tab==='daily' ? 'block' : 'none';
   const gp = document.querySelector('.game-page');
   const wp = document.querySelector('.wof-page');
   const lp = document.getElementById('lb-page');
@@ -3346,6 +3376,7 @@ function switchTab(tab) {
     if (ap) ap.innerHTML = renderAchievementsPanel();
   }
   if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
+  if (tab==='daily') { renderStandaloneDailyBoard(); }
 }
 
 // ── Leaderboard storage (localStorage) ──
@@ -3475,7 +3506,7 @@ function buildShareCardSVG() {
 
   const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="340" viewBox="0 0 400 340">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="320" viewBox="0 0 400 320">
   <defs>
     <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0a0a08"/>
@@ -3527,18 +3558,21 @@ function buildShareCardSVG() {
 
 async function svgToBlob(svgStr) {
   return new Promise(resolve => {
+    // Timeout after 4s so UI never hangs
+    const timer = setTimeout(() => resolve(null), 4000);
     const img = new Image();
     const svgBlob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
     const url = URL.createObjectURL(svgBlob);
     img.onload = () => {
+      clearTimeout(timer);
       const canvas = document.createElement('canvas');
-      canvas.width = 800; canvas.height = 560; // 2x for retina
+      canvas.width = 600; canvas.height = 420; // reduced for speed
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, 800, 560);
+      ctx.drawImage(img, 0, 0, 600, 420);
       URL.revokeObjectURL(url);
-      canvas.toBlob(blob => resolve(blob), 'image/png', 0.95);
+      canvas.toBlob(blob => resolve(blob), 'image/png', 0.82);
     };
-    img.onerror = () => resolve(null);
+    img.onerror = () => { clearTimeout(timer); resolve(null); };
     img.src = url;
   });
 }
@@ -3565,6 +3599,12 @@ async function showShareCardPreview() {
 
 // ── Share handlers ──
 function wireShareButtons() {
+  // Strip existing listeners by cloning each button node before re-wiring
+  ['share-native-btn','share-card-btn','share-copy-btn','share-twitter-link',
+   'submit-wof-btn','share-daily-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { const clone = el.cloneNode(true); el.parentNode?.replaceChild(clone, el); }
+  });
   const $ = id => document.getElementById(id);
 
   // ── Share (📤)  -  native share sheet on mobile, card + text on desktop ──
@@ -3893,26 +3933,46 @@ function getPickFeedback(chosen, roundIdx) {
 
 // ── Achievements ─────────────────────────────────────────────────────────────
 const ACHIEVEMENTS = [
-  { id:"first_run",   label:"Scene One, Take One",    check: (S) => S.picks.length === 9, icon:"🎬" },
-  { id:"all_prestige",label:"EGOT Energy",            check: (S) => S.picks.every(p => p.oscar >= 15), icon:"🏆" },
-  { id:"pure_chaos",  label:"Pure Chaos",             check: (S) => S.picks.some(p => p.bo <= 5) && S.picks.some(p => p.oscar <= 4), icon:"💀" },
-  { id:"box_beast",   label:"Box Office Beast",       check: (S) => S.picks.every(p => p.bo >= 15), icon:"💰" },
-  { id:"synergy_king",label:"Chemistry Class",        check: (S) => (S.activeSynergies||[]).length >= 3, icon:"⚡" },
-  { id:"borchardt",   label:"American Movie Energy",  check: (S) => S.picks.some(p => p.name && p.name.includes("Borchardt")), icon:"🎥" },
-  { id:"cronenberg",  label:"Body of Work",           check: (S) => S.picks.some(p => p.name && p.name.includes("Cronenberg")), icon:"🧬" },
-  { id:"cage_curry",  label:"Unhinged Casting",       check: (S) => S.picks.some(p=>p.name&&p.name.includes("Cage")) && S.picks.some(p=>p.name&&p.name.includes("Curry")), icon:"🤪" },
-  { id:"a24_sweep",   label:"Letterboxd Bait",        check: (S) => S.picks.some(p=>p.name==="A24") && S.picks.some(p=>p.oscar>=17), icon:"🎨" },
-  { id:"no_budget",        label:"Zero Dollar Dream",         check: (S) => S.picks.some(p=>p.name&&p.name.includes("Zero Budget")), icon:"📱" },
-  { id:"greenlit",         label:"Greenlit",                  check: (S) => !!S.greenlightBonus, icon:"✅" },
-  { id:"eyes_closed",      label:"Eyes Closed",               check: (S) => HARD_MODE && S.picks.length===9, icon:"🔒" },
-  { id:"daily_done",       label:"Daily Regular",             check: (S) => DAILY_MODE && S.picks.length===9, icon:"📅" },
-  { id:"on_a_roll",        label:"On a Roll",                 check: () => getDailyStreak() >= 5, icon:"🔥" },
-  { id:"golden_age",       label:"Golden Age",                check: (S) => S.picks.some(p=>p.name&&p.name.includes("Hitchcock")) && S.picks.some(p=>p.name&&(p.name.includes("Grant")||p.name.includes("Stewart"))), icon:"🎩" },
-  { id:"max_chaos",        label:"Maximum Chaos",             check: (S) => S.picks.filter(p=>p.bo<=7).length>=4, icon:"🌀" },
-  { id:"ip_maximalist",    label:"IP Maximalist",             check: (S) => S.picks.filter(p=>p.bo>=19).length>=4, icon:"🦸" },
-  { id:"film_school",      label:"Film School Darling",       check: (S) => ["Lynch","Malick","Godard","Bergman","Fellini","Herzog"].some(n=>S.picks.some(p=>p.name&&p.name.includes(n))) && S.picks.some(p=>p.name==="A24"), icon:"🎞️" },
-  { id:"mcu_sweep",        label:"Phase Unknown",             check: (S) => S.picks.some(p=>p.name&&p.name.includes("Marvel")) && S.picks.some(p=>p.bo>=20), icon:"🦾" },
-  { id:"chaos_survivor",   label:"Chaos Survivor",            check: (S) => (S.chaosModBO||0)<0 && (S.boM||0)>=400, icon:"🌪️" },
+  { id:"first_greenlight",    icon:"🎬", label:"First Greenlight",      desc:"Complete your first draft. The reel starts here.",
+    check: s => s.boM > 0 },
+  { id:"box_office_hit",      icon:"💰", label:"Box Office Hit",         desc:"Draft a film that grosses over $300M worldwide.",
+    check: s => s.boM >= 300 },
+  { id:"oscar_contender",     icon:"🏆", label:"Oscar Contender",        desc:"Earn 7 or more Oscar nominations in a single draft.",
+    check: s => s.noms >= 7 },
+  { id:"sweep",               icon:"👑", label:"Full Sweep",             desc:"Hit $500M box office AND 10+ Oscar nominations in the same draft.",
+    check: s => s.boM >= 500 && s.noms >= 10 },
+  { id:"cult_status",         icon:"🕯️", label:"Cult Status",            desc:"End up with the Cult Classic verdict.",
+    check: s => s.verdict?.id === 'cult' },
+  { id:"tax_writeoff",        icon:"🧾", label:"The Write-Off",          desc:"Produce a film so catastrophic it qualifies as a Tax Write-Off.",
+    check: s => s.verdict?.id === 'tax_writeoff' },
+  { id:"historic_disaster",   icon:"🔥", label:"Historic Disaster",      desc:"Achieve the Historic Disaster verdict. Some firsts you never forget.",
+    check: s => s.verdict?.id === 'disaster' },
+  { id:"greenlight_god",      icon:"⚡", label:"Greenlight God",         desc:"Trigger the Unanimous Greenlight bonus.",
+    check: s => s.greenlightLabel === 'Unanimous Greenlight' },
+  { id:"synergy_master",      icon:"🔗", label:"Synergy Master",         desc:"Activate 5 or more synergies in a single draft.",
+    check: s => (s.activeSynergies||[]).length >= 5 },
+  { id:"chaos_survivor",      icon:"🌪️", label:"Chaos Survivor",        desc:"Have two chaos events hit your production and still finish the film.",
+    check: s => (s.chaosHistory||[]).length >= 2 },
+  { id:"hard_mode",           icon:"🔒", label:"Blind Director",         desc:"Complete a draft in Hard Mode without seeing a single score.",
+    check: (s, hardMode) => hardMode && s.boM > 0 },
+  { id:"arthouse_sweep",      icon:"🎨", label:"Arthouse Sweep",         desc:"Win the Auteur Run bonus with an indie studio and award-caliber director.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('Auteur')) },
+  { id:"all_star",            icon:"⭐", label:"All-Star Draft",         desc:"Trigger the All-Star Draft production bonus.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('All-Star')) },
+  { id:"festival_path",       icon:"🌿", label:"Festival Path",          desc:"Trigger the Festival Path bonus with an arthouse studio and festival premiere.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('Festival')) },
+  { id:"cultural_crossover",  icon:"🌐", label:"Cultural Crossover",     desc:"Hit $550M box office AND 8+ Oscar nominations in the same draft.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('Cultural Crossover')) },
+  { id:"all_time_classic",    icon:"🏛️", label:"All-Time Classic Run",   desc:"Trigger the All-Time Classic Run bonus  -  the rarest achievement in the game.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('All-Time Classic')) },
+  { id:"daily_complete",      icon:"📅", label:"Daily Habit",            desc:"Complete the Daily Draft.",
+    check: (s, hm, daily) => daily && s.boM > 0 },
+  { id:"comeback_kid",        icon:"🔥", label:"Comeback Arc",           desc:"Earn the Career Comeback verdict.",
+    check: s => s.verdict?.id === 'comeback_kid' },
+  { id:"musical_phenom",      icon:"🎵", label:"Musical Phenomenon",     desc:"Earn the Musical Phenomenon verdict.",
+    check: s => s.verdict?.id === 'musical_phenom' },
+  { id:"perfect_chemistry",   icon:"💥", label:"Perfect Chemistry",      desc:"Activate 3+ synergies AND trigger the Perfect Chemistry production bonus.",
+    check: s => (s.bonuses||[]).some(b => b.label.includes('Perfect Chemistry')) },
 ];
 
 const ACH_KEY = 'lca_achievements_v2';
@@ -3949,11 +4009,29 @@ function renderAchievementsPanel() {
   const unlocked = unlockedAchievements;
   const locked = ACHIEVEMENTS.filter(a => !unlocked.find(u => u.id === a.id));
   return `<div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
-    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">🏅 The Reel Awards (${unlocked.length}/${ACHIEVEMENTS.length})</div>
-    ${unlocked.length ? unlocked.map(a => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:18px">${a.icon}</span><div><div style="font-size:12px;font-weight:600;color:var(--text)">${a.label}</div><div style="font-size:10px;color:var(--text3)">Unlocked ${a.date}</div></div></div>`).join('') : '<div style="font-size:12px;color:var(--text3);padding:8px 0">No achievements yet. Keep drafting.</div>'}
-    ${locked.length ? `<div style="font-size:11px;color:var(--text3);margin-top:10px">${locked.map(a => `<span style="opacity:0.4;margin-right:8px">${a.icon} ${a.label}</span>`).join('')}</div>` : ''}
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">🎬 Reel Awards (${unlocked.length}/${ACHIEVEMENTS.length})</div>
+    ${unlocked.map(a => {
+      const def = ACHIEVEMENTS.find(x => x.id === a.id);
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div style="font-size:20px;min-width:28px">${def?.icon||'🏆'}</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--amber)">${def?.label||a.label}</div>
+          <div style="font-size:10px;color:var(--text3);font-style:italic;margin-top:1px">${def?.desc||''}</div>
+          <div style="font-size:10px;color:var(--amber);opacity:0.7;margin-top:2px">Unlocked ${a.date}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    ${locked.map(a => `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);opacity:0.35">
+        <div style="font-size:20px;min-width:28px">${a.icon}</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">${a.label}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Not yet earned</div>
+        </div>
+      </div>`).join('')}
   </div>`;
 }
+
+
 
 // ── Supabase Walk of Fame ────────────────────────────────────────────────────
 const SB_URL = "https://vebndlyvfrxbrwsiwtbj.supabase.co";
@@ -4090,6 +4168,39 @@ function renderGlobalEntries() {
   list.innerHTML = rows + expandBtn + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;border-top:0.5px solid var(--border);margin-top:4px">Global Walk of Fame · https://lights-camera-action.app</div>';
 }
 
+async function renderStandaloneDailyBoard() {
+  const list = document.getElementById('daily-lb-standalone');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading daily board...</div>';
+  let entries = [];
+  try { entries = await sbFetchDaily(30); } catch(e) { entries = []; }
+  const medals = ["🥇","🥈","🥉"];
+  const rankClass = ["gold","silver","bronze"];
+  if (!entries || !entries.length) {
+    const doneToday = hasDoneDaily();
+    list.innerHTML = doneToday
+      ? '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">Your score is submitted. Check back - more players are completing today\'s draft.</div>'
+      : '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">No entries yet. Play the daily draft to be first on the board.</div>';
+    return;
+  }
+  list.innerHTML = entries.map((e,i) => {
+    const by = (e.submitted_by && e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    return `<div class="lb-entry">
+      <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
+      <div class="lb-info">
+        <div class="lb-title">${e.film_title||'Untitled'}</div>
+        <div class="lb-verdict">${e.verdict||''}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.lead_actor||''}${by}</div>
+      </div>
+      <div class="lb-scores">
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
+      </div>
+    </div>`;
+  }).join('')
+  + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Daily board resets at midnight</div>';
+}
+
 function toggleDailyBoard() {
   const list   = document.getElementById('daily-lb-list');
   const chev   = document.getElementById('daily-board-chevron');
@@ -4148,7 +4259,7 @@ async function renderGlobalLeaderboard() {
 
 render();
 // Wire share buttons after initial render
-setTimeout(wireShareButtons, 100);
+// wireShareButtons called via bind() on result phase
 </script>
 </body>
 </html>
