@@ -56,10 +56,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .hdr { text-align: center; margin-bottom: 1.5rem; }
 .hdr h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
 .hdr p { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
-.score-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
-.score-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 12px; text-align: center; }
+.score-bar { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 1.25rem; }
+.score-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 8px 6px; text-align: center; }
 .score-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
-.score-val { font-size: 22px; font-weight: 700; }
+.score-val { font-size: 18px; font-weight: 700; }
 .score-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
 .round-row { text-align: center; margin-bottom: 1rem; }
 .round-badge { display: inline-block; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-md); padding: 4px 14px; font-size: 12px; color: var(--text2); }
@@ -940,7 +940,7 @@ function saveToWalkOfFame(picks, filmTitle, synopsis, boM, noms, wins, verdict) 
     rtCritic: rtC,
     rtAudience: rtA,
     verdict: verdict?.title || '',
-    score: boM + (noms * 15) + (wins * 25) + Math.round((rtC + rtA) / 2),
+    score: boM + (noms * 12) + (wins * 20) + Math.round((rtC + rtA) / 4),
     crew: picks.map((p, i) => ({ cat: CATEGORIES[i].label, icon: CATEGORIES[i].icon, name: p.name })),
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   };
@@ -1770,8 +1770,6 @@ const DATA = {
 ],
 
   studio: [
-
-
     { name:"Warner Bros.",         bo:19, oscar:13, era:"Blockbuster",  known:"The Dark Knight, Harry Potter, Dune" },
     { name:"A24",                  bo:9,  oscar:20, era:"Indie",        known:"Moonlight, Everything Everywhere, Midsommar" },
     { name:"Disney / Marvel",      bo:22, oscar:7,  era:"Franchise",    known:"Avengers, The Lion King, Frozen" },
@@ -2243,6 +2241,17 @@ const CHAOS_EVENTS = [
   { round:6, chance:0.05, msg:"🦁 Animal Wrangler Incident: Three production days lost. No animals were harmed. Several crew members were surprised.", reroll:false, rerollRound:null, penaltyBO:-1, penaltyOS:0 },
   { round:8, chance:0.05, msg:"☁️ Weather Delay: Six weeks of exterior shooting lost to weather. The insurance claim is significant. The cinematographer found a silver lining.", reroll:false, rerollRound:null, penaltyBO:-1, penaltyOS:1 },
   { round:9, chance:0.05, msg:"🥇 Competitor Flops: The film that was supposed to dominate this release window just bombed spectacularly. The weekend is yours.", reroll:false, rerollRound:null, penaltyBO:3,  penaltyOS:0 },
+  // ── NEW CHAOS EVENTS ──
+  { round:9, chance:0.06, msg:"🎉 Wrap Party Moment: The wrap party generated a viral clip that made everyone want to see the film. Goodwill is at a maximum.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:1 },
+  { round:4, chance:0.07, msg:"🤝 Studio Changes Hands: The studio was acquired during production. New leadership loves the project. The budget just increased.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:1 },
+  { round:6, chance:0.06, msg:"🎙️ Director Podcast: The director gave a 3-hour interview that went viral. Half the internet now has opinions about a film they haven't seen.", reroll:false, rerollRound:null, penaltyBO:1, penaltyOS:0 },
+  { round:3, chance:0.05, msg:"💸 Tax Credit Windfall: A last-minute location change unlocked a significant tax credit. The money went back into production.", reroll:false, rerollRound:null, penaltyBO:1, penaltyOS:1 },
+  { round:7, chance:0.06, msg:"🎼 Score Rejection: The first composer's score was rejected entirely. The new composer had three weeks. The result is either better or worse for it.", reroll:true, rerollRound:6, penaltyBO:0, penaltyOS:0 },
+  { round:5, chance:0.05, msg:"✂️ Studio Demands Cut: A 20-minute cut was requested. The director complied. The 20 minutes are available on YouTube and are extraordinary.", reroll:false, rerollRound:null, penaltyBO:1, penaltyOS:-1 },
+  { round:8, chance:0.05, msg:"📺 Streaming Counterprogramming: A major streamer dropped a similar film the same day. The comparisons are immediate and unkind.", reroll:false, rerollRound:null, penaltyBO:-2, penaltyOS:0 },
+  { round:6, chance:0.05, msg:"🌍 International Breakout: Early tracking shows unexpected international interest. The distributor is expanding the release.", reroll:false, rerollRound:null, penaltyBO:3, penaltyOS:0 },
+  { round:9, chance:0.05, msg:"🎗️ Cause Alignment: The film accidentally became associated with a major cultural moment. The timing is either perfect or complicated.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:1 },
+  { round:2, chance:0.04, msg:"👤 Mystery Casting Leak: Someone leaked that a major uncredited star appears in the film. Speculation is driving significant pre-sale interest.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:0 },
 ];
 
 function getRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
@@ -2543,6 +2552,82 @@ function calcScores(picks) {
   };
 }
 
+// ── Named bonus/penalty calculation ──────────────────────────────────────────
+function calcBonuses(picks, boM, noms, synergies) {
+  const bonuses = [];
+  const sp    = picks[4]?.name || '';
+  const genre = picks[5]?.name || '';
+  const studio= picks[3]?.name || '';
+  const season= picks[8]?.name || '';
+  const comp  = picks[6]?.name || '';
+  const dir   = picks[0]?.name || '';
+  const g = genre.toLowerCase(); const se = season.toLowerCase();
+
+  const arthouses = ['A24','Neon','IFC','Magnolia','Annapurna','Canal+'];
+  const isArthouse = arthouses.some(a => studio.includes(a));
+  const isFestival = /festival|cannes|sundance|venice|sxsw/i.test(season);
+
+  // ── POSITIVE BONUSES ──
+  const dirPick = picks[0]; const allBO = picks.every(p => (p.bo||0) >= 12);
+  const allOscar = picks.every(p => (p.oscar||0) >= 10);
+  const allStar  = picks.every(p => (p.bo||0) >= 13 || (p.oscar||0) >= 14);
+  const minDirOscar = dirPick?.oscar || 0;
+
+  if (minDirOscar >= 17 && isArthouse)
+    bonuses.push({ label:'🎨 Auteur Run', pts:50, flavor:'A visionary director with the only studio that lets them work without compromise' });
+
+  if ((g.includes('horror') && se.includes('halloween')) ||
+      (sp.includes('Biopic') || sp.includes('True Story') || sp.includes('Memoir')) && se.includes('awards') ||
+      (g.includes('musical') && (se.includes('holiday') || se.includes('thanksgiving'))) ||
+      (g.includes('sci-fi') && se.includes('summer')))
+    bonuses.push({ label:'📅 Release Window Sync', pts:25, flavor:'The calendar is working for you' });
+
+  if ((synergies||[]).length >= 3)
+    bonuses.push({ label:'🔗 Perfect Chemistry', pts:45, flavor:'Three or more creative forces firing at once' });
+
+  if (allBO && boM >= 600)
+    bonuses.push({ label:'💥 Box Office Machine', pts:45, flavor:'Every pick calibrated for commercial success' });
+
+  if (noms >= 9 && allOscar)
+    bonuses.push({ label:'🏆 Prestige Sweep', pts:50, flavor:'Every department awards-caliber' });
+
+  if (allStar)
+    bonuses.push({ label:'⭐ All-Star Draft', pts:55, flavor:'No weak links  -  the industry is paying attention' });
+
+  if (isFestival && isArthouse)
+    bonuses.push({ label:'🌿 Festival Path', pts:40, flavor:'The Palme dOr race has a new entrant' });
+
+  if (boM >= 550 && noms >= 8)
+    bonuses.push({ label:'🌐 Cultural Crossover', pts:80, flavor:'Two audiences who never agree  -  have agreed' });
+
+  if (boM >= 700 && noms >= 10 && (synergies||[]).length >= 2 && picks.every(p => (p.bo||0)>=11 && (p.oscar||0)>=9))
+    bonuses.push({ label:'👑 All-Time Classic Run', pts:150, flavor:'This run belongs in a hall of fame' });
+
+  // ── PENALTIES ──
+  if (comp.includes('AI-Assisted') || comp.includes('AI'))
+    bonuses.push({ label:'🤖 AI Score Backlash', pts:-35, flavor:'The music branch issued a statement. All opinions negative' });
+
+  if (se.includes('August Dump') || se.includes('Dump Month'))
+    bonuses.push({ label:'🗑️ Dump Month', pts:-25, flavor:'The studio moved the date after seeing a rough cut' });
+
+  const isMicro = /zero budget|guerrilla|kickstarter|phone camera/i.test(picks[7]?.name||'');
+  const isMega  = /mega|all-in|superhero scale|\$350M|\$300M/i.test(picks[7]?.name||'');
+  const isBlockGenre = /blockbuster|kaiju|disaster|sci-fi epic/i.test(genre);
+  const isArtGenre   = /arthouse|folk horror|surrealist|existential/i.test(genre);
+  if ((isMicro && isBlockGenre) || (isMega && isArtGenre))
+    bonuses.push({ label:'📉 Budget Mismatch', pts:-30, flavor:'Budget and genre in fundamental conflict' });
+
+  if ((sp.includes('Sequel') || sp.includes('Franchise') || sp.includes('Prequel')) && (dirPick?.oscar||0) < 10)
+    bonuses.push({ label:'😴 Sequel Fatigue', pts:-20, flavor:'A sequel without the creative ambition to justify its existence' });
+
+  // Cap: max 2 positive, max 2 negative bonuses
+  const pos = bonuses.filter(b => b.pts > 0).slice(0, 2);
+  const neg = bonuses.filter(b => b.pts < 0).slice(0, 2);
+  return [...pos, ...neg];
+}
+
+function bonusTotal(bonuses) { return bonuses.reduce((s,b) => s + b.pts, 0); }
+
 function boToM(norm) {
   const raw = Math.round(15 + Math.pow(norm, 1.9) * 1485);
   const variance = 0.82 + Math.random() * 0.36;
@@ -2657,14 +2742,24 @@ function picksSoFar() {
   if (!S.picks.length) return "";
   return `<div class="card">
     <div class="card-lbl">Your Film So Far</div>
-    ${S.picks.map((p,i)=>`<div class="pick-row">
+    ${S.picks.map((p,i)=>{
+      const tomato   = Math.min(99, Math.max(10, Math.round(22 + (p.oscar/20)*68)));
+      const audience = Math.min(99, Math.max(10, Math.round(18 + (p.bo/22)*68)));
+      const tColor   = tomato   >= 60 ? '#FA320A' : '#888780';
+      const aColor   = audience >= 60 ? '#FA8C00' : '#888780';
+      const tIcon    = tomato   >= 60 ? '🍅' : '🤢';
+      const aIcon    = audience >= 60 ? '🍿' : '💀';
+      return `<div class="pick-row">
       <span class="pick-cat">${CATEGORIES[i].icon} ${CATEGORIES[i].label}</span>
       <span class="pick-name">${p.name}</span>
       <div class="pick-pills">
         <span class="pill pill-bo">💰${p.bo}</span>
         <span class="pill pill-oscar">🏆${p.oscar}</span>
+        <span class="pill" style="color:${tColor}">${tIcon}${tomato}%</span>
+        <span class="pill" style="color:${aColor}">${aIcon}${audience}%</span>
       </div>
-    </div>`).join("")}
+    </div>`;
+    }).join("")}
   </div>`;
 }
 
@@ -2918,11 +3013,23 @@ function renderResult() {
   const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
   const hardBadge  = HARD_MODE  ? ' <span style="background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🔒 Blind Draft</span>' : '';
   const glMultiplier = S.greenlightLabel === 'Unanimous Greenlight' ? '+20%' : S.greenlightLabel === 'Greenlit' ? '+12%' : '+10%';
-  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ ${greenlightLabel}  -  ${glMultiplier} score multiplier applied</div>` : '';
+  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ ${greenlightLabel} - ${glMultiplier} score multiplier applied</div>` : '';
+  const bonusPanel = (S.bonuses||[]).length ? `<div style="background:var(--surface2);border-radius:var(--r-lg);padding:10px 14px;margin-bottom:10px">
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Production Bonuses</div>
+    ${(S.bonuses||[]).map(b => `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:${b.pts>0?'var(--amber)':'#E05555'}">${b.label}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">${b.flavor}</div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:${b.pts>0?'var(--amber)':'#E05555'};margin-left:12px;white-space:nowrap">${b.pts>0?'+':''}${b.pts} pts</div>
+    </div>`).join('')}
+    <div style="font-size:11px;font-weight:600;color:var(--text);text-align:right;padding-top:5px">Final score: ${S.finalScore||0} pts</div>
+  </div>` : '';
   return `<div class="result">
     <div class="result-title">${v.title}${dailyBadge}${hardBadge}</div>
     <div class="result-sub">"${syn ? syn.title : 'Untitled'}" is in the can.</div>
     ${glBanner}
+    ${bonusPanel}
     ${chaosHtml}
     ${synHtml}
     <div class="result-grid">
@@ -3271,19 +3378,7 @@ const _origSaveToWalkOfFame = typeof saveToWalkOfFame === 'function' ? saveToWal
 
 // Patch submit button to also save to leaderboard
 function handleSubmitWof() {
-  if (!S.synopsis) return;
-  saveToWalkOfFame(S.picks, S.synopsis.title, S.synopsis, S.boM, S.noms, S.wins, S.verdict);
-  saveToLeaderboard({
-    title: S.synopsis.title,
-    verdict: S.verdict.title,
-    boM: S.boM,
-    noms: S.noms,
-    wins: S.wins,
-    tagline: S.synopsis.tagline,
-    crew: S.picks.map((p,i)=>({ cat: CATEGORIES[i].label, name: p.name })),
-  });
-  const btn = document.getElementById('submit-wof-btn');
-  if (btn) { btn.textContent = '✅ Submitted!'; btn.disabled = true; btn.style.opacity = '0.6'; }
+  // Kept for legacy wiring  -  actual submit is in the addEventListener above
 }
 
 // ── Toast helper ──
@@ -3303,9 +3398,25 @@ function safeEncode(str) {
 
 function buildShareText() {
   if (!S.synopsis || !S.verdict) return '';
-  const v = S.verdict;
-  const crew = S.picks.map((p,i)=>`${CATEGORIES[i].icon} ${p.name}`).join(' - ');
-  return `${v.title}\n\n"${S.synopsis.title}"\n${S.synopsis.tagline}\n\nBox Office: $${S.boM}M worldwide - Oscar noms: ${S.noms} - Wins: ${S.wins}\n\n${crew}\n\nPlay at lights-camera-action.app`;
+  const v      = S.verdict;
+  const studio = S.picks[3]?.name || '';
+  const genre  = S.picks[5]?.name || '';
+  const comp   = S.picks[6]?.name || '';
+  const dir    = S.picks[0]?.name || '';
+  const lead   = S.picks[1]?.name || '';
+  const season = S.picks[8]?.name || '';
+  // Run signature: studio + genre + composer
+  const sig = [studio, genre, comp ? comp + ' score' : ''].filter(Boolean).join(', ');
+  // Top bonus
+  const topBonus = (S.bonuses||[]).find(b => b.pts > 0);
+  const bonusLine = topBonus ? `${topBonus.label}. ` : '';
+  // Verdict description
+  const vDesc = v.id === 'goat' ? 'All-Time Classic run.' :
+    v.id === 'darling' ? 'Awards darling.' :
+    v.id === 'flop' || v.id === 'disaster' || v.id === 'tax_writeoff' ? 'Spectacular flop.' :
+    v.id === 'cult' ? 'Instant cult classic.' :
+    (v.title||'').replace(/[^ -~]/g,'').trim() + '.';
+  return `I greenlighted "${S.synopsis.title}"  -  ${sig}. $${S.boM}M, ${S.noms} Oscar noms${S.wins ? ', ' + S.wins + ' wins' : ''}. ${vDesc} ${bonusLine}Play: lights-camera-action.app`;
 }
 
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
@@ -3373,8 +3484,10 @@ function buildShareCardSVG() {
   <line x1="24" y1="216" x2="376" y2="216" stroke="#2a2a20" stroke-width="1"/>
   <rect x="22" y="224" width="${Math.min(240, verdict.length * 8 + 20)}" height="24" fill="#1e1e1c" rx="5"/>
   <text x="32" y="240" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(emojiVerdict)}</text>
-  ${achLine ? '<rect x="22" y="255" width="356" height="18" fill="#1a1a16" rx="4"/><text x="32" y="267" font-family="system-ui,sans-serif" font-size="9" fill="#FAC775" letter-spacing="1">REEL AWARD: ' + esc(achLine) + '</text>' : ''}
-  <text x="376" y="325" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
+  ${_sigSVG}
+  ${_bonusSVG}
+  ${achLine ? '<text x="22" y="300" font-family="system-ui,sans-serif" font-size="8" fill="#5a5a40">REEL AWARD: ' + esc(achLine) + '</text>' : ''}
+  <text x="376" y="328" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
 </svg>`;
 }
 
