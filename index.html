@@ -306,9 +306,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Loading...</div>
     </div>
     <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📅 Today's Daily Draft Board</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Global rankings for today's seeded draft. Everyone plays the same 8 options.</div>
-      <div id="daily-lb-list"><div style="font-size:12px;color:var(--text3);padding:1rem 0">Play today's daily draft to appear here.</div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDailyBoard()">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">📅 Today's Daily Board</div>
+          <div style="font-size:11px;color:var(--text3)">Same draft, global rankings</div>
+        </div>
+        <span id="daily-board-chevron" style="font-size:16px;color:var(--text3);padding:4px 8px">▼</span>
+      </div>
+      <div id="daily-lb-list" style="display:none;margin-top:10px">
+        <div style="font-size:12px;color:var(--text3);padding:.5rem 0">Play today's daily draft to appear here.</div>
+      </div>
     </div>
     <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:0.5px solid var(--border)">
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">📽️ Your Submissions</div>
@@ -2794,7 +2801,7 @@ function renderIntro() {
   const dailyResult = doneToday ? JSON.parse(localStorage.getItem(getDailyKey()) || "{}") : null;
   return `<div style="padding:.5rem 0 1.5rem">
     <div style="background:#0a0a08;border-radius:var(--r-lg);padding:2rem 1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid #2a2a20">
-      <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">A lights-camera-action.app Production</div>
+      <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">A https://lights-camera-action.app Production</div>
       <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#7a5a18;margin-bottom:4px;font-style:italic">Presents</div>
       <div style="margin-bottom:8px"><span style="font-size:30px;font-weight:900;letter-spacing:-0.01em;font-style:italic;background:linear-gradient(135deg,#FFD700 0%,#FFA500 35%,#FF6B35 65%,#FFD700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(255,165,0,0.35))">Lights, Camera, Action!</span></div>
       <div style="font-size:11px;color:#6a5a38;letter-spacing:0.08em;margin-bottom:18px;font-style:italic">The Hollywood Draft Game</div>
@@ -3117,7 +3124,7 @@ function renderResult() {
         </button>
       </div>
       <div style="text-align:center;padding:6px 0 2px">
-        <a href="https://lights-camera-action.app" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none">🎬 lights-camera-action.app</a>
+        <a href="https://lights-camera-action.app" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none">🎬 https://lights-camera-action.app</a>
         &nbsp;·&nbsp;
         <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent ? '' : ''}" id="share-twitter-link" target="_blank" style="font-size:11px;color:var(--text3);text-decoration:none">Post to 𝕏</a>
       </div>
@@ -3160,7 +3167,7 @@ function bind() {
     const r=JSON.parse(localStorage.getItem(getDailyKey())||"{}");
     const txt = "🎬 Daily Draft  -  " + getTodayString() + "\n\n"
       + "I greenlighted \"" + (r.filmTitle||"a film") + "\"  -  $" + (r.boM||0) + "M, " + (r.noms||0) + " Oscar noms. " + (r.verdict||"") + ".\n\n"
-      + "Can you beat my score? Play: lights-camera-action.app";
+      + "Can you beat my score? Play: https://lights-camera-action.app";
     navigator.clipboard.writeText(txt).then(()=>showToast("Daily result copied!")).catch(()=>showToast("Copied!"));
   });
   $("roll-btn")?.addEventListener("click", ()=>{
@@ -3338,7 +3345,7 @@ function switchTab(tab) {
     const ap = document.getElementById('wof-achievements');
     if (ap) ap.innerHTML = renderAchievementsPanel();
   }
-  if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); renderDailyLeaderboard(); }
+  if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
 }
 
 // ── Leaderboard storage (localStorage) ──
@@ -3443,7 +3450,7 @@ function buildShareText() {
     v.id === 'flop' || v.id === 'disaster' || v.id === 'tax_writeoff' ? 'Spectacular flop.' :
     v.id === 'cult' ? 'Instant cult classic.' :
     (v.title||'').replace(/[^ -~]/g,'').trim() + '.';
-  return `I greenlighted "${S.synopsis.title}"  -  ${sig}. $${S.boM}M, ${S.noms} Oscar noms${S.wins ? ', ' + S.wins + ' wins' : ''}. ${vDesc} ${bonusLine}Play: lights-camera-action.app`;
+  return `I greenlighted "${S.synopsis.title}"  -  ${sig}. $${S.boM}M, ${S.noms} Oscar noms${S.wins ? ', ' + S.wins + ' wins' : ''}. ${vDesc} ${bonusLine}Play: https://lights-camera-action.app`;
 }
 
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
@@ -3514,7 +3521,7 @@ function buildShareCardSVG() {
   ${_sigSVG}
   ${_bonusSVG}
   ${achLine ? '<text x="22" y="300" font-family="system-ui,sans-serif" font-size="8" fill="#5a5a40">REEL AWARD: ' + esc(achLine) + '</text>' : ''}
-  <text x="376" y="328" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">lights-camera-action.app</text>
+  <text x="376" y="328" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">https://lights-camera-action.app</text>
 </svg>`;
 }
 
@@ -4041,6 +4048,8 @@ function setGlobalSort(s) {
   renderGlobalEntries();
 }
 
+let globalExpanded = false;
+
 function renderGlobalEntries() {
   const list = document.getElementById("global-lb-list");
   if (!list || !globalEntries.length) return;
@@ -4053,7 +4062,8 @@ function renderGlobalEntries() {
   if (globalSort === 'recent')   sorted.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
   const medals = ["🥇","🥈","🥉"];
   const rankClass = ["gold","silver","bronze"];
-  list.innerHTML = sorted.map((e, i) => {
+  const visible = globalExpanded ? sorted : sorted.slice(0, 10);
+  const rows = visible.map((e, i) => {
     const byLine = (e.submitted_by && e.submitted_by !== "Anonymous")
       ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
     return `<div class="lb-entry">
@@ -4070,12 +4080,30 @@ function renderGlobalEntries() {
         ${e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rt_audience}%</div>` : ''}
       </div>
     </div>`;
-  }).join("") + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Global Walk of Fame · lights-camera-action.app</div>';
+  }).join("");
+  const expandBtn = sorted.length > 10 ? `
+    <div style="text-align:center;padding:10px 0">
+      <button class="btn-sm" onclick="globalExpanded=!globalExpanded;renderGlobalEntries()">
+        ${globalExpanded ? "Show less" : "Show all " + sorted.length + " films"}
+      </button>
+    </div>` : '';
+  list.innerHTML = rows + expandBtn + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;border-top:0.5px solid var(--border);margin-top:4px">Global Walk of Fame · https://lights-camera-action.app</div>';
 }
 
+function toggleDailyBoard() {
+  const list   = document.getElementById('daily-lb-list');
+  const chev   = document.getElementById('daily-board-chevron');
+  if (!list) return;
+  const isOpen = list.style.display !== 'none';
+  list.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.textContent = isOpen ? '▼' : '▲';
+  if (!isOpen) renderDailyLeaderboard(); // load on first open
+}
+
+let dailyBoardLoaded = false;
 async function renderDailyLeaderboard() {
   const list = document.getElementById('daily-lb-list');
-  if (!list) return;
+  if (!list || list.style.display === 'none') return;
   list.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:.5rem 0">Loading...</div>';
   let entries = [];
   try { entries = await sbFetchDaily(20); } catch(e) { entries = []; }
