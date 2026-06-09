@@ -71,7 +71,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .card-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
 .pick-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; }
 .pick-row:last-child { border-bottom: none; }
-.pick-cat { font-size: 11px; color: var(--text2); width: 90px; flex-shrink: 0; }
+.pick-cat { font-size: 10px; color: var(--text2); width: 72px; flex-shrink: 0; min-width: 72px; }
 .pick-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; word-break: break-word; white-space: nowrap; }
 .pick-pills { display: flex; gap: 3px; flex-shrink: 0; }
 .slot-hdr { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 12px; }
@@ -1944,7 +1944,12 @@ const DATA = {
     { name:"Found Footage",               bo:10, oscar:7,  era:"Genre" },
     { name:"Neo-Noir",                    bo:11, oscar:14, era:"Thriller" },
     { name:"Stoner Comedy",               bo:12, oscar:5,  era:"Mainstream" },
-  ],
+      { name:"Erotic Thriller", bo:13, oscar:8, era:"Prestige", known:"Fatal Attraction, Basic Instinct, Obsession, Body Heat" },
+    { name:"Liminal Horror", bo:8, oscar:11, era:"Arthouse", known:"The Backrooms, House of Leaves energy, uncanny architecture" },
+    { name:"Found Footage Horror", bo:11, oscar:7, era:"Horror", known:"Paranormal Activity, Blair Witch, The Backrooms, REC" },
+    { name:"Psychological Obsession", bo:10, oscar:12, era:"Prestige", known:"Obsession, Black Swan, Promising Young Woman, Single White Female" },
+    { name:"Slow Burn Thriller", bo:9, oscar:13, era:"Prestige", known:"Parasite, Nightcrawler, Gone Girl, The Watcher" },
+],
 
   composer: [
     { name:"John Williams",           bo:17, oscar:18, era:"Classic",      known:"Star Wars, Indiana Jones, Schindler's List" },
@@ -2409,7 +2414,6 @@ const SYNERGIES = [
   { names:["Danny Elfman","Tim Burton"],              boBonus:1, osBonus:2, label:"Elfman x Burton",           msg:"Their twelfth collaboration. The score will be recognisably Elfman and recognisably Burton and exactly right." },
   { names:["Howard Shore","Peter Jackson"],           boBonus:2, osBonus:3, label:"Shore x Jackson",           msg:"The Lord of the Rings trilogy. The score became the mythology. The reunion carries the weight of that history." },
   { names:["Michael Giacchino","J.J. Abrams"],        boBonus:2, osBonus:1, label:"Giacchino x Abrams",        msg:"Their eighth collaboration. The themes build on twenty years of shared musical vocabulary." },
-  { names:["Jonny Greenwood","Paul Thomas Anderson"], boBonus:0, osBonus:4, label:"Greenwood x PTA",           msg:"The Master. Inherent Vice. Phantom Thread. There Will Be Blood. The score will be studied as a standalone text." },
   { names:["Thomas Newman","Sam Mendes"],             boBonus:1, osBonus:3, label:"Newman x Mendes",           msg:"American Beauty. Road to Perdition. The score will find the ache inside the spectacle. It always does." },
   { names:["Cliff Martinez","Nicolas Winding Refn"], boBonus:1, osBonus:2, label:"Martinez x Refn",           msg:"Drive energy. The score is more character than the characters. The neon will be earned." },
 
@@ -2518,7 +2522,6 @@ const SYNERGIES = [
   { names:["Robert Eggers","Willem Dafoe"],           boBonus:0, osBonus:3, label:"Eggers x Dafoe",         msg:"The Lighthouse reunion. The most intensely watched film of the year by a very specific kind of person." },
   { names:["Ti West","Mia Goth"],                    boBonus:1, osBonus:2, label:"West x Goth",            msg:"The X trilogy energy. An actress disappearing so completely into a role that people check if she is okay." },
   { names:["Damien Chazelle","Emma Stone"],           boBonus:2, osBonus:3, label:"Chazelle x Stone",       msg:"La La Land reunion. The sadness starts before the first note plays. Everyone knew this was coming." },
-  { names:["Tom Hanks","Steven Spielberg"],           boBonus:2, osBonus:3, label:"Hanks x Spielberg",      msg:"Saving Private Ryan. Cast Away. The Terminal. Their sixth film together. The reliability is mathematical." },
   { names:["Dwayne Johnson","A24"],                   boBonus:1, osBonus:-1, label:"Rock x A24",            msg:"The most confusing press release of the decade. A24 sent a statement. It raised more questions." },
   { names:["Gaspar Noe","Disney / Marvel"],           boBonus:-2, osBonus:2, label:"Noe x Disney",          msg:"Someone made this happen. Someone will lose their job over it. The film will be extraordinary and wrong." },
   { names:["Kelly Reichardt","All-In ($350M+)"],      boBonus:-2, osBonus:3, label:"Reichardt $350M",       msg:"The studio gave Reichardt $350M. She will spend $12M of it. The other $338M will confuse everyone." },
@@ -2554,7 +2557,6 @@ const SYNERGIES = [
   { names:["Justin Hurwitz","A24-style Arthouse"],    boBonus:1, osBonus:3, label:"Hurwitz x Arthouse",        msg:"Babylon showed he can go dark and sprawling. The arthouse context will let him go somewhere even more unexpected." },
   { names:["Ludwig Goransson","Sci-Fi Epic"],         boBonus:2, osBonus:3, label:"Goransson x Sci-Fi",        msg:"Oppenheimer. Tenet. He makes the cosmic feel personal and the personal feel cosmic." },
   { names:["Ludwig Goransson","Action Blockbuster"],  boBonus:2, osBonus:2, label:"Goransson x Action",         msg:"Black Panther established the template. The score is the culture. The culture moves the box office." },
-  { names:["Hildur Gudnadottir","Psychological Thriller"], boBonus:1, osBonus:3, label:"Hildur x Thriller",    msg:"Joker. Chernobyl. She finds the humanity inside the horror and makes it the most devastating thing in the room." },
   { names:["Hildur Gudnadottir","Horror"],            boBonus:1, osBonus:3, label:"Hildur x Horror",           msg:"Women Talking energy. The dread she builds is not jump-scare dread. It is the kind that lives with you for weeks." },
   { names:["Trent Reznor and Atticus Ross","Neo-Noir"], boBonus:2, osBonus:3, label:"Reznor x Neo-Noir",       msg:"The Social Network. Gone Girl. The score as psychological pressure. The city sounds like it is watching you back." },
   { names:["Daft Punk","Sci-Fi Epic"],                boBonus:2, osBonus:2, label:"Daft Punk x Sci-Fi",        msg:"TRON: Legacy redefined what an electronic score could do in a mainstream film. The sequel energy is already present." },
@@ -2576,13 +2578,10 @@ const SYNERGIES = [
   { names:["A24","Horror"],                       boBonus:2, osBonus:4, label:"A24 x Horror",              msg:"Hereditary. Midsommar. Men. Talk to Me. A24 has made horror the genre film critics can no longer afford to dismiss." },
   { names:["Disney / Pixar","Animated"],          boBonus:3, osBonus:5, label:"Pixar x Animation",         msg:"The Best Animated Feature Oscar was practically created for this combination. The emotional devastation will be fully earned." },
   // ── Composer x specific director ───────────────────────────────────────────
-  { names:["Hans Zimmer","Denis Villeneuve"],     boBonus:2, osBonus:2, label:"Zimmer x Villeneuve",       msg:"Dune Part One. The score was a character. A culture. A civilisation expressed entirely through sound. Part Two confirmed it was not an accident." },
-  { names:["Jonny Greenwood","Ari Aster"],        boBonus:0, osBonus:4, label:"Greenwood x Aster",         msg:"A theoretical combination that the film music world has been discussing since Hereditary. If it happens, the Academy's music branch will cancel its plans." },
   { names:["Justin Hurwitz","Damien Chazelle"],   boBonus:2, osBonus:5, label:"Hurwitz x Chazelle",        msg:"Whiplash. La La Land. Babylon. Three films. Three eras. One of the most productive director-composer relationships in contemporary cinema." },
   { names:["Ennio Morricone","Sergio Leone"],     boBonus:2, osBonus:3, label:"Morricone x Leone Legacy",  msg:"Once Upon a Time in America. The Good the Bad and the Ugly. The collaboration that invented a genre's sound. The legacy enters the room." },
   // ── More negative dynamics ─────────────────────────────────────────────────
   { names:["Michael Bay","Prestige Drama"],       boBonus:-2, osBonus:-3, label:"Bay x Prestige",          msg:"The studio had a conversation about creative direction that lasted six hours. The film changed. Not in the direction the original vision intended." },
-  { names:["Disney / Marvel","A24-style Arthouse"], boBonus:-1, osBonus:-2, label:"Marvel x Arthouse",     msg:"The brief was to make something smaller and more personal. The committee gave notes. The film is neither small nor particularly personal." },
   { names:["Streaming Dump","Awards Season (Nov to Dec)"], boBonus:-3, osBonus:-2, label:"Streaming Dump in Awards Season", msg:"The distributor moved it to a streaming drop three weeks before the theatrical window. The Academy voters have been notified. Their calendars are full." },
   { names:["Video Game Adaptation","Mega Budget ($350M+)"], boBonus:-1, osBonus:-2, label:"Video Game Mega Budget", msg:"The IP justified the budget in theory. The execution justified seventeen post-mortems. The sequel has been quietly shelved." },
   // ── Fun wildcard combos ────────────────────────────────────────────────────
@@ -2591,6 +2590,31 @@ const SYNERGIES = [
   { names:["Dwayne Johnson","Prestige Drama"],    boBonus:0, osBonus:2, label:"Rock x Prestige",          msg:"The combination nobody expected. He has been quietly pursuing this for a decade. The material is demanding. He appears to be ready for it." },
   { names:["Bad Bunny","Musical"],                boBonus:3, osBonus:1, label:"Bad Bunny x Musical",      msg:"The most-streamed artist in the world in a musical is a commercial event that transcends film marketing. The demographic crossover is staggering." },
   { names:["Taylor Swift","Musical"],             boBonus:4, osBonus:1, label:"Swift x Musical",          msg:"The Eras Tour did $2 billion in concert film revenue. A scripted musical is the logical next chapter. The Swifties are already buying tickets." },
+  // ── Erotic Thriller ───────────────────────────────────────────────────────
+  { names:["Erotic Thriller","A24"],                  boBonus:1, osBonus:3, label:"A24 Erotic Thriller",     msg:"Obsession showed what happens when European production values meet American appetite for transgression. A24 is the only studio that can distribute this without flinching." },
+  { names:["Erotic Thriller","Paul Verhoeven"],       boBonus:3, osBonus:2, label:"Verhoeven x Erotic",      msg:"Basic Instinct. Elle. Showgirls. He is the only director whose erotic thrillers the Academy and the box office both noticed. The combination has history." },
+  { names:["Erotic Thriller","Ridley Scott"],         boBonus:2, osBonus:2, label:"Scott x Erotic Thriller", msg:"The obsession and the spectacle arriving in the same frame. Scott shoots desire the way he shoots everything else  -  as a power dynamic." },
+  { names:["Erotic Thriller","Mega Budget ($350M+)"], boBonus:-3, osBonus:-2, label:"Mega Budget Erotic Thriller", msg:"The studio spent $350M on an erotic thriller. There were notes. Extensive notes. The film that exists is not the film that was greenlit." },
+  { names:["Erotic Thriller","Neon"],                 boBonus:2, osBonus:2, label:"Neon x Erotic Thriller",  msg:"Neon distributes what others decline. The erotic thriller has been waiting for a distributor with this level of institutional nerve." },
+  // ── Liminal Horror / Backrooms ────────────────────────────────────────────
+  { names:["Liminal Horror","A24"],                   boBonus:1, osBonus:4, label:"A24 Liminal Horror",      msg:"The Backrooms as prestige cinema. A24 understands that the uncanny is more frightening than the explicit. The architecture becomes the villain." },
+  { names:["Liminal Horror","Oz Perkins"],            boBonus:1, osBonus:4, label:"Perkins x Liminal",       msg:"Longlegs shot empty corridors like they were confessions. Liminal horror is his native register. The spaces will feel wrong before anything happens in them." },
+  { names:["Liminal Horror","Zero Budget (Phone Camera)"], boBonus:2, osBonus:2, label:"No Budget Liminal",  msg:"The Backrooms began as a phone camera video. The lo-fi aesthetic is not a limitation  -  it is the entire point. The wrongness requires nothing expensive." },
+  { names:["Liminal Horror","Rose Glass"],            boBonus:1, osBonus:3, label:"Glass x Liminal",         msg:"Saint Maud treated a single room as a psychological landscape. Empty hotels and infinite corridors will give her even more to work with." },
+  // ── Found Footage Horror ──────────────────────────────────────────────────
+  { names:["Found Footage Horror","Blumhouse"],       boBonus:3, osBonus:1, label:"Blumhouse Found Footage", msg:"Paranormal Activity. The Blumhouse formula was built on found footage. The ROI on this combination is the best in the history of cinema." },
+  { names:["Found Footage Horror","Zero Budget (Phone Camera)"], boBonus:2, osBonus:1, label:"Phone Camera Found Footage", msg:"The format demands this budget. The audience accepts the visual grammar. The crew needs nine people and four days. The result can make $200M." },
+  { names:["Found Footage Horror","Jennifer Kent"],   boBonus:1, osBonus:3, label:"Kent x Found Footage",    msg:"The Babadook used domestic space as dread architecture. Found footage would give her the intimacy she already shoots toward  -  with the pretense of documentary truth." },
+  // ── Psychological Obsession ───────────────────────────────────────────────
+  { names:["Psychological Obsession","Darren Aronofsky"], boBonus:1, osBonus:4, label:"Aronofsky x Obsession", msg:"Black Swan. Requiem for a Dream. Pi. His entire filmography is a study in the aesthetics of psychological disintegration. This is where he lives." },
+  { names:["Psychological Obsession","Natalie Portman"], boBonus:2, osBonus:4, label:"Portman x Obsession",   msg:"Black Swan produced one of the great performances of the 2010s. The reunion of performer and genre is the most anticipated casting in current prestige cinema." },
+  { names:["Psychological Obsession","Neon"],         boBonus:1, osBonus:3, label:"Neon x Obsession",        msg:"Neon distributed Parasite and I, Tonya  -  films that are partly about obsession as a social force. The genre is in their wheelhouse." },
+  { names:["Psychological Obsession","Zendaya"],      boBonus:2, osBonus:3, label:"Zendaya x Obsession",     msg:"Euphoria established her range with psychologically complex material. The obsession drama is the logical next scale." },
+  // ── Slow Burn Thriller ────────────────────────────────────────────────────
+  { names:["Slow Burn Thriller","Bong Joon-ho"],      boBonus:2, osBonus:4, label:"Bong x Slow Burn",        msg:"Parasite spent an hour being a comedy before it became the most tense film of 2019. The slow burn is his primary formal weapon." },
+  { names:["Slow Burn Thriller","Park Chan-wook"],    boBonus:1, osBonus:4, label:"Park x Slow Burn",        msg:"Oldboy. Decision to Leave. The slow burn is not a genre for him  -  it is a moral framework. The film will be three steps ahead of the audience at all times." },
+  { names:["Slow Burn Thriller","A24"],               boBonus:1, osBonus:3, label:"A24 Slow Burn",           msg:"A24 has infinite patience for the slow burn. Their audience has been trained to wait for the third act by everything else on their slate." },
+  { names:["Slow Burn Thriller","Cate Blanchett"],    boBonus:1, osBonus:4, label:"Blanchett x Slow Burn",   msg:"Tar was a slow burn psychological portrait that she dominated from the first frame. The genre is where her range has the most room to operate." },
 ];
 
 function detectSynergies(picks) {
@@ -2669,6 +2693,11 @@ function calcBonuses(picks, boM, noms, synergies) {
 
   const arthouses = ['A24','Neon','IFC','Magnolia','Annapurna','Canal+'];
   const isArthouse = arthouses.some(a => studio.includes(a));
+  const isEroticThriller   = /erotic thriller/i.test(genre);
+  const isLiminalHorror    = /liminal horror/i.test(genre);
+  const isFoundFootage     = /found footage/i.test(genre);
+  const isPsychObsession   = /psychological obsession/i.test(genre);
+  const isSlowBurn         = /slow burn/i.test(genre);
   const isFestival = /festival|cannes|sundance|venice|sxsw/i.test(season);
 
   // ── POSITIVE BONUSES ──
@@ -2717,9 +2746,16 @@ function calcBonuses(picks, boM, noms, synergies) {
   const isMicro = /zero budget|guerrilla|kickstarter|phone camera/i.test(picks[7]?.name||'');
   const isMega  = /mega|all-in|superhero scale|\$350M|\$300M/i.test(picks[7]?.name||'');
   const isBlockGenre = /blockbuster|kaiju|disaster|sci-fi epic/i.test(genre);
-  const isArtGenre   = /arthouse|folk horror|surrealist|existential/i.test(genre);
-  if ((isMicro && isBlockGenre) || (isMega && isArtGenre))
+  const isArtGenre   = /arthouse|folk horror|surrealist|existential|liminal|psychological obsession/i.test(genre);
+  const isBigEroticMismatch = isEroticThriller && isMega;
+  if ((isMicro && isBlockGenre) || (isMega && isArtGenre) || isBigEroticMismatch)
     bonuses.push({ label:'📉 Budget Mismatch', pts:-30, flavor:'Budget and genre in fundamental conflict' });
+  // Found footage micro-budget bonus
+  if (isFoundFootage && isMicro)
+    bonuses.push({ label:'📱 Lo-Fi Authenticity', pts:20, flavor:'The format demands this budget. The audience trusts it.' });
+  // Liminal horror + arthouse studio
+  if (isLiminalHorror && isArthouse)
+    bonuses.push({ label:'🚪 Architecture as Villain', pts:25, flavor:'The space is the story. The studio understood that from the pitch.' });
 
   if ((sp.includes('Sequel') || sp.includes('Franchise') || sp.includes('Prequel')) && (dirPick?.oscar||0) < 10)
     bonuses.push({ label:'😴 Sequel Fatigue', pts:-20, flavor:'A sequel without the creative ambition to justify its existence' });
@@ -2815,13 +2851,22 @@ function scoreBar() {
   const projAud = Math.min(99, Math.max(10, Math.round(35 + boP * 0.55)));
   const tColor = projRT  >= 60 ? '#FA320A' : '#888780';
   const aColor = projAud >= 60 ? '#FA8C00' : '#888780';
-  // Greenlight indicator
-  const avgBO = S.picks.reduce((s,p)=>s+(p.bo||0),0)/Math.max(S.picks.length,1);
-  const avgOS = S.picks.reduce((s,p)=>s+(p.oscar||0),0)/Math.max(S.picks.length,1);
-  const glStatus = avgBO >= 19 && avgOS >= 17 ? '⚡ Unanimous Greenlight trajectory' :
-                   avgBO >= 17 && avgOS >= 15 ? '✅ Greenlit trajectory' :
-                   avgBO >= 15 && avgOS >= 18 ? '🏆 Awards powerhouse trajectory' :
-                   avgBO >= 20 && avgOS >= 10 ? '💰 Box office machine trajectory' : '';
+  // Greenlight indicator  -  only show when 3+ picks made, use total score not avg
+  const totalBO = S.picks.reduce((s,p)=>s+(p.bo||0),0);
+  const totalOS = S.picks.reduce((s,p)=>s+(p.oscar||0),0);
+  const n       = Math.max(S.picks.length, 1);
+  const avgBO   = totalBO / n;
+  const avgOS   = totalOS / n;
+  // Only display after round 3  -  earlier it's too volatile
+  const glStatus = S.picks.length < 3 ? '' :
+    avgBO >= 19 && avgOS >= 17 ? '⚡ Unanimous Greenlight  -  Every exec said yes without looking up' :
+    avgBO >= 17 && avgOS >= 15 ? '✅ Greenlit  -  The production has momentum' :
+    avgBO >= 15 && avgOS >= 18 ? '🏆 Awards Powerhouse  -  The Academy is interested' :
+    avgBO >= 20 && avgOS >= 10 ? '💰 Box Office Machine  -  Commercial dominance incoming' : '';
+  // Sticky: once achieved, don't drop below a lower tier mid-draft
+  if (glStatus && (!S._glLevel || ['','💰','🏆','✅','⚡'].indexOf(glStatus[0]) > ['','💰','🏆','✅','⚡'].indexOf(S._glLevel))) {
+    S._glLevel = glStatus[0];
+  }
   return `<div class="score-bar">
     <div class="score-card">
       <div class="score-lbl">💰 Box Office</div>
@@ -2844,7 +2889,10 @@ function scoreBar() {
       <div class="score-sub">audience</div>
     </div>
   </div>
-  ${glStatus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:6px 12px;font-size:11px;font-weight:600;color:var(--amber);text-align:center;margin-bottom:8px">${glStatus}</div>` : ''}`;
+  ${glStatus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:7px 12px;font-size:11px;font-weight:600;color:var(--amber);text-align:center;margin-bottom:8px">
+    ${glStatus}
+    <div style="font-size:9px;font-weight:400;color:var(--text3);margin-top:2px">Triggered by your average pick quality across all categories  -  keep it high to unlock the Greenlight Bonus at the end</div>
+  </div>` : ''}`;
 }
 
 function picksSoFar() {
@@ -3618,17 +3666,17 @@ function buildShareCardSVG() {
   <line x1="28" y1="82" x2="572" y2="82" stroke="#252520" stroke-width="1"/>
 
   <!-- Stats  -  4 columns -->
-  <text x="28"  y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
+  <text x="28"  y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
   <text x="28"  y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">BOX OFFICE</text>
 
-  <text x="178" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FAC775">${S.noms}</text>
-  <text x="178" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">OSCAR NOMS</text>
+  <text x="165" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms} noms</text>
+  <text x="165" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">OSCAR · ${S.wins||0} WINS</text>
 
-  <text x="310" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
-  <text x="310" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
+  <text x="336" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
+  <text x="336" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
 
-  <text x="458" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
-  <text x="458" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
+  <text x="468" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
+  <text x="468" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
 
   <!-- Divider -->
   <line x1="28" y1="124" x2="572" y2="124" stroke="#252520" stroke-width="1"/>
@@ -4308,28 +4356,40 @@ async function renderStandaloneDailyBoard() {
   const rankClass = ["gold","silver","bronze"];
   if (!entries || !entries.length) {
     const doneToday = hasDoneDaily();
-    list.innerHTML = doneToday
-      ? '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">Your score is submitted. Check back - more players are completing today\'s draft.</div>'
-      : '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">No entries yet. Play the daily draft to be first on the board.</div>';
+    const cached    = doneToday ? JSON.parse(localStorage.getItem(getDailyKey()) || 'null') : null;
+    if (cached) {
+      list.innerHTML = '<div style="background:var(--surface2);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px">'
+        + '<div style="font-size:11px;color:var(--amber);font-weight:600;margin-bottom:4px">Your Result Today</div>'
+        + '<div style="font-size:13px;font-weight:600;color:var(--text)">' + (cached.filmTitle||'Untitled') + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + (cached.verdict||'') + '</div>'
+        + '<div style="display:flex;gap:8px;margin-top:6px">'
+        + '<span class="pill pill-bo">$' + (cached.boM||0) + 'M</span>'
+        + '<span class="pill pill-oscar">🏆 ' + (cached.noms||0) + ' noms</span>'
+        + '</div></div>'
+        + '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px 0">Waiting for other scores...</div>';
+    } else {
+      list.innerHTML = doneToday
+        ? '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">Your score is submitted. Check back later.</div>'
+        : '<div style="font-size:13px;color:var(--text2);padding:1rem 0;text-align:center">No entries yet. Play the daily draft to be first on the board.</div>';
+    }
     return;
   }
   list.innerHTML = entries.map((e,i) => {
     const by = (e.submitted_by && e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
-    return `<div class="lb-entry">
-      <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
-      <div class="lb-info">
-        <div class="lb-title">${e.film_title||'Untitled'}</div>
-        <div class="lb-verdict">${e.verdict||''}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.lead_actor||''}${by}</div>
-      </div>
-      <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
-        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
-      </div>
-    </div>`;
-  }).join('')
-  + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Daily board resets at midnight</div>';
+    return '<div class="lb-entry">'
+      + '<div class="lb-rank-num ' + (rankClass[i]||'') + '">' + (medals[i]||i+1) + '</div>'
+      + '<div class="lb-info">'
+      + '<div class="lb-title">' + (e.film_title||'Untitled') + '</div>'
+      + '<div class="lb-verdict">' + (e.verdict||'') + '</div>'
+      + '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + (e.director||'') + ' · ' + (e.lead_actor||'') + by + '</div>'
+      + '</div>'
+      + '<div class="lb-scores">'
+      + '<div class="lb-score-row" style="color:var(--blue)">💰 $' + (e.bo_m||0) + 'M</div>'
+      + '<div class="lb-score-row" style="color:var(--amber)">🏆 ' + (e.noms||0) + ' noms</div>'
+      + '</div></div>';
+  }).join('') + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Daily board resets at midnight</div>';
 }
+
 
 function toggleDailyBoard() {
   const list   = document.getElementById('daily-lb-list');
