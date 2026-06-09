@@ -258,6 +258,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .submit-btn:hover { background: var(--purple); color: var(--surface); }
 
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a08">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LCA Draft">
 </head>
 <body>
 <div class="wrap">
@@ -310,7 +315,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
       <div style="font-size:12px;color:var(--text2)">Films drafted by players worldwide. Submit yours to appear here.</div>
     </div>
     <div class="lb-filters" id="lb-filters">
-      <button class="lb-filter active" data-sort="bo" onclick="setGlobalSort('bo')">💰 Box Office</button>
+      <button class="lb-filter active" data-sort="score" onclick="setGlobalSort('score')">⭐ Score</button>
+      <button class="lb-filter" data-sort="bo" onclick="setGlobalSort('bo')">💰 Box Office</button>
       <button class="lb-filter" data-sort="oscar" onclick="setGlobalSort('oscar')">🏆 Oscar Noms</button>
       <button class="lb-filter" data-sort="wins" onclick="setGlobalSort('wins')">🥇 Wins</button>
       <button class="lb-filter" data-sort="rt" onclick="setGlobalSort('rt')">🍅 Tomatometer</button>
@@ -3065,7 +3071,7 @@ function renderResult() {
   const syn = S.synopsis;
 
   const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
-  const hardBadge  = HARD_MODE  ? ' <span style="background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">🔒 Blind Draft</span>' : '';
+    const hardBadge  = HARD_MODE  ? ' <span style="background:#1a1a2e;color:#9B8FD4;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:0.5px solid #9B8FD4">🔒 Blind Draft</span>' : '';
   const glMultiplier = S.greenlightLabel === 'Unanimous Greenlight' ? '+20%' : S.greenlightLabel === 'Greenlit' ? '+12%' : '+10%';
   const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ ${greenlightLabel} - ${glMultiplier} score multiplier applied</div>` : '';
   const bonusPanel = (S.bonuses||[]).length ? `<div style="background:var(--surface2);border-radius:var(--r-lg);padding:10px 14px;margin-bottom:10px">
@@ -3082,7 +3088,6 @@ function renderResult() {
   return `<div class="result">
     <div class="result-title">${v.title}${dailyBadge}${hardBadge}</div>
     <div class="result-sub">"${syn ? syn.title : 'Untitled'}" is in the can.</div>
-    ${glBanner}
     ${bonusPanel}
     ${chaosHtml}
     ${synHtml}
@@ -3312,7 +3317,23 @@ function bind() {
     if (S.phase === 'result') setTimeout(wireShareButtons, 50);
   });
   $("again-btn")?.addEventListener("click", ()=>{ S=fresh(); render(); });
-  if (S.phase === "result") setTimeout(() => { checkAchievements(S); if (DAILY_MODE) saveDailyResult(S.boM, S.noms, S.wins, S.verdict?.title||""); }, 500);
+  if (S.phase === "result") setTimeout(() => { checkAchievements(S); if (DAILY_MODE) {
+      saveDailyResult(S.boM, S.noms, S.wins, S.verdict?.title||"");
+      // Submit to Supabase daily leaderboard
+      const dName = localStorage.getItem("lca_player_name") || "Anonymous";
+      sbInsertDaily({
+        daily_seed:   getDailySeed(),
+        film_title:   S.synopsis?.title || "Untitled",
+        verdict:      S.verdict?.title  || "",
+        bo_m:         S.boM  || 0,
+        noms:         S.noms || 0,
+        wins:         S.wins || 0,
+        score:        S.finalScore || (S.boM + (S.noms*12) + (S.wins*20)),
+        director:     S.picks[0]?.name || "",
+        lead_actor:   S.picks[1]?.name || "",
+        submitted_by: dName,
+      });
+    } }, 500);
   // Wire share buttons whenever result is rendered
   if (S.phase === 'result') setTimeout(wireShareButtons, 50);
   $("submit-wof-btn")?.addEventListener("click", async ()=>{
@@ -3628,7 +3649,7 @@ async function showShareCardPreview() {
   const blob = await svgToBlob(svg);
   if (blob) {
     const url = URL.createObjectURL(blob);
-    el.innerHTML = `<img src="${url}" style="width:100%;border-radius:12px;display:block;-webkit-user-select:none;user-select:none" alt="Share card"/>
+    el.innerHTML = `<img src="${url}" style="width:100%;max-width:600px;height:auto;border-radius:12px;display:block;margin:0 auto;-webkit-user-select:none;user-select:none" alt="Share card"/>
       <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">
         On mobile: <strong>long-press the image</strong> to save to camera roll, then share anywhere.
       </p>`;
@@ -3712,8 +3733,12 @@ function wireShareButtons() {
   // ── X link  -  update href dynamically so it carries the current film text ──
   const twitterLink = document.getElementById('share-twitter-link');
   if (twitterLink) {
-    const tweetText = safeEncode(buildShareText().slice(0, 260));
-    twitterLink.href = 'https://twitter.com/intent/tweet?text=' + tweetText;
+    const fullText = buildShareText();
+    // Strip the URL from the text — pass it as the url= param so X doesn't show it twice
+    const textOnly = fullText.replace(/https?:\/\/lights-camera-action\.app/g, '').replace(/Play:\s*$/,'').trim();
+    const tweetText = safeEncode(textOnly.slice(0, 240));
+    const tweetUrl  = safeEncode('https://lights-camera-action.app');
+    twitterLink.href = 'https://twitter.com/intent/tweet?text=' + tweetText + '&url=' + tweetUrl;
   }
 
   $('submit-wof-btn')?.removeEventListener('click', handleSubmitWof);
@@ -4087,18 +4112,19 @@ async function sbInsert(row) {
         "Content-Type": "application/json",
         "apikey": SB_KEY,
         "Authorization": "Bearer " + SB_KEY,
-        "Prefer": "return=representation"
+        "Prefer": "return=minimal"
       },
       body: JSON.stringify(row)
     });
     if (!res.ok) {
       const err = await res.text();
-      console.warn("Supabase insert error:", err);
+      console.error("WoF insert error:", res.status, err);
+      showToast("Submit failed (" + res.status + ")  -  check console");
       return null;
     }
-    return await res.json();
+    return true;
   } catch(e) {
-    console.warn("Supabase insert failed:", e);
+    console.error("WoF insert exception:", e);
     return null;
   }
 }
@@ -4130,13 +4156,26 @@ async function sbInsertDaily(row) {
   try {
     const res = await fetch(SB_URL + "/rest/v1/daily_leaderboard", {
       method: "POST",
-      headers: { "Content-Type":"application/json", "apikey":SB_KEY, "Authorization":"Bearer "+SB_KEY, "Prefer":"return=representation" },
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SB_KEY,
+        "Authorization": "Bearer " + SB_KEY,
+        "Prefer": "return=minimal"
+      },
       body: JSON.stringify(row)
     });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch(e) { return null; }
+    if (!res.ok) {
+      const err = await res.text();
+      console.error("Daily insert error:", res.status, err);
+      return null;
+    }
+    return true;
+  } catch(e) {
+    console.error("Daily insert exception:", e);
+    return null;
+  }
 }
+
 
 async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCritic, rtAudience, directorName) {
   const row = {
@@ -4159,7 +4198,7 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
 }
 
 // ── Global Walk of Fame renderer ─────────────────────────────────────────────
-let globalSort = 'bo';
+let globalSort = 'score';
 let globalEntries = [];
 
 function setGlobalSort(s) {
@@ -4174,6 +4213,7 @@ function renderGlobalEntries() {
   const list = document.getElementById("global-lb-list");
   if (!list || !globalEntries.length) return;
   let sorted = [...globalEntries];
+  if (globalSort === 'score')    sorted.sort((a,b) => (b.score||b.bo_m||0) - (a.score||a.bo_m||0));
   if (globalSort === 'bo')       sorted.sort((a,b) => (b.bo_m||0) - (a.bo_m||0));
   if (globalSort === 'oscar')    sorted.sort((a,b) => (b.noms||0) - (a.noms||0));
   if (globalSort === 'wins')     sorted.sort((a,b) => (b.wins||0) - (a.wins||0));
