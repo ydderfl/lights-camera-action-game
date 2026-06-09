@@ -635,7 +635,9 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
   // Pick a critic quote for share card
   const criticData = (() => {
     try {
-      const pool = lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general;
+      const _activeTheme = getActiveTheme();
+    const _extraLB  = _activeTheme?.letterboxdExtra || [];
+    const pool = [...(_extraLB.length ? _extraLB : []), ...(lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general)];
       const entry = pool[Math.floor(Math.random()*pool.length)];
       return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
     } catch(e) { return { criticQuote:'', criticName:'' }; }
@@ -937,7 +939,9 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
   // Pick a critic quote for share card
   const criticData = (() => {
     try {
-      const pool = lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general;
+      const _activeTheme = getActiveTheme();
+    const _extraLB  = _activeTheme?.letterboxdExtra || [];
+    const pool = [...(_extraLB.length ? _extraLB : []), ...(lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general)];
       const entry = pool[Math.floor(Math.random()*pool.length)];
       return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
     } catch(e) { return { criticQuote:'', criticName:'' }; }
@@ -2795,11 +2799,18 @@ function mulberry32(seed) {
   };
 }
 function getDailySeed() {
+  // Use UTC date so all timezones share the same daily seed
   const d = new Date();
-  return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  return d.getUTCFullYear() * 10000 + (d.getUTCMonth()+1) * 100 + d.getUTCDate();
 }
 function getSeededOptions(arr, n, rng) {
-  return [...arr].sort(() => rng() - 0.5).slice(0, n);
+  // Fisher-Yates shuffle with seeded RNG  -  deterministic across all browsers/devices
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
 }
 function getTodayString() {
   return new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
@@ -2920,23 +2931,106 @@ function picksSoFar() {
   </div>`;
 }
 
+// ── THEMED EVENTS ────────────────────────────────────────────────────────
+const THEMES = {
+  minions: {
+    id: "minions",
+    name: "Lights, Camera, Banana!",
+    subtitle: "A Minions Production",
+    tagline: "The Hollywood Draft Game  -  Minions Edition",
+    dates: ["2026-07-01","2026-07-02","2026-07-03","2026-07-04"],
+    palette: {
+      titleGradient: "linear-gradient(135deg,#F5C518 0%,#FFE14D 40%,#F5A800 70%,#F5C518 100%)",
+      glow: "rgba(245,197,24,0.50)",
+      bg: "#0d0c00",
+      border: "#3d3300",
+      subtitleColor: "#8a7200",
+      taglineColor: "#6a5500",
+      statColors: ["#F5C518","#4A7EBC","#F5C518","#5DBB63"],
+    },
+    introTag: "🍌 It's Minions weekend. You know the assignment.",
+    introTagColor: "#F5C518",
+    introTagBg: "rgba(245,197,24,0.12)",
+    introTagBorder: "rgba(245,197,24,0.35)",
+    productionCredit: "A Gru Production",
+    presentsLine: "Despicably Presents",
+    // Result screen overrides
+    verdictOverrides: {
+      goat:       { title:"🍌 BABABOI. All-Time Classic.",           detail:"A film so beloved the Minions have adopted it as their own. $700M opening weekend. The franchise will never end." },
+      jugger:     { title:"💰 BANANA. Box Office Juggernaut.",       detail:"Record-shattering numbers. The Minions have taken the planet. Again. Sequel greenlit before the popcorn cooled." },
+      franchise:  { title:"🚀 Franchise Machine.",                   detail:"You didn't just make a movie. You made another universe for the Minions to inhabit. The toys are already in production." },
+      darling:    { title:"🌟 Awards Darling. Molto Bello.",         detail:"The Academy is confused but intrigued. Playing in 12 theatres. The Minions gave it five stars." },
+      prestige:   { title:"🎨 Prestige Drama. The Minions Approve.", detail:"Critics loved every frame. The Minions nodded approvingly. The tagline was 'Bello.'" },
+      hit:        { title:"✨ Crowd-Pleasing Hit. Gelato!",          detail:"Audiences loved it. Critics respected it. The Minions gave it four out of five bananas." },
+      blockbust:  { title:"🎯 Solid Blockbuster. Poopaye!",         detail:"Made real money. The Academy forgot it existed. The Minions did not." },
+      sleeper:    { title:"🌱 Sleeper Hit. Nobody Saw It Coming.",   detail:"The Minions found it on streaming. Word spread. Three thousand screens in week three." },
+      cult:       { title:"🕯️ Cult Classic. The Minions Claim It.", detail:"Nobody showed up. Then the Minions found it. In ten years it will be someone's entire personality." },
+      mid:        { title:"😐 Forgettable Mid. Underwhelming.",      detail:"Not bad enough to be memorable. The Minions shrugged. They still watched it twice." },
+      flop:       { title:"💸 Box Office Flop. Tatata...",           detail:"The studio lost $100M. The Minions were embarrassed on your behalf. The director has started a podcast." },
+      disaster:   { title:"🔥 Historic Disaster. Poulet Tikka Masala.", detail:"A catastrophe of historic proportions. Even the Minions couldn't save it. The Wikipedia page has eighteen citations." },
+      tax_writeoff:{ title:"🧾 Tax Write-Off. Non. Just Non.",       detail:"The accountants are the only ones happy. The Minions have moved on. The director is selling candles online." },
+    },
+    // Chaos overrides  -  Minion-flavored
+    chaosInjections: [
+      { round:3, chance:0.10, msg:"🍌 Minion Sighting: A Minion was spotted on set. Nobody knows how. Trending worldwide. Opening weekend tracking just moved up.", penaltyBO:3, penaltyOS:0 },
+      { round:5, chance:0.08, msg:"💛 Banana Scene: An improvised banana gag made it into the cut. Test audiences gave it a standing ovation. The studio is confused but supportive.", penaltyBO:2, penaltyOS:1 },
+      { round:7, chance:0.08, msg:"🎤 Gru Cameo Rumour: Someone on set posted a blurry photo. The internet has decided it is Steve Carell. Opening weekend tracking has gone vertical.", penaltyBO:3, penaltyOS:0 },
+    ],
+    // Letterboxd overrides
+    letterboxdExtra: [
+      { user:"banana_certified",     stars:"★★★★★", review:"did not come here for prestige cinema and i was not disappointed. bababoi." },
+      { user:"minion_stan_account",  stars:"★★★★★", review:"the minion said poopaye and i screamed. five stars. no notes." },
+      { user:"kevin_the_minion",     stars:"★★★★",  review:"gelato. that is my entire review. gelato." },
+      { user:"gru_letterboxd",       stars:"★★★",   review:"it was neither the best nor the worst film i have seen this weekend. the minions disagreed." },
+      { user:"illumination_enjoyer", stars:"★★★★★", review:"the banana scene alone is worth the ticket price. i have seen it four times. i will see it again." },
+    ],
+    // Share text override
+    shareEmoji: "🍌",
+    shareTagline: "Can you beat my score? Bababoi.",
+    // Intro pill bonus text
+    pillExtras: ["Minions-coded options", "Banana-tier scoring", "Special chaos events", "Bababoi verdict tier"],
+  }
+};
+
+function getActiveTheme() {
+  const today = new Date().toISOString().slice(0,10);
+  return Object.values(THEMES).find(t => t.dates.includes(today)) || null;
+}
+
+function buildIntroHero(t) {
+  const bg        = t ? t.palette.bg            : '#0a0a08';
+  const brd       = t ? t.palette.border        : '#2a2a20';
+  const glow      = t ? t.palette.glow          : 'rgba(255,165,0,0.35)';
+  const subColor  = t ? t.palette.subtitleColor : '#7a5a18';
+  const tagColor  = t ? t.palette.taglineColor  : '#6a5a38';
+  const titleText = t ? t.name                  : 'Lights, Camera, Action!';
+  const credit    = t ? t.productionCredit      : 'A Lights, Camera, Action! Production';
+  const presents  = t ? t.presentsLine          : 'Presents';
+  const tagline   = t ? t.tagline               : 'The Hollywood Draft Game';
+  const titleGrad = t ? t.palette.titleGradient : 'linear-gradient(135deg,#FFD700 0%,#FFA500 35%,#FF6B35 65%,#FFD700 100%)';
+  const sc        = t ? t.palette.statColors    : ['#FFD700','#FF6B6B','#6BAAFF','#7BDD88'];
+  const tag       = t ? '<div style="background:' + t.introTagBg + ';border:0.5px solid ' + t.introTagBorder + ';border-radius:20px;display:inline-block;padding:4px 14px;font-size:11px;font-weight:600;color:' + t.introTagColor + ';margin-bottom:14px">' + t.introTag + '</div>' : '';
+  return '<div style="background:' + bg + ';border-radius:var(--r-lg);padding:2rem 1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid ' + brd + '">'
+    + '<div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">' + credit + '</div>'
+    + '<div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:' + subColor + ';margin-bottom:4px;font-style:italic">' + presents + '</div>'
+    + '<div style="margin-bottom:8px"><span style="font-size:30px;font-weight:900;letter-spacing:-0.01em;font-style:italic;background:' + titleGrad + ';-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px ' + glow + ')">' + titleText + '</span></div>'
+    + '<div style="font-size:11px;color:' + tagColor + ';letter-spacing:0.08em;margin-bottom:' + (t ? '6px' : '18px') + ';font-style:italic">' + tagline + '</div>'
+    + tag
+    + '<div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;' + (t ? 'margin-top:12px' : '') + '">'
+    + '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:' + sc[0] + ';filter:drop-shadow(0 0 6px ' + glow + ')">150+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Directors</div></div>'
+    + '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:' + sc[1] + ';filter:drop-shadow(0 0 6px rgba(74,126,188,0.45))">500+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Actors</div></div>'
+    + '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:' + sc[2] + ';filter:drop-shadow(0 0 6px ' + glow + ')">9</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Rounds</div></div>'
+    + '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:' + sc[3] + ';filter:drop-shadow(0 0 6px rgba(80,200,80,0.35))">20+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Outcomes</div></div>'
+    + '</div></div>';
+}
+
 function renderIntro() {
   const streak = getDailyStreak();
   const doneToday = hasDoneDaily();
+  const theme = getActiveTheme();
   const dailyResult = doneToday ? JSON.parse(localStorage.getItem(getDailyKey()) || "{}") : null;
   return `<div style="padding:.5rem 0 1.5rem">
-    <div style="background:#0a0a08;border-radius:var(--r-lg);padding:2rem 1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid #2a2a20">
-      <div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">A Lights, Camera, Action! Production</div>
-      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#7a5a18;margin-bottom:4px;font-style:italic">Presents</div>
-      <div style="margin-bottom:8px"><span style="font-size:30px;font-weight:900;letter-spacing:-0.01em;font-style:italic;background:linear-gradient(135deg,#FFD700 0%,#FFA500 35%,#FF6B35 65%,#FFD700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(255,165,0,0.35))">Lights, Camera, Action!</span></div>
-      <div style="font-size:11px;color:#6a5a38;letter-spacing:0.08em;margin-bottom:18px;font-style:italic">The Hollywood Draft Game</div>
-      <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap">
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#FFD700;filter:drop-shadow(0 0 6px rgba(255,215,0,0.4))">150+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Directors</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#FF6B6B;filter:drop-shadow(0 0 6px rgba(255,80,80,0.35))">500+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Actors</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#6BAAFF;filter:drop-shadow(0 0 6px rgba(80,140,255,0.35))">9</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Rounds</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#7BDD88;filter:drop-shadow(0 0 6px rgba(80,200,80,0.35))">20+</div><div style="font-size:9px;color:#5a5a40;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Outcomes</div></div>
-      </div>
-    </div>
+    ${buildIntroHero(theme)}
     <div style="background:${doneToday ? 'var(--surface2)' : 'var(--amber-bg)'};border:0.5px solid ${doneToday ? 'var(--border)' : 'var(--amber)'};border-radius:var(--r-lg);padding:1rem 1.1rem;margin-bottom:1rem;text-align:center">
       <div style="font-size:12px;font-weight:600;color:${doneToday ? 'var(--text2)' : 'var(--amber)'};margin-bottom:4px">🎬 Daily Draft  -  ${getTodayString()}</div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5">${doneToday ? ("You scored $" + (dailyResult.boM||0) + "M · " + (dailyResult.noms||0) + " noms · " + (dailyResult.verdict||"") + (streak>1?" · "+streak+" day streak 🔥":"")) : ("Everyone gets the same 8 options today. Beat your friends." + (streak>1?" · "+streak+" day streak 🔥":""))}</div>
@@ -3029,7 +3123,12 @@ function renderResult() {
   const boM    = boToM(boNorm);
   const noms   = osNoms(osNorm);
   const wins   = osWins(noms);
-  const v      = getVerdict(boM, noms, S.picks);
+  const v      = (() => {
+    const base = getVerdict(boM, noms, S.picks);
+    const th   = getActiveTheme();
+    if (th?.verdictOverrides?.[base.id]) return { ...base, ...th.verdictOverrides[base.id] };
+    return base;
+  })();
 
   // Cache all result data on state so share functions can access it
   if (!S.synopsis) {
@@ -3307,7 +3406,7 @@ function bind() {
     const r=JSON.parse(localStorage.getItem(getDailyKey())||"{}");
     const txt = "🎬 Daily Draft  -  " + getTodayString() + "\n\n"
       + "I greenlighted \"" + (r.filmTitle||"a film") + "\"  -  $" + (r.boM||0) + "M, " + (r.noms||0) + " Oscar noms. " + (r.verdict||"") + ".\n\n"
-      + "Can you beat my score? Play: https://lights-camera-action.app";
+      + (() => { const _t = getActiveTheme(); return (_t?.shareTagline ? _t.shareTagline : "Can you beat my score?") + " Play: https://lights-camera-action.app"; })();
     navigator.clipboard.writeText(txt).then(()=>showToast("Daily result copied!")).catch(()=>showToast("Copied!"));
   });
   $("roll-btn")?.addEventListener("click", ()=>{
@@ -3406,7 +3505,9 @@ function bind() {
 
     const chaosCount = (S.chaosHistory||[]).length;
     if (!DAILY_MODE && chaosCount < 2) {
-      const eligible = CHAOS_EVENTS.filter(e => e.round===S.round);
+      const _theme     = getActiveTheme();
+      const _themeEvts = (_theme?.chaosInjections||[]).map(e => ({...e, reroll:false, rerollRound:null}));
+      const eligible   = [...CHAOS_EVENTS, ..._themeEvts].filter(e => e.round===S.round);
       const ev = eligible.find(e => Math.random()<e.chance);
       if (ev) {
         S.chaosEvent = ev;
@@ -3437,7 +3538,7 @@ function bind() {
         bo_m:         S.boM  || 0,
         noms:         S.noms || 0,
         wins:         S.wins || 0,
-        score:        (S.boM||0) + ((S.noms||0)*12) + ((S.wins||0)*20) + ((S.rtCritic||0)+(S.rtAudience||0))/4 + (S.bonuses||[]).reduce((s,b)=>s+b.pts,0),
+        score:        (S.boM ?? 0) + ((S.noms ?? 0)*12) + ((S.wins ?? 0)*20) + (((S.rtCritic ?? 0)+(S.rtAudience ?? 0))/4) + (S.bonuses||[]).reduce((s,b)=>s+(b.pts??0),0),
         director:     S.picks[0]?.name || "",
         lead_actor:   S.picks[1]?.name || "",
         submitted_by: dName,
@@ -3490,7 +3591,7 @@ function saveToLeaderboard(entry) {
   const entries = loadLeaderboard();
   entries.push({ ...entry, ts: Date.now() });
   // Keep top 50
-  entries.sort((a,b) => (b.score||b.boM||0) - (a.score||a.boM||0));
+  entries.sort((a,b) => (b.score ?? 0) - (a.score ?? 0));
   localStorage.setItem(LB_KEY, JSON.stringify(entries.slice(0,50)));
 }
 
@@ -3506,8 +3607,9 @@ function renderLeaderboard() {
   if (lbSort==='bo')     entries.sort((a,b)=>b.boM-a.boM);
   if (lbSort==='oscar')  entries.sort((a,b)=>b.noms-a.noms);
   if (lbSort==='wins')   entries.sort((a,b)=>b.wins-a.wins);
-  if (lbSort==='rt')     entries.sort((a,b)=>(b.rtCritic||0)-(a.rtCritic||0));
-  if (lbSort==='recent') entries.sort((a,b)=>b.ts-a.ts);
+  if (lbSort==='rt')       entries.sort((a,b)=>(b.rtCritic||0)-(a.rtCritic||0));
+  if (lbSort==='audience') entries.sort((a,b)=>(b.rtAudience||0)-(a.rtAudience||0));
+  if (lbSort==='recent')   entries.sort((a,b)=>b.ts-a.ts);
   const medals = ['🥇','🥈','🥉'];
   const rankClass = ['gold','silver','bronze'];
   list.innerHTML = entries.slice(0,20).map((e,i)=>`
@@ -3584,6 +3686,7 @@ function safeEncode(str) {
 
 function buildShareText() {
   if (!S.synopsis || !S.verdict) return '';
+  const _thm = getActiveTheme();
   const v      = S.verdict;
   const studio = S.picks[3]?.name || '';
   const genre  = S.picks[5]?.name || '';
@@ -3602,38 +3705,58 @@ function buildShareText() {
     v.id === 'flop' || v.id === 'disaster' || v.id === 'tax_writeoff' ? 'Spectacular flop.' :
     v.id === 'cult' ? 'Instant cult classic.' :
     (v.title||'').replace(/[^ -~]/g,'').trim() + '.';
-  return `I greenlighted "${S.synopsis.title}"  -  ${sig}. $${S.boM}M, ${S.noms} Oscar noms${S.wins ? ', ' + S.wins + ' wins' : ''}. ${vDesc} ${bonusLine}Play: https://lights-camera-action.app`;
+  const _emoji = _thm?.shareEmoji || '🎬';
+  return `${_emoji} I greenlighted "${S.synopsis.title}"  -  ${sig}. $${S.boM}M, ${S.noms} Oscar noms${S.wins ? ', ' + S.wins + ' wins' : ''}. ${vDesc} ${bonusLine}Play: https://lights-camera-action.app`;
 }
 
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
 function buildShareCardSVG() {
   if (!S.synopsis || !S.verdict) return '';
-  const v       = S.verdict;
-  const title   = (S.synopsis.title   || 'Untitled').slice(0, 36);
-  const tagline = (S.synopsis.tagline || '').slice(0, 58);
-  const director= (S.picks[0]?.name   || '').slice(0, 24);
-  const lead    = (S.picks[1]?.name   || '').slice(0, 24);
-  const studio  = (S.picks[3]?.name   || '').slice(0, 22);
-  const genre   = (S.picks[5]?.name   || '').slice(0, 22);
-  const composer= (S.picks[6]?.name   || '').slice(0, 22);
-  const verdict = (v.title || '').replace(/[^ -~]/g,'').trim();
-
+  const v        = S.verdict;
+  const title    = (S.synopsis.title   || 'Untitled').slice(0, 36);
+  const tagline  = (S.synopsis.tagline || '').slice(0, 58);
+  const director = (S.picks[0]?.name   || '').slice(0, 24);
+  const lead     = (S.picks[1]?.name   || '').slice(0, 24);
+  const studio   = (S.picks[3]?.name   || '').slice(0, 22);
+  const genre    = (S.picks[5]?.name   || '').slice(0, 20);
+  const composer = (S.picks[6]?.name   || '').slice(0, 20);
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  // Pick a critic quote from the synopsis if available
-  const criticQuote = S.synopsis?.criticQuote || '';
-  const quoteLine   = criticQuote ? esc(('\u201C' + criticQuote + '\u201D').slice(0,72)) : '';
-  const criticName  = S.synopsis?.criticName  ? esc(('- ' + S.synopsis.criticName).slice(0,40)) : '';
+  // Critic quote  -  use synopsis stored value or pick from pools
+  const rawQuote = S.synopsis?.criticQuote || '';
+  const rawCritic= S.synopsis?.criticName  || '';
+  // Wrap long quotes
+  const quoteWords = rawQuote.split(' ');
+  let quoteLine1 = '', quoteLine2 = '';
+  quoteWords.forEach(w => {
+    if ((quoteLine1 + ' ' + w).trim().length <= 46) quoteLine1 = (quoteLine1 + ' ' + w).trim();
+    else if ((quoteLine2 + ' ' + w).trim().length <= 46) quoteLine2 = (quoteLine2 + ' ' + w).trim();
+  });
+  const hasQuote = quoteLine1.length > 0;
 
-  // Run signature
-  const sig = [studio, genre, composer ? composer + ' score' : ''].filter(Boolean).join(' · ').slice(0,58);
+  // Letterboxd-style one-liner from lbPools
+  const lbLine = (() => {
+    try {
+      const boM = S.boM||0; const noms = S.noms||0; const studioName = studio;
+      const dirName = director; const leadName = lead;
+      const g = genre.toLowerCase();
+      const pool = g.includes('horror') ? lbPools.horror :
+                   g.includes('musical') ? lbPools.musical :
+                   g.includes('action') || g.includes('blockbuster') ? lbPools.action :
+                   (noms >= 7 || boM < 150) ? lbPools.prestige : lbPools.general;
+      const entry = pool[Math.floor(Math.random()*pool.length)];
+      return (entry?.review || '').replace(/\$\{[^}]+\}/g,'...').slice(0,58);
+    } catch(e) { return ''; }
+  })();
 
-  // Top bonus or synergy
+  // Bonus line
   const _topBonus = (S.bonuses||[]).find(b => b.pts > 0);
   const _topSyn   = (S.activeSynergies||[])[0];
   const bonusLine = _topBonus
     ? esc(_topBonus.label + '  +' + _topBonus.pts + ' pts')
-    : _topSyn ? esc('⚡ ' + (_topSyn.label||'').slice(0,38) + ' synergy') : '';
+    : _topSyn ? esc('Synergy: ' + (_topSyn.label||'').slice(0,36)) : '';
+
+  const sig = [studio, genre, composer ? composer + ' score' : ''].filter(Boolean).join(' - ').slice(0,56);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
   <defs>
@@ -3648,70 +3771,70 @@ function buildShareCardSVG() {
     </linearGradient>
   </defs>
 
-  <!-- Background -->
   <rect width="600" height="400" fill="url(#bg2)" rx="14"/>
   <rect width="600" height="400" fill="none" stroke="#2a2a20" stroke-width="1" rx="14"/>
   <rect x="0" y="0" width="600" height="4" fill="url(#gold2)" rx="2"/>
 
-  <!-- Game label -->
+  <!-- Header -->
   <text x="28" y="22" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="3">LIGHTS, CAMERA, ACTION!</text>
+  <text x="28" y="50" font-family="Georgia,serif" font-size="22" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
+  <text x="28" y="66" font-family="system-ui,sans-serif" font-size="10" fill="#7a6a40" font-style="italic">${esc(tagline)}</text>
 
-  <!-- Title -->
-  <text x="28" y="52" font-family="Georgia,serif" font-size="24" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
+  <line x1="28" y1="76" x2="572" y2="76" stroke="#252520" stroke-width="1"/>
 
-  <!-- Tagline -->
-  <text x="28" y="70" font-family="system-ui,sans-serif" font-size="10" fill="#7a6a40" font-style="italic">${esc(tagline)}</text>
+  <!-- Stats row  -  4 even columns -->
+  <text x="28"  y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
+  <text x="28"  y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">BOX OFFICE</text>
 
-  <!-- Divider -->
-  <line x1="28" y1="82" x2="572" y2="82" stroke="#252520" stroke-width="1"/>
+  <text x="165" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms} noms</text>
+  <text x="165" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">OSCAR - ${S.wins||0} WINS</text>
 
-  <!-- Stats  -  4 columns -->
-  <text x="28"  y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
-  <text x="28"  y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">BOX OFFICE</text>
+  <text x="336" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
+  <text x="336" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
 
-  <text x="165" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms} noms</text>
-  <text x="165" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">OSCAR · ${S.wins||0} WINS</text>
+  <text x="470" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
+  <text x="470" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
 
-  <text x="336" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
-  <text x="336" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
+  <line x1="28" y1="116" x2="572" y2="116" stroke="#252520" stroke-width="1"/>
 
-  <text x="468" y="100" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
-  <text x="468" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
+  <!-- Left column: crew | Right column: quote + letterboxd -->
+  <!-- LEFT: Director, Lead, Studio, Run sig -->
+  <text x="28"  y="132" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">DIRECTED BY</text>
+  <text x="28"  y="146" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
 
-  <!-- Divider -->
-  <line x1="28" y1="124" x2="572" y2="124" stroke="#252520" stroke-width="1"/>
+  <text x="28"  y="163" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STARRING</text>
+  <text x="28"  y="177" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
 
-  <!-- Crew  -  3 columns -->
-  <text x="28"  y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">DIRECTED BY</text>
-  <text x="28"  y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
+  <text x="28"  y="194" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STUDIO</text>
+  <text x="28"  y="208" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
 
-  <text x="230" y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STARRING</text>
-  <text x="230" y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
+  <text x="28"  y="222" font-family="system-ui,sans-serif" font-size="9"  fill="#5a5a3a">${esc(sig)}</text>
 
-  <text x="430" y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STUDIO</text>
-  <text x="430" y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
+  <!-- Vertical divider -->
+  <line x1="290" y1="120" x2="290" y2="300" stroke="#252520" stroke-width="0.5"/>
 
-  <!-- Run signature line -->
-  <text x="28" y="172" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${esc(sig)}</text>
+  <!-- RIGHT: Critic quote block -->
+  <text x="304" y="132" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">CRITICAL RECEPTION</text>
+  ${hasQuote ? `<text x="304" y="148" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">\u201C${esc(quoteLine1)}</text>
+  <text x="304" y="163" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">${quoteLine2 ? esc(quoteLine2) + '\u201D' : ''}</text>
+  <text x="304" y="${quoteLine2 ? 178 : 163}" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${esc('- ' + rawCritic)}</text>` : `<text x="304" y="152" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#5a5a3a">${esc(v.title||'')}</text>`}
 
-  <!-- Divider -->
-  <line x1="28" y1="182" x2="572" y2="182" stroke="#252520" stroke-width="1"/>
+  <!-- Letterboxd one-liner -->
+  <text x="304" y="202" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">LETTERBOXD</text>
+  <text x="304" y="216" font-family="system-ui,sans-serif" font-size="9" fill="#8a8a6a" font-style="italic">${esc(lbLine.slice(0,46))}</text>
+  ${lbLine.length > 46 ? `<text x="304" y="229" font-family="system-ui,sans-serif" font-size="9" fill="#8a8a6a" font-style="italic">${esc(lbLine.slice(46))}</text>` : ''}
 
-  <!-- Critic quote block -->
-  ${quoteLine ? `<text x="28" y="200" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">${quoteLine}</text>
-  <text x="28" y="216" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${criticName}</text>` : `<text x="28" y="205" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#5a5a3a">${esc(verdict)}</text>`}
+  <line x1="28" y1="240" x2="572" y2="240" stroke="#252520" stroke-width="1"/>
 
-  <!-- Verdict badge -->
-  <rect x="28" y="228" width="${Math.min(340, verdict.length * 8 + 24)}" height="26" fill="#1a1a16" rx="5" stroke="#3a3a28" stroke-width="0.5"/>
-  <text x="40" y="246" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(v.title||'')}</text>
-
-  <!-- Bonus/synergy line -->
-  ${bonusLine ? `<text x="28" y="270" font-family="system-ui,sans-serif" font-size="9" fill="#7BDD88">${bonusLine}</text>` : ''}
+  <!-- Verdict + bonus -->
+  <rect x="28" y="249" width="${Math.min(320, (v.title||'').length * 8 + 24)}" height="24" fill="#1a1a16" rx="5" stroke="#3a3a28" stroke-width="0.5"/>
+  <text x="40" y="266" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(v.title||'')}</text>
+  ${bonusLine ? `<text x="28" y="288" font-family="system-ui,sans-serif" font-size="9" fill="#7BDD88">${bonusLine}</text>` : ''}
 
   <!-- Footer -->
-  <line x1="28" y1="380" x2="572" y2="380" stroke="#1e1e18" stroke-width="0.5"/>
-  <text x="28"  y="393" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" letter-spacing="1">LIGHTS-CAMERA-ACTION.APP</text>
-  <text x="572" y="393" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" text-anchor="end">Play at https://lights-camera-action.app</text>
+  <line x1="28" y1="310" x2="572" y2="310" stroke="#1e1e18" stroke-width="0.5"/>
+  <text x="28"  y="323" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" letter-spacing="1">LIGHTS-CAMERA-ACTION.APP</text>
+  <text x="572" y="323" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" text-anchor="end">Play at https://lights-camera-action.app</text>
 </svg>`;
 }
 
