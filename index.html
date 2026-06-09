@@ -69,7 +69,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .progress-step.active { background: var(--blue); }
 .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.1rem; margin-bottom: 1rem; }
 .card-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
-.pick-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+.pick-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; }
 .pick-row:last-child { border-bottom: none; }
 .pick-cat { font-size: 11px; color: var(--text2); width: 90px; flex-shrink: 0; }
 .pick-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; word-break: break-word; white-space: nowrap; }
@@ -632,10 +632,21 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
     chaosLine
   ].filter(Boolean).join('. ');
 
+  // Pick a critic quote for share card
+  const criticData = (() => {
+    try {
+      const pool = lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general;
+      const entry = pool[Math.floor(Math.random()*pool.length)];
+      return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
+    } catch(e) { return { criticQuote:'', criticName:'' }; }
+  })();
+
   return {
     title: filmTitle,
     tagline: generateTagline(genre, isBlockbuster, isAwardsBait, isFlop),
-    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`
+    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`,
+    criticQuote: criticData.criticQuote,
+    criticName:  criticData.criticName,
   };
 }
 
@@ -923,10 +934,21 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
     chaosLine
   ].filter(Boolean).join('. ');
 
+  // Pick a critic quote for share card
+  const criticData = (() => {
+    try {
+      const pool = lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general;
+      const entry = pool[Math.floor(Math.random()*pool.length)];
+      return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
+    } catch(e) { return { criticQuote:'', criticName:'' }; }
+  })();
+
   return {
     title: filmTitle,
     tagline: generateTagline(genre, isBlockbuster, isAwardsBait, isFlop),
-    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`
+    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`,
+    criticQuote: criticData.criticQuote,
+    criticName:  criticData.criticName,
   };
 }
 
@@ -984,6 +1006,8 @@ function setWofSort(s) {
 let wofExpanded = false;
 
 function renderWalkOfFame() {
+  // Always reload from localStorage so new entries appear immediately
+  WALK_OF_FAME = JSON.parse(localStorage.getItem(WOF_KEY) || '[]');
   const container = document.getElementById("wof-list");
   if (!container) return;
   if (WALK_OF_FAME.length === 0) {
@@ -995,7 +1019,7 @@ function renderWalkOfFame() {
     return;
   }
   // Ensure all entries have a score
-  WALK_OF_FAME.forEach(e => { if (!e.score) e.score = (e.boM||0) + ((e.noms||0)*15) + ((e.wins||0)*25); });
+  WALK_OF_FAME.forEach(e => { if (!e.score) e.score = (e.boM||0) + ((e.noms||0)*12) + ((e.wins||0)*20) + Math.round(((e.rtCritic||0)+(e.rtAudience||0))/4); });
   let sorted = [...WALK_OF_FAME].slice(0, 50);
   if (wofSort === 'score')    sorted.sort((a,b) => (b.score||0)-(a.score||0));
   if (wofSort === 'bo')       sorted.sort((a,b) => (b.boM||0)-(a.boM||0));
@@ -1017,7 +1041,7 @@ function renderWalkOfFame() {
       <div class="wof-tagline">${e.synopsis?.tagline || ''}</div>
       <div class="wof-stats">
         <span class="pill pill-bo">$${e.boM}M</span>
-        <span class="pill pill-oscar">🏆 ${e.noms} noms</span>
+        <span class="pill pill-oscar">🏆 ${e.noms} noms · ${e.wins||0}w</span>
         <span class="pill" style="background:var(--green-bg);color:var(--green)">🥇 ${e.wins||0}w</span>
         <span class="pill" style="background:var(--green-bg);color:var(--green)">⭐ ${e.score}</span>
         ${rt}
@@ -2281,6 +2305,15 @@ const CHAOS_EVENTS = [
   { round:6, chance:0.05, msg:"🌍 International Breakout: Early tracking shows unexpected international interest. The distributor is expanding the release.", reroll:false, rerollRound:null, penaltyBO:3, penaltyOS:0 },
   { round:9, chance:0.05, msg:"🎗️ Cause Alignment: The film accidentally became associated with a major cultural moment. The timing is either perfect or complicated.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:1 },
   { round:2, chance:0.04, msg:"👤 Mystery Casting Leak: Someone leaked that a major uncredited star appears in the film. Speculation is driving significant pre-sale interest.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:0 },
+  // ── Additional chaos ────────────────────────────────────────────────────
+  { round:2, chance:0.05, msg:"📸 Lead Actor Recast: The original lead dropped out after one day of shooting. The recast is surprising. The chemistry read was extraordinary.", reroll:true, rerollRound:1, penaltyBO:0, penaltyOS:1 },
+  { round:4, chance:0.05, msg:"🏆 Prestige Rival Announced: A competing prestige film just announced the same release window. The Awards race just got complicated.", reroll:false, rerollRound:null, penaltyBO:-1, penaltyOS:-1 },
+  { round:5, chance:0.05, msg:"📖 Source Novel Goes Viral: The source novel hit number one on TikTok BookTok. Pre-awareness is extraordinary. The audience arrived before the trailer.", reroll:false, rerollRound:null, penaltyBO:3, penaltyOS:1 },
+  { round:6, chance:0.05, msg:"🎬 Director Wins Major Award Mid-Shoot: The director won a major festival prize for a previous film while this one is in production. Expectations just recalibrated entirely.", reroll:false, rerollRound:null, penaltyBO:1, penaltyOS:3 },
+  { round:7, chance:0.05, msg:"💿 Soundtrack Pre-Release: A single from the score dropped without warning and hit the charts. The score is now a cultural object before the film exists.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:2 },
+  { round:8, chance:0.05, msg:"🌧️ Climate Delay: Extreme weather conditions shut down the final week of shooting. The insurance claim is extraordinary. The missing footage was found to be unnecessary.", reroll:false, rerollRound:null, penaltyBO:0, penaltyOS:0 },
+  { round:3, chance:0.05, msg:"🤝 Co-Production Deal: A major international studio entered as co-producer. The budget increased. The international release is now guaranteed. The creative oversight did not increase noticeably.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:1 },
+  { round:9, chance:0.05, msg:"🎗️ Political Timing: The film's themes accidentally aligned with a major cultural or political moment. The timing is either perfect or deeply complicated.", reroll:false, rerollRound:null, penaltyBO:2, penaltyOS:2 },
 ];
 
 function getRandom(arr, n) { return [...arr].sort(()=>Math.random()-0.5).slice(0,n); }
@@ -2528,6 +2561,36 @@ const SYNERGIES = [
   { names:["Alexandre Desplat","Prestige Drama"],     boBonus:1, osBonus:3, label:"Desplat x Prestige",        msg:"The Grand Budapest Hotel. The Shape of Water. He scores prestige cinema with the lightness of a master." },
   { names:["Max Richter","Epic Drama"],               boBonus:0, osBonus:3, label:"Richter x Drama",           msg:"On the Nature of Daylight became the unofficial theme of thoughtful cinema for a decade. His instinct for grief is unmatched." },
   { names:["Gustavo Santaolalla","Prestige Drama"],   boBonus:1, osBonus:3, label:"Santaolalla x Drama",        msg:"Brokeback Mountain. Babel. The sparse guitar carries more emotional weight than a full orchestra. The Academy agrees." },
+  // ── More director x actor ─────────────────────────────────────────────────
+  { names:["Denis Villeneuve","Zendaya"],         boBonus:2, osBonus:3, label:"Villeneuve x Zendaya",      msg:"Dune Part Two. They found something together. The industry noticed. The audience noticed. The industry noticed the audience noticing." },
+  { names:["Ari Aster","Florence Pugh"],          boBonus:1, osBonus:4, label:"Aster x Pugh",              msg:"Midsommar energy. She is the most fearless performer of her generation meeting the most uncompromising director of his. The result will be devastating." },
+  { names:["Greta Gerwig","Florence Pugh"],       boBonus:2, osBonus:3, label:"Gerwig x Pugh",             msg:"Don't Worry Darling showed what she can do with complicated material. Gerwig will give her something even more complicated and more worthy." },
+  { names:["Noah Baumbach","Adam Driver"],        boBonus:1, osBonus:4, label:"Baumbach x Driver",         msg:"Marriage Story. The collaboration that produced the most painful film of 2019. They are not finished with each other." },
+  { names:["Paul Thomas Anderson","Philip Seymour Hoffman"], boBonus:1, osBonus:5, label:"PTA x Hoffman Legacy", msg:"Boogie Nights. Magnolia. Punch-Drunk Love. The Masterplan. The reunion that cannot happen but whose shadow falls across everything PTA does." },
+  { names:["Wes Anderson","Scarlett Johansson"],  boBonus:2, osBonus:2, label:"Anderson x Johansson",      msg:"The Isle of Dogs voice cast suggested an affinity. A live-action collaboration would be the most precisely costumed film of the decade." },
+  { names:["Jordan Peele","Lupita Nyong'o"],      boBonus:3, osBonus:3, label:"Peele x Nyong'o",           msg:"Us. The most terrifying central performance in modern horror paired with the director who best understands what terror means culturally." },
+  // ── More studio x genre ────────────────────────────────────────────────────
+  { names:["Blumhouse","Psychological Thriller"], boBonus:2, osBonus:2, label:"Blumhouse x Thriller",      msg:"Get Out started as a horror film and ended as the most politically urgent thriller of the decade. Blumhouse understood what they had." },
+  { names:["Apple Original Films","Biopic"],      boBonus:1, osBonus:4, label:"Apple x Biopic",            msg:"CODA. Killers of the Flower Moon. Apple funds the biopics nobody else will fund at the scale they require. The Academy keeps noticing." },
+  { names:["Netflix Films","Epic Drama"],         boBonus:2, osBonus:3, label:"Netflix x Epic",            msg:"The Irishman. Marriage Story. When Netflix decides to make a prestige film they give the director everything. The results speak for themselves." },
+  { names:["A24","Horror"],                       boBonus:2, osBonus:4, label:"A24 x Horror",              msg:"Hereditary. Midsommar. Men. Talk to Me. A24 has made horror the genre film critics can no longer afford to dismiss." },
+  { names:["Disney / Pixar","Animated"],          boBonus:3, osBonus:5, label:"Pixar x Animation",         msg:"The Best Animated Feature Oscar was practically created for this combination. The emotional devastation will be fully earned." },
+  // ── Composer x specific director ───────────────────────────────────────────
+  { names:["Hans Zimmer","Denis Villeneuve"],     boBonus:2, osBonus:2, label:"Zimmer x Villeneuve",       msg:"Dune Part One. The score was a character. A culture. A civilisation expressed entirely through sound. Part Two confirmed it was not an accident." },
+  { names:["Jonny Greenwood","Ari Aster"],        boBonus:0, osBonus:4, label:"Greenwood x Aster",         msg:"A theoretical combination that the film music world has been discussing since Hereditary. If it happens, the Academy's music branch will cancel its plans." },
+  { names:["Justin Hurwitz","Damien Chazelle"],   boBonus:2, osBonus:5, label:"Hurwitz x Chazelle",        msg:"Whiplash. La La Land. Babylon. Three films. Three eras. One of the most productive director-composer relationships in contemporary cinema." },
+  { names:["Ennio Morricone","Sergio Leone"],     boBonus:2, osBonus:3, label:"Morricone x Leone Legacy",  msg:"Once Upon a Time in America. The Good the Bad and the Ugly. The collaboration that invented a genre's sound. The legacy enters the room." },
+  // ── More negative dynamics ─────────────────────────────────────────────────
+  { names:["Michael Bay","Prestige Drama"],       boBonus:-2, osBonus:-3, label:"Bay x Prestige",          msg:"The studio had a conversation about creative direction that lasted six hours. The film changed. Not in the direction the original vision intended." },
+  { names:["Disney / Marvel","A24-style Arthouse"], boBonus:-1, osBonus:-2, label:"Marvel x Arthouse",     msg:"The brief was to make something smaller and more personal. The committee gave notes. The film is neither small nor particularly personal." },
+  { names:["Streaming Dump","Awards Season (Nov to Dec)"], boBonus:-3, osBonus:-2, label:"Streaming Dump in Awards Season", msg:"The distributor moved it to a streaming drop three weeks before the theatrical window. The Academy voters have been notified. Their calendars are full." },
+  { names:["Video Game Adaptation","Mega Budget ($350M+)"], boBonus:-1, osBonus:-2, label:"Video Game Mega Budget", msg:"The IP justified the budget in theory. The execution justified seventeen post-mortems. The sequel has been quietly shelved." },
+  // ── Fun wildcard combos ────────────────────────────────────────────────────
+  { names:["Nicolas Cage","Musical"],             boBonus:1, osBonus:2, label:"Cage x Musical",           msg:"Nobody predicted this. Cage predicted this. He has reportedly been preparing the dance numbers for eleven years." },
+  { names:["Adam Sandler","Drama"],               boBonus:1, osBonus:4, label:"Sandler Serious Mode",     msg:"Uncut Gems. Hustle. Punch-Drunk Love. When Sandler decides to be serious he produces performances that make critics deeply uncomfortable about their previous positions." },
+  { names:["Dwayne Johnson","Prestige Drama"],    boBonus:0, osBonus:2, label:"Rock x Prestige",          msg:"The combination nobody expected. He has been quietly pursuing this for a decade. The material is demanding. He appears to be ready for it." },
+  { names:["Bad Bunny","Musical"],                boBonus:3, osBonus:1, label:"Bad Bunny x Musical",      msg:"The most-streamed artist in the world in a musical is a commercial event that transcends film marketing. The demographic crossover is staggering." },
+  { names:["Taylor Swift","Musical"],             boBonus:4, osBonus:1, label:"Swift x Musical",          msg:"The Eras Tour did $2 billion in concert film revenue. A scripted musical is the logical next chapter. The Swifties are already buying tickets." },
 ];
 
 function detectSynergies(picks) {
@@ -3071,9 +3134,7 @@ function renderResult() {
   const syn = S.synopsis;
 
   const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
-    const hardBadge  = HARD_MODE  ? ' <span style="background:#1a1a2e;color:#9B8FD4;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:0.5px solid #9B8FD4">🔒 Blind Draft</span>' : '';
-  const glMultiplier = S.greenlightLabel === 'Unanimous Greenlight' ? '+20%' : S.greenlightLabel === 'Greenlit' ? '+12%' : '+10%';
-  const glBanner   = greenlightBonus ? `<div style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r-lg);padding:8px 12px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--amber);text-align:center">⚡ ${greenlightLabel} - ${glMultiplier} score multiplier applied</div>` : '';
+      const hardBadge = HARD_MODE ? ' <span style="background:var(--purple-bg);color:var(--purple);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:0.5px solid var(--purple)">🔒 Blind Draft</span>' : '';
   const bonusPanel = (S.bonuses||[]).length ? `<div style="background:var(--surface2);border-radius:var(--r-lg);padding:10px 14px;margin-bottom:10px">
     <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Production Bonuses</div>
     ${(S.bonuses||[]).map(b => `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)">
@@ -3328,7 +3389,7 @@ function bind() {
         bo_m:         S.boM  || 0,
         noms:         S.noms || 0,
         wins:         S.wins || 0,
-        score:        S.finalScore || (S.boM + (S.noms*12) + (S.wins*20)),
+        score:        (S.boM||0) + ((S.noms||0)*12) + ((S.wins||0)*20) + ((S.rtCritic||0)+(S.rtAudience||0))/4 + (S.bonuses||[]).reduce((s,b)=>s+b.pts,0),
         director:     S.picks[0]?.name || "",
         lead_actor:   S.picks[1]?.name || "",
         submitted_by: dName,
@@ -3336,44 +3397,7 @@ function bind() {
     } }, 500);
   // Wire share buttons whenever result is rendered
   if (S.phase === 'result') setTimeout(wireShareButtons, 50);
-  $("submit-wof-btn")?.addEventListener("click", async ()=>{
-    if (!S.synopsis) return;
-    const btn      = document.getElementById("submit-wof-btn");
-    const nameEl   = document.getElementById("wof-director-name");
-    const optInEl  = document.getElementById("wof-opt-in");
-    const dirName  = (nameEl?.value || "").trim() || "Anonymous";
-    if (dirName !== 'Anonymous') localStorage.setItem('lca_player_name', dirName);
-    const optIn    = optInEl ? optInEl.checked : true;
-
-    if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
-    if (nameEl) nameEl.disabled = true;
-    if (optInEl) optInEl.disabled = true;
-
-    // Save locally with director name
-    saveToWalkOfFame(S.picks, S.synopsis.title, S.synopsis, S.boM, S.noms, S.wins, S.verdict);
-
-    // Push to Supabase only if user opted in
-    let result = null;
-    if (optIn) {
-      result = await submitToSupabase(
-        S.picks, S.synopsis, S.boM, S.noms, S.wins, S.verdict, S.rtCritic, S.rtAudience, dirName
-      );
-    }
-
-    if (btn) {
-      if (optIn && result) {
-        btn.textContent = "✅ On the Global Leaderboard!";
-        showToast("Your film is live on the global board!");
-      } else if (optIn && !result) {
-        btn.textContent = "✅ Saved locally (offline)";
-        showToast("Saved locally - check your connection");
-      } else {
-        btn.textContent = "✅ Saved to your Walk of Fame";
-        showToast("Saved to your local Walk of Fame!");
-      }
-      btn.style.opacity = "0.6";
-    }
-  });
+  // submit-wof-btn wired to handleSubmitWof() in bind()
 }
 
 // ── Tab switching ──
@@ -3418,7 +3442,7 @@ function saveToLeaderboard(entry) {
   const entries = loadLeaderboard();
   entries.push({ ...entry, ts: Date.now() });
   // Keep top 50
-  entries.sort((a,b) => b.boM - a.boM);
+  entries.sort((a,b) => (b.score||b.boM||0) - (a.score||a.boM||0));
   localStorage.setItem(LB_KEY, JSON.stringify(entries.slice(0,50)));
 }
 
@@ -3430,9 +3454,11 @@ function renderLeaderboard() {
     list.innerHTML = '<div class="lb-empty"><div class="lb-empty-icon">🏅</div>No films on the board yet.<br>Complete a draft and submit it to Walk of Fame<br>to appear here.</div>';
     return;
   }
+  if (lbSort==='score')  entries.sort((a,b)=>(b.score||b.boM||0)-(a.score||a.boM||0));
   if (lbSort==='bo')     entries.sort((a,b)=>b.boM-a.boM);
   if (lbSort==='oscar')  entries.sort((a,b)=>b.noms-a.noms);
   if (lbSort==='wins')   entries.sort((a,b)=>b.wins-a.wins);
+  if (lbSort==='rt')     entries.sort((a,b)=>(b.rtCritic||0)-(a.rtCritic||0));
   if (lbSort==='recent') entries.sort((a,b)=>b.ts-a.ts);
   const medals = ['🥇','🥈','🥉'];
   const rankClass = ['gold','silver','bronze'];
@@ -3445,7 +3471,7 @@ function renderLeaderboard() {
       </div>
       <div class="lb-scores">
         <div class="lb-score-row" style="color:var(--blue)">💰 $${e.boM}M</div>
-        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms} noms</div>
+        <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms} noms · ${e.wins||0}w</div>
         <div class="lb-score-row" style="color:var(--amber)">🥇 ${e.wins} wins</div>
       </div>
     </div>
@@ -3534,40 +3560,33 @@ function buildShareText() {
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
 function buildShareCardSVG() {
   if (!S.synopsis || !S.verdict) return '';
-  const v        = S.verdict;
-  const title    = (S.synopsis.title || 'Untitled').slice(0, 38);
-  const tagline  = (S.synopsis.tagline || '').slice(0, 62);
-  const director = (S.picks[0]?.name || '').slice(0, 26);
-  const lead     = (S.picks[1]?.name || '').slice(0, 26);
-  const support  = (S.picks[2]?.name || '').slice(0, 26);
-  const studio   = (S.picks[3]?.name || '').slice(0, 24);
-  const genre    = (S.picks[5]?.name || '').slice(0, 24);
-  const composer = (S.picks[6]?.name || '').slice(0, 24);
-  const verdict  = (v.title || '').replace(/[^ -~]/g, '').trim();
-  const emojiVerdict = v.title || '';
-
-  const recentAch = unlockedAchievements.length
-    ? (unlockedAchievements[unlockedAchievements.length-1].icon + ' ' +
-       unlockedAchievements[unlockedAchievements.length-1].label).replace(/[^ -~]/g,'').trim()
-    : '';
-  const achLine = recentAch ? recentAch.slice(0, 36) : '';
+  const v       = S.verdict;
+  const title   = (S.synopsis.title   || 'Untitled').slice(0, 36);
+  const tagline = (S.synopsis.tagline || '').slice(0, 58);
+  const director= (S.picks[0]?.name   || '').slice(0, 24);
+  const lead    = (S.picks[1]?.name   || '').slice(0, 24);
+  const studio  = (S.picks[3]?.name   || '').slice(0, 22);
+  const genre   = (S.picks[5]?.name   || '').slice(0, 22);
+  const composer= (S.picks[6]?.name   || '').slice(0, 22);
+  const verdict = (v.title || '').replace(/[^ -~]/g,'').trim();
 
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  // Pre-build sig and bonus lines (no nested template literals)
-  const _sig = [studio, genre.slice(0,18), composer.slice(0,18)].filter(Boolean).join(' - ').slice(0, 60);
+  // Pick a critic quote from the synopsis if available
+  const criticQuote = S.synopsis?.criticQuote || '';
+  const quoteLine   = criticQuote ? esc(('\u201C' + criticQuote + '\u201D').slice(0,72)) : '';
+  const criticName  = S.synopsis?.criticName  ? esc(('- ' + S.synopsis.criticName).slice(0,40)) : '';
+
+  // Run signature
+  const sig = [studio, genre, composer ? composer + ' score' : ''].filter(Boolean).join(' · ').slice(0,58);
+
+  // Top bonus or synergy
   const _topBonus = (S.bonuses||[]).find(b => b.pts > 0);
   const _topSyn   = (S.activeSynergies||[])[0];
-  const _sigSVG   = _sig
-    ? '<text x="28" y="272" font-family="system-ui,sans-serif" font-size="9" fill="#6a6a50">' + esc(_sig) + '</text>'
-    : '';
-  const _bonusSVG = _topBonus
-    ? '<rect x="28" y="280" width="540" height="16" fill="#1a1a16" rx="3"/><text x="36" y="292" font-family="system-ui,sans-serif" font-size="8" fill="#FAC775">' + esc(_topBonus.label + '  +' + _topBonus.pts + ' pts') + '</text>'
-    : _topSyn
-    ? '<rect x="28" y="280" width="540" height="16" fill="#1a1a16" rx="3"/><text x="36" y="292" font-family="system-ui,sans-serif" font-size="8" fill="#7BDD88">' + esc('Synergy: ' + (_topSyn.label||'').slice(0,46)) + '</text>'
-    : '';
+  const bonusLine = _topBonus
+    ? esc(_topBonus.label + '  +' + _topBonus.pts + ' pts')
+    : _topSyn ? esc('⚡ ' + (_topSyn.label||'').slice(0,38) + ' synergy') : '';
 
-  // Card: 600 wide x 400 tall. Two-column crew layout, centred stats row.
   return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
   <defs>
     <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
@@ -3582,65 +3601,69 @@ function buildShareCardSVG() {
   </defs>
 
   <!-- Background -->
-  <rect width="600" height="400" fill="url(#bg2)" rx="16"/>
-  <rect width="600" height="400" fill="none" stroke="#2a2a20" stroke-width="1" rx="16"/>
-  <!-- Gold top bar -->
-  <rect x="0" y="0" width="600" height="3" fill="url(#gold2)" rx="2"/>
+  <rect width="600" height="400" fill="url(#bg2)" rx="14"/>
+  <rect width="600" height="400" fill="none" stroke="#2a2a20" stroke-width="1" rx="14"/>
+  <rect x="0" y="0" width="600" height="4" fill="url(#gold2)" rx="2"/>
 
-  <!-- Header -->
-  <text x="28" y="24" font-family="system-ui,sans-serif" font-size="8" fill="#5a5a40" letter-spacing="3">LIGHTS CAMERA ACTION</text>
-  <text x="28" y="56" font-family="Georgia,serif" font-size="22" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
-  <text x="28" y="73" font-family="system-ui,sans-serif" font-size="10" fill="#8a7a50" font-style="italic">${esc(tagline)}</text>
+  <!-- Game label -->
+  <text x="28" y="22" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="3">LIGHTS, CAMERA, ACTION!</text>
 
-  <!-- Divider -->
-  <line x1="28" y1="84" x2="572" y2="84" stroke="#2a2a20" stroke-width="1"/>
+  <!-- Title -->
+  <text x="28" y="52" font-family="Georgia,serif" font-size="24" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
 
-  <!-- Stats row  -  4 columns evenly spaced across 600px -->
-  <!-- Col 1: x=28, Col 2: x=178, Col 3: x=328, Col 4: x=468 -->
-  <text x="28"  y="104" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
-  <text x="28"  y="116" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">BOX OFFICE</text>
-  <text x="178" y="104" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms}</text>
-  <text x="178" y="116" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">OSCAR NOMS</text>
-  <text x="328" y="104" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
-  <text x="328" y="116" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">TOMATOMETER</text>
-  <text x="468" y="104" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
-  <text x="468" y="116" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">AUDIENCE</text>
+  <!-- Tagline -->
+  <text x="28" y="70" font-family="system-ui,sans-serif" font-size="10" fill="#7a6a40" font-style="italic">${esc(tagline)}</text>
 
   <!-- Divider -->
-  <line x1="28" y1="128" x2="572" y2="128" stroke="#2a2a20" stroke-width="1"/>
+  <line x1="28" y1="82" x2="572" y2="82" stroke="#252520" stroke-width="1"/>
 
-  <!-- Crew  -  two columns, left col x=28, right col x=314 -->
-  <text x="28"  y="144" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">DIRECTOR</text>
-  <text x="28"  y="158" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
-  <text x="314" y="144" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">LEAD ACTOR</text>
-  <text x="314" y="158" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
+  <!-- Stats  -  4 columns -->
+  <text x="28"  y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
+  <text x="28"  y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">BOX OFFICE</text>
 
-  <text x="28"  y="175" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">SUPPORTING</text>
-  <text x="28"  y="189" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(support)}</text>
-  <text x="314" y="175" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">STUDIO</text>
-  <text x="314" y="189" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
+  <text x="178" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FAC775">${S.noms}</text>
+  <text x="178" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">OSCAR NOMS</text>
 
-  <text x="28"  y="206" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">GENRE</text>
-  <text x="28"  y="220" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(genre)}</text>
-  <text x="314" y="206" font-family="system-ui,sans-serif" font-size="8"  fill="#5a5a40" letter-spacing="1">COMPOSER</text>
-  <text x="314" y="220" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(composer)}</text>
+  <text x="310" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
+  <text x="310" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
+
+  <text x="458" y="100" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
+  <text x="458" y="113" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
 
   <!-- Divider -->
-  <line x1="28" y1="232" x2="572" y2="232" stroke="#2a2a20" stroke-width="1"/>
+  <line x1="28" y1="124" x2="572" y2="124" stroke="#252520" stroke-width="1"/>
 
-  <!-- Verdict -->
-  <rect x="28" y="241" width="${Math.min(360, verdict.length * 9 + 24)}" height="26" fill="#1e1e1c" rx="5"/>
-  <text x="40" y="259" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#FFD700">${esc(emojiVerdict)}</text>
+  <!-- Crew  -  3 columns -->
+  <text x="28"  y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">DIRECTED BY</text>
+  <text x="28"  y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
 
-  <!-- Run signature and top bonus -->
-  ${_sigSVG}
-  ${_bonusSVG}
+  <text x="230" y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STARRING</text>
+  <text x="230" y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
 
-  <!-- Reel Award -->
-  ${achLine ? '<text x="28" y="318" font-family="system-ui,sans-serif" font-size="8" fill="#5a5a40">REEL AWARD: ' + esc(achLine) + '</text>' : ''}
+  <text x="430" y="140" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STUDIO</text>
+  <text x="430" y="154" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
+
+  <!-- Run signature line -->
+  <text x="28" y="172" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${esc(sig)}</text>
+
+  <!-- Divider -->
+  <line x1="28" y1="182" x2="572" y2="182" stroke="#252520" stroke-width="1"/>
+
+  <!-- Critic quote block -->
+  ${quoteLine ? `<text x="28" y="200" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">${quoteLine}</text>
+  <text x="28" y="216" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${criticName}</text>` : `<text x="28" y="205" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#5a5a3a">${esc(verdict)}</text>`}
+
+  <!-- Verdict badge -->
+  <rect x="28" y="228" width="${Math.min(340, verdict.length * 8 + 24)}" height="26" fill="#1a1a16" rx="5" stroke="#3a3a28" stroke-width="0.5"/>
+  <text x="40" y="246" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(v.title||'')}</text>
+
+  <!-- Bonus/synergy line -->
+  ${bonusLine ? `<text x="28" y="270" font-family="system-ui,sans-serif" font-size="9" fill="#7BDD88">${bonusLine}</text>` : ''}
 
   <!-- Footer -->
-  <text x="572" y="390" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a30" text-anchor="end" letter-spacing="1">https://lights-camera-action.app</text>
+  <line x1="28" y1="380" x2="572" y2="380" stroke="#1e1e18" stroke-width="0.5"/>
+  <text x="28"  y="393" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" letter-spacing="1">LIGHTS-CAMERA-ACTION.APP</text>
+  <text x="572" y="393" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" text-anchor="end">Play at https://lights-camera-action.app</text>
 </svg>`;
 }
 
@@ -3657,7 +3680,7 @@ async function svgToBlob(svgStr) {
       const canvas = document.createElement('canvas');
       canvas.width = 600; canvas.height = 400; // matches SVG viewBox
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, 600, 420);
+      ctx.drawImage(img, 0, 0, 600, 400);
       URL.revokeObjectURL(url);
       canvas.toBlob(blob => resolve(blob), 'image/png', 0.82);
     };
