@@ -632,23 +632,66 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
     chaosLine
   ].filter(Boolean).join('. ');
 
-  // Pick a critic quote for share card
-  const criticData = (() => {
-    try {
-      const _activeTheme = getActiveTheme();
-    const _extraLB  = _activeTheme?.letterboxdExtra || [];
-    const pool = [...(_extraLB.length ? _extraLB : []), ...(lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general)];
-      const entry = pool[Math.floor(Math.random()*pool.length)];
-      return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
-    } catch(e) { return { criticQuote:'', criticName:'' }; }
-  })();
+  // Letterboxd pool  -  defined here so noms/boM/dirName are in scope
+  const lbPools = {
+    horror: [
+      { user:"horrorjunkie1987",         stars:"★★★★★", review: noms>6 ? "watched this at midnight alone. had to call someone. they were asleep. i called anyway." : "the last twenty minutes will live in my head forever" },
+      { user:"sleepingwiththelight_on",  stars:"★★★★",  review: "the part where the camera just stays. and stays. this is what dread feels like." },
+      { user:"elevated_horror_defender", stars: noms>7 ? "★★★★★" : "★★★★", review: noms>7 ? director+" has made the horror film i did not know i needed." : "the kind of horror film you recommend to people who say they don't like horror. and then they do." },
+      { user:"watched_it_at_3am_mistake",stars:"★★★★★", review: "do not watch this alone at 3am. or do. it is better that way." },
+      { user:"unwell_about_this_one",    stars:"★★★★★", review: "i am not okay. "+director+" has done something irreversible to my relationship with ordinary rooms." },
+    ],
+    musical: [
+      { user:"showtune_stephanie",        stars:"★★★★★", review: noms>7 ? "i am not okay. the second act is cinema." : "stood up in the theatre. stranger next to me also stood up. we did not speak. we understood." },
+      { user:"cried_three_times",         stars: boM>400 ? "★★★★★" : "★★★★", review: boM>400 ? "the kind of film that makes you call people you have not spoken to in years" : "not perfect but the musical numbers make you forgive everything else" },
+      { user:"humming_it_on_the_way_home",stars:"★★★★",  review: "i have had the third song stuck in my head for eleven days. i have stopped trying to remove it." },
+    ],
+    action: [
+      { user:"imax_or_nothing",            stars: boM>500 ? "★★★★★" : "★★★★", review: boM>500 ? "saw it on the biggest screen i could find and it still was not big enough" : "the action sequences are genuinely incredible. the plot takes a well-deserved vacation." },
+      { user:"practical_stunt_appreciator",stars:"★★★★",  review: "the third act set piece is one of the best things i have seen in a cinema in five years." },
+      { user:"reluctant_blockbuster_fan", stars:"★★★★",  review: "i came for the action and stayed because the film turned out to be about something. did not expect that." },
+    ],
+    prestige: [
+      { user:"letterboxd_essay_guy",      stars:"★★★★★", review: noms>8 ? "the way "+director+" uses negative space in the third act is the most precise filmmaking i have witnessed this decade" : "this film understands something about grief that most films do not try to touch" },
+      { user:"sat_in_silence_after",      stars: noms>9 ? "★★★★★" : "★★★★", review: "nobody in the theatre moved during the credits. we were all processing." },
+      { user:"film_changed_me_actually",  stars:"★★★★★", review: "i know people say this but i mean it: i am not the same person who sat down to watch this film." },
+      { user:"wept_in_a_good_way",        stars:"★★★★★", review: lead+" in the final scene does something i do not have the vocabulary to describe." },
+    ],
+    flop: [
+      { user:"disappointed_fan",          stars:"★★",    review: "i wanted so much more from this. the ingredients were all there. something happened in the edit." },
+      { user:"contrarian_take",           stars:"★★★",   review: "actually it is not as bad as everyone is saying. it is bad. but not THAT bad." },
+      { user:"studios_learning_nothing",  stars:"★★",    review: studio+" greenlit this. "+studio+" will not learn from this. this is the cycle." },
+    ],
+    general: [
+      { user:"film_adjacent",             stars: boM>500 ? "★★★★★" : noms>7 ? "★★★★" : "★★★", review: boM>600 ? "the kind of film that reminds you why cinema exists" : noms>7 ? "sat with this for a week before writing anything. it deserves the time." : "good! not great. good. sometimes good is what you need." },
+      { user:"woke_up_thinking_about_it", stars: boM>500||noms>8 ? "★★★★★" : "★★★★", review: boM>500||noms>8 ? "woke up thinking about this film. third night in a row. i have accepted my fate." : director+" making their best film? i think so. fight me." },
+      { user:"just_here_for_the_vibes",   stars: noms>8 ? "★★★★★" : "★★★★", review: lead+" in this role. "+lead+". i am not calm about it." },
+      { user:"cinema_is_back",            stars: boM>600 ? "★★★★★" : "★★★★", review: boM>600 ? "people were standing outside in the rain waiting for the next screening. that is cinema." : "left the theatre and immediately texted four people. that is the whole review." },
+      { user:"annual_rewatch_material",   stars: noms>8 ? "★★★★★" : "★★★★", review: noms>8 ? "this film has earned a permanent slot in my annual rewatch and i only just saw it" : "recommend to people and then immediately worry they will not get it" },
+      { user:"post_film_silence_enjoyer", stars: noms>9 ? "★★★★★" : "★★★★", review: "the credits rolled and the entire audience just sat there for two minutes. that is the review." },
+      { user:"defending_this_forever",    stars: boM<200 ? "★★★★★" : "★★★★", review: boM<200 ? "nobody saw this and i am angry about it on the film's behalf" : "the discourse around this was wrong. the film was right." },
+    ],
+  };
 
+  // Pick letterboxd entry for share card (deterministic by score)
+  const _lbKey   = isFlop?'flop':isBlockbuster?'action':(isAwardsBait&&!isBlockbuster)?'prestige':'general';
+  const _lbPool  = lbPools[_lbKey] || lbPools.general;
+  const _lbEntry = _lbPool[((boM||0)+(noms||0)*7) % _lbPool.length];
+
+  // Pick a critic quote for share card
+  // criticQuote is set after renderResult picks from criticPools
+  const criticData = { criticQuote: '', criticName: '' };
+
+  // Pre-compute Letterboxd entry for share card (deterministic by score)
   return {
     title: filmTitle,
     tagline: generateTagline(genre, isBlockbuster, isAwardsBait, isFlop),
     body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`,
     criticQuote: criticData.criticQuote,
     criticName:  criticData.criticName,
+    lbStars:  _lbEntry?.stars  || '★★★★',
+    lbUser:   _lbEntry?.user   || 'letterboxd',
+    lbReview: (_lbEntry?.review || 'a film worth seeing.').replace(/\$\{[^}]+\}/g, '...'),
   };
 }
 
@@ -691,272 +734,7 @@ function generateTagline(genre, isBlockbuster, isAwardsBait, isFlop) {
   if (isBlockbuster) return rng(pools.action);
   if (isAwardsBait)  return rng(pools.drama);
   return rng(pools.drama);
-}
-
-
-function generateSynopsis(picks, filmTitle, boM, noms) {
-  const director  = picks[0]?.name || "an unknown director";
-  const lead      = picks[1]?.name || "an unnamed star";
-  const supporting= picks[2]?.name || "a supporting cast";
-  const studio    = picks[3]?.name || "an indie studio";
-  const genre     = picks[5]?.name || "a drama";
-  const composer  = picks[6]?.name || "an unknown composer";
-  const budget    = picks[7]?.name || "mid-budget";
-  const season    = picks[8]?.name || "limited release";
-
-  const isBlockbuster = boM > 450;
-  const isFlop        = boM < 80;
-  const isAwardsBait  = noms >= 6;
-  const isCult        = boM < 150 && noms >= 3;
-  const isLowBudget   = budget.includes("Micro") || budget.includes("Zero") || budget.includes("Ultra");
-  const isHorror      = genre.includes("Horror");
-  const isMusical     = genre.includes("Musical");
-  const isComedy      = genre.includes("Comedy");
-  const isSci         = genre.includes("Sci-Fi");
-  const isAction      = genre.includes("Action") || genre.includes("Blockbuster") || genre.includes("Superhero");
-  const isSequel      = genre.includes("Sequel") || genre.includes("Part 2");
-  const isBiopic      = genre.includes("Biopic") || genre.includes("True Story");
-  const isCrime       = genre.includes("Crime") || genre.includes("Heist");
-  const isAnimated    = genre.includes("Animated");
-
-  // Genre-specific setups - multiple per genre for variety
-  const setupPools = {
-    horror: [
-      `Something is wrong. Everyone in the house felt it on the first night. Nobody said anything, because saying it out loud would make it real`,
-      `The town has been keeping a secret for forty years. ${lead} just arrived. They have a gift for finding things people want left buried`,
-      `Three strangers renting the same lake house for the summer. A local legend. A noise from the basement. A decision that cannot be undone`,
-      `The sleep study was supposed to last seven days. On day three, the participants stopped sleeping. On day five, the researchers stopped asking why`,
-      `The inheritance comes with conditions. ${lead} must spend thirty days in the house. Nobody explains why the previous occupants always left before the thirty days were up`,
-      `Everyone who moved to the island eventually came back to the mainland. ${lead} is going to find out why nobody who came back ever talked about what they saw`,
-      `${director} has been building toward this film for a decade. The result is something the genre has not seen before. Critics are already arguing about what to call it`,
-      `Set over the course of one night. The morning will not look like what ${lead} expected. The camera never looks away`,
-      `The creature is not the point. The creature is a symptom. ${director} understands this. The audience will understand it too, by the end, whether they wanted to or not`,
-      `${lead} plays someone who begins to suspect the world is not what it appears to be. ${director} makes that suspicion feel like the most rational response available`,
-      `The film begins with a funeral and ends with a question. Everything in between is dread, beautifully constructed and impossible to shake`,
-      `${studio} funded a horror film with genuine ambition and no safety net. ${director} spent every cent on unease`,
-    ],
-    musical: [
-      `The theater has been closed for thirty years. The new owners find the old costumes. The costumes still fit. The songs still know all the words`,
-      `In a city where music has been banned, a street performer discovers a melody that moves people in ways the authorities cannot explain or permit`,
-      `${lead} inherits a recording studio from an uncle they never met. The tapes inside contain songs that have not been written yet`,
-      `Two rival musicians reach for the same dream from opposite sides of the city. The closer they get, the harder it becomes to stay apart`,
-      `A touring company. A broken-down bus. A small town that has not heard live music in twenty years. ${lead} has three days to change that`,
-      `The last night of a legendary venue. Every performer who ever played there returns for one final show. ${director} films it like it is the last night of something larger`,
-      `${lead} plays the musician everyone forgot. ${director} is interested in why we forget people and what it costs them`,
-      `The choreography came first. The story was written around it. ${composer} scored the silence between the steps and somehow that is the best part`,
-      `An immigrant community. A language barrier. A tradition of music that crosses both. ${director} found something universal inside something very specific`,
-      `The rehearsal. The performance. The aftermath. ${director} is more interested in the three days before opening night than the opening night itself`,
-    ],
-    action: [
-      `The intelligence was wrong. The mission was a lie. ${lead} is the only person left who knows the truth, and three governments want them silenced`,
-      `When the operation goes wrong, ${lead} has twelve hours to extract the asset, expose the conspiracy, and get out alive. Twelve hours is generous`,
-      `The bridge. The convoy. The window. Everything is in place. ${lead} has done this a hundred times. This time something is different`,
-      `The city has been taken. The hostages have a deadline. ${lead} retired five years ago. Retirement is over`,
-      `${director} does not make small films. This is not a small film. The practical stunts alone required a six-month pre-production unit`,
-      `An elite operative. A missing weapon. A clock that started before anyone knew the mission existed. ${lead} has been waiting for a role like this`,
-      `${studio} spent significant resources on this. Every dollar is on the screen. ${director} was the only person in the world who could justify the scale`,
-      `The world is watching. ${lead} is the reason. ${director} is the reason the world is watching something this accomplished`,
-      `Two sides of a war that should never have started. ${lead} on one side. ${supporting} on the other. ${director} refuses to let either side be wrong`,
-      `The heist was supposed to be clean. The complication is personal. ${lead} spends two hours making the wrong choice look like the right one`,
-      `Shot in nine countries across four continents. ${director} wanted the geography to feel earned. It does`,
-      `The villain believes they are right. ${director} made sure the audience would spend the entire film uncertain whether they are`,
-    ],
-    sequel: [
-      `It was supposed to be over. The threat was neutralised. The deal was signed. Three years later, ${lead} discovers the deal was a distraction`,
-      `Everyone survived the first time. Not everyone will survive this. ${lead} returns to the only world they know how to navigate`,
-      `The aftermath turned out to be a beginning. What looked like resolution was actually a countdown. This is what comes next`,
-      `The world changed after the events of the first film. ${lead} changed with it. The audience is about to find out how much`,
-      `${director} was not interested in making the same film again. The studio was nervous. ${director} was right to push`,
-      `The mythology expanded. The stakes raised. ${lead} has more to lose now than they did the first time. That is the entire point`,
-      `Ten years later. The world moved on. ${lead} did not. This film is about what that costs`,
-    ],
-    scifi: [
-      `In 2157, the last transmission from the colony arrives on a fourteen-second delay. The fourteenth second is silence. ${lead} is sent to find out why`,
-      `The simulation has been running for six hundred years. ${lead} is the first person to ask whether the people inside it can tell the difference`,
-      `Contact was made at 3:17am on a Tuesday. The message was six words long. ${lead} has spent three years trying to decode the seventh`,
-      `The ship left Earth with a crew of eight. It is returning with a crew of nine. Nobody remembers picking anyone up`,
-      `The terraforming worked. The planet is habitable. Nobody explains why the previous survey team is no longer responding`,
-      `${lead} plays the scientist who proved it was possible. ${director} is interested in what it cost to be right when everyone else was wrong`,
-      `The technology exists. The ethics do not yet. ${lead} is the only person in the room who understands both problems equally`,
-      `Two civilizations. One frequency. ${director} takes ninety minutes to explain why that is the most terrifying sentence in the universe`,
-      `${studio} gave ${director} the budget to make the film they have been describing for fifteen years. The result either vindicates or destroys that patience`,
-      `The future is not dystopian. It is just slightly wrong in ways that are very hard to articulate. ${lead} has been trying to articulate them for the entire first act`,
-      `Time travel exists. It is bureaucratic, expensive, and deeply regulated. ${lead} has just done something that will require a significant amount of paperwork`,
-    ],
-    biopic: [
-      `Everyone knew the name. Nobody knew the story. ${lead} embodies a life that changed everything, in a film that refuses to look away from the cost`,
-      `The official account left out the years that mattered most. This is the version the family wanted told. ${lead} carries the weight of it in every scene`,
-      `Genius, obsession, and the price of being right before the world is ready. ${lead} in the role they were born to play`,
-      `The letters were discovered in an archive. They rewrote history. ${lead} brings the person behind the letters back to life`,
-      `${director} was not interested in the famous years. ${director} was interested in the decade before anyone knew the name. ${lead} makes that decade essential`,
-      `A life compressed into two hours. ${director} chose the compression carefully. What was cut says as much as what remains`,
-      `${lead} spent eight months preparing for this role. The preparation is invisible in the performance. That is the point`,
-      `Three people who knew the subject personally have seen the film. All three said the same thing. All three cried`,
-      `The biopic that refused to flatter. ${director} and ${lead} agreed: the contradictions are the story`,
-      `The rise is half the film. ${director} gives equal time to everything that came after. That is what makes it honest`,
-    ],
-    crime: [
-      `Five people in a room. One item worth $40 million. A plan that accounts for everything except the one person who is not who they said they were`,
-      `The detective has been chasing this case for nine years. The case has been watching back. ${lead} is about to find out what that means`,
-      `The city runs on a system. The system has a flaw. ${lead} found it. Now everyone who benefits from the system wants ${lead} to disappear`,
-      `One last job. The phrase has been used before. The phrase has never been entirely true. This time is no different`,
-      `${director} is not interested in the crime. ${director} is interested in the conversation that happens three days before the crime, when everyone still thinks it will go smoothly`,
-      `${lead} plays both sides. The audience spends the first hour deciding which side they are rooting for. The second hour makes that decision complicated`,
-      `The robbery went perfectly. The aftermath did not. ${director} treats the aftermath as the film and the robbery as the prologue`,
-      `A city where everyone owes someone something. ${lead} has just called in a debt that should not exist. The resulting film takes place over seventy-two hours`,
-      `The interrogation. The confession. The version of events that might be true. ${director} gives the audience three films and asks them to choose`,
-      `${supporting} is the most interesting character in the film. ${director} and ${lead} both knew this going in. They built the whole thing around that fact`,
-    ],
-    animated: [
-      `A small creature with an enormous problem discovers that the only person who can help is the one person they were told to avoid`,
-      `The map was drawn by someone who had never been to the place it shows. ${lead} follows it anyway. The map turns out to know more than its maker`,
-      `In a world where colour fades when people stop believing in things, one child still believes in everything. That child is about to be tested`,
-      `The migration has happened every year for a thousand years. This year, something has changed the path. Someone has to find out why`,
-      `${studio} handed ${director} complete creative control and a significant budget. The resulting film is not what anyone expected. It is better`,
-      `A story about saying goodbye that somehow becomes a story about saying hello. ${composer}'s score does the emotional lifting that the script knew it could not do alone`,
-      `The villain has a point. ${director} made sure of that. The climax is complicated by the fact that the audience has spent the film understanding both sides`,
-      `Two worlds. One bridge. ${lead} is the only character who can see both. ${director} uses that limitation as a window into everything the film wants to say`,
-      `The animation style changes as the story deepens. By the third act, the world looks entirely different from the one the film began in. So does ${lead}`,
-    ],
-    comedy: [
-      `${lead} has exactly one weekend to fix everything they broke over the previous decade. They will need help. The help is also somewhat broken`,
-      `The reunion was supposed to last forty-eight hours. Forty-eight hours turned out to be long enough for every unresolved thing to resolve itself loudly`,
-      `The job, the apartment, and the relationship all ended on the same Tuesday. ${lead} is treating this as a sign. The sign is pointing somewhere unexpected`,
-      `Two families. One vacation rental. A booking error that neither is willing to concede. What follows is a masterclass in stubborn ingenuity`,
-      `${lead} and ${supporting} have never been in the same room before this film. The chemistry is either going to be extraordinary or catastrophic. It is extraordinary`,
-      `A comedy about a subject that is not funny, directed by someone who understands that sometimes not-funny things are hilarious. ${director} found the line`,
-      `${director} shot this in three weeks on a minimal budget. The freedom shows. Every joke lands because nobody was protecting anything`,
-      `The script was written in a weekend. ${lead} rewrote their dialogue entirely. ${director} kept both versions and let the audience notice the seams. It works`,
-      `A road movie where the destination is not the point. ${lead} and ${supporting} are the point. ${director} knew that and kept the camera on them`,
-      `${studio} released this in the wrong month for entirely the wrong reasons. The word of mouth corrected their mistake within two weeks`,
-    ],
-    general: [
-      `In a world on the edge of a change it cannot yet name, ${lead} makes a choice that starts a chain of events nobody predicted`,
-      `Some stories take years to understand. This one started thirty years ago. ${lead} has been living in the aftermath without knowing it`,
-      `The letter arrived on a Thursday. By Friday, everything ${lead} thought they knew about their family had become a question`,
-      `Two people. One decision. Everything that follows from it. ${director} finds the ordinary places where extraordinary things happen`,
-      `${lead} has been running from something for fifteen years. The something has been patient. This is where the running ends`,
-      `${director} was given the script with no conditions attached. The result is a film that could only have been made by someone with nothing left to prove`,
-      `The kind of story that should not work on paper. On screen, with ${lead} and ${director}, it becomes something else entirely`,
-      `${studio} greenlit this in a single phone call. That is not how things work. This film is not how things work`,
-      `Two hours of cinema that will make the audience feel seen and discomforted in approximately equal measure`,
-      `The premise is simple. The execution, in ${director}'s hands, is anything but`,
-      `A film that asks a question in its first scene and spends two hours deciding whether to answer it`,
-      `${director} said they made this film for one specific person in the audience. ${lead} said they were that person`,
-      `${lead} and ${supporting} share three scenes. Those three scenes are the reason the film exists`,
-      `The film everybody who loves cinema will recommend to the one person in their life who does not love cinema yet`,
-      `${director} takes something familiar and finds inside it something no one else noticed was there. ${lead} finds the same quality in the character`,
-      `Shot over fourteen weeks in four countries. The locations are not backdrop. They are argument`,
-      `A film about grief that never says the word. A film about love that never explains itself. ${lead} does the work the screenplay leaves deliberately undone`,
-      `${studio} and ${director} have now made three films together. Each one has been the best thing either of them has done. This is the third`,
-    ]
-  };
-
-  const pool = isHorror ? setupPools.horror : isMusical ? setupPools.musical : isAction ? setupPools.action : isSequel ? setupPools.sequel : isSci ? setupPools.scifi : isBiopic ? setupPools.biopic : isCrime ? setupPools.crime : isAnimated ? setupPools.animated : isComedy ? setupPools.comedy : setupPools.general;
-  const setup = pool[Math.floor(Math.random() * pool.length)];
-
-  // Lead performance line - varies by score and specific names
-  const perfAdjectives = isAwardsBait
-    ? ["career-defining", "transformative", "the kind of performance people describe to strangers", "the performance the Academy has been waiting for"]
-    : isFlop
-    ? ["committed but uneven", "bold in ways the film doesn't always support", "genuinely interesting even when the material isn't"]
-    : ["compelling and grounded", "fully inhabited", "impossible to look away from"];
-  const perfAdj = perfAdjectives[Math.floor(Math.random() * perfAdjectives.length)];
-
-  const leadLine = `${lead} delivers what critics are already calling ${perfAdj}, opposite ${supporting} in a supporting turn that may overshadow everything else in the film.`;
-
-  // Director line - varies by director style
-  const isAuteur = ["Nolan","Scorsese","PTA","Anderson","Fincher","Villeneuve","Cronenberg","Aster","von Trier","Lynch","Malick","Kubrick"].some(n => director.includes(n));
-  const dirStyle = isAuteur
-    ? `${director} works in a register that no other filmmaker can access, and this film finds them at the peak of their considerable powers`
-    : isBlockbuster
-    ? `${director} keeps the spectacle grounded in something human, which is the hardest thing to do at this scale and the thing that separates the great ones from the merely successful`
-    : isLowBudget
-    ? `${director} does more with less than anyone working today, finding in the constraints something that bigger films spend millions trying to manufacture`
-    : `${director} brings a clarity of vision to the material that elevates every scene beyond what it might have been in other hands`;
-
-  // Composer line
-  const isIconicComposer = ["Williams","Zimmer","Greenwood","Morricone","Herrmann","Goransson","Reznor"].some(n => composer.includes(n));
-  const compLine = isIconicComposer
-    ? `${composer}'s score is the film's second language, saying in music what the screenplay saves for silence`
-    : composer.includes("Stock") || composer.includes("AI")
-    ? `The score does what is asked of it without distinction. The film survives this`
-    : `${composer}'s score finds the emotional register the film lives in and never leaves it`;
-
-  // Budget/studio color
-  const contextLine = isLowBudget
-    ? `Made for a fraction of what studios spend on catering, the film proves that resourcefulness is not a limitation but a creative condition`
-    : budget.includes("All-In") || budget.includes("Mega") || budget.includes("Tentpole")
-    ? `${studio} committed at a scale that makes the project impossible to ignore. Every dollar is visible`
-    : `${studio} backed the material with the resources it needed and the distance it required`;
-
-  // Outcome line
-  // Weave in active synergies and chaos history
-  const synergyLine = (S.activeSynergies && S.activeSynergies.length)
-    ? (() => {
-        const s = S.activeSynergies[0];
-        const positives = S.activeSynergies.filter(x => (x.boBonus||0) + (x.osBonus||0) > 0);
-        const negatives = S.activeSynergies.filter(x => (x.boBonus||0) + (x.osBonus||0) < 0);
-        if (positives.length && negatives.length) return `The ${positives[0].label} chemistry elevated the material while the ${negatives[0].label} dynamic complicated production. Both are visible in the final cut`;
-        if (positives.length > 1) return `The ${positives[0].label} and ${positives[1].label} combinations produced something neither element could have achieved independently`;
-        if (positives.length) return `The ${positives[0].label} combination is the reason the film works as well as it does`;
-        if (negatives.length) return `The ${negatives[0].label} tension behind the scenes is legible on screen. Whether that is a problem depends entirely on who you ask`;
-        return '';
-      })()
-    : '';
-
-  const chaosLine = (S.chaosHistory && S.chaosHistory.length)
-    ? (() => {
-        const hasReroll = S.chaosHistory.some(h => h.includes('director') || h.includes('lead') || h.includes('Reroll'));
-        const hasBudget = S.chaosHistory.some(h => h.includes('Budget') || h.includes('Finance'));
-        const hasBuzz = S.chaosHistory.some(h => h.includes('Festival') || h.includes('Precursor') || h.includes('Triumph'));
-        const hasScandal = S.chaosHistory.some(h => h.includes('Tabloid') || h.includes('Drama') || h.includes('Controversy'));
-        if (hasReroll && hasBuzz) return `A production marked by early turbulence and a festival run that changed the conversation entirely`;
-        if (hasBudget && hasBuzz) return `Financial pressure during production gave way to something critics are calling the year's most essential film`;
-        if (hasScandal) return `The off-screen noise threatened to overwhelm the on-screen work. Whether it succeeded is for the audience to decide`;
-        if (hasBuzz) return `The early festival reaction set expectations. The wide release confirmed them`;
-        if (hasBudget) return `The budget cuts left marks. Some of those marks turned out to be the most interesting thing about the film`;
-        return `Production was not without its complications. The film carries them honestly`;
-      })()
-    : '';
-
-  const outcomeLines = isBlockbuster
-    ? [`A ${season.toLowerCase()} release that became the year's defining cinematic event`, `The kind of film that people see twice in the first weekend and bring their parents the third time`, `${studio} had one job. The film more than returned the favour`]
-    : isFlop
-    ? [`A ${season.toLowerCase()} rollout that couldn't find its audience. History may be kinder`, `The right film at the wrong time, or the wrong film at the right time. The post-mortem is still ongoing`, `${director} has already moved on to the next project. The studio is still processing this one`]
-    : isAwardsBait
-    ? [`The ${season.toLowerCase()} release date was chosen with surgical precision`, `A film that rewards patience, multiple viewings, and the kind of attention cinema rarely asks for`, `${studio} backed this from day one. The campaign is now in full motion`]
-    : isCult
-    ? [`Released quietly, discovered loudly. This is how cults begin`, `The midnight screening community found it six months after release. They have not stopped talking since`]
-    : [`A ${season.toLowerCase()} release that delivered what it promised and occasionally something more`, `The film found its audience. The transaction was honourable`, `${director} set out to make a specific kind of film. The result is exactly that`];
-
-  const outcomeLine = [
-    outcomeLines[Math.floor(Math.random() * outcomeLines.length)],
-    synergyLine,
-    chaosLine
-  ].filter(Boolean).join('. ');
-
-  // Pick a critic quote for share card
-  const criticData = (() => {
-    try {
-      const _activeTheme = getActiveTheme();
-    const _extraLB  = _activeTheme?.letterboxdExtra || [];
-    const pool = [...(_extraLB.length ? _extraLB : []), ...(lbPools[isFlop ? 'flop' : isBlockbuster ? 'action' : isAwardsBait ? 'prestige' : 'general'] || lbPools.general)];
-      const entry = pool[Math.floor(Math.random()*pool.length)];
-      return { criticQuote: entry?.review?.slice(0,70) || '', criticName: entry?.user || '' };
-    } catch(e) { return { criticQuote:'', criticName:'' }; }
-  })();
-
-  return {
-    title: filmTitle,
-    tagline: generateTagline(genre, isBlockbuster, isAwardsBait, isFlop),
-    body: `${setup}. ${leadLine} ${dirStyle}. ${compLine}. ${contextLine}. ${outcomeLine}.`,
-    criticQuote: criticData.criticQuote,
-    criticName:  criticData.criticName,
-  };
-}
-
-function generateTagline(genre, isBlockbuster, isAwardsBait, isFlop) {
+}function generateTagline(genre, isBlockbuster, isAwardsBait, isFlop) {
   const blockbuster = ["Some heroes aren't born. They're drafted.", "The world needed a miracle. It got something better.", "This summer, everything changes.", "They said it couldn't be done. They were almost right."];
   const awards = ["The truth is the most dangerous thing of all.", "Some stories take a lifetime to tell.", "In the silence between words, everything is said.", "What we leave behind defines us."];
   const flop = ["Not all films find their moment. This one is still waiting.", "Ahead of its time. Behind at the box office.", "A vision. A gamble. A legend  -  eventually."];
@@ -3000,15 +2778,15 @@ function getActiveTheme() {
 function buildIntroHero(t) {
   const bg        = t ? t.palette.bg            : '#0a0a08';
   const brd       = t ? t.palette.border        : '#2a2a20';
-  const glow      = t ? t.palette.glow          : 'rgba(255,165,0,0.35)';
-  const subColor  = t ? t.palette.subtitleColor : '#7a5a18';
-  const tagColor  = t ? t.palette.taglineColor  : '#6a5a38';
+  const glow      = t ? t.palette.glow          : 'rgba(255,215,0,0.50)';
+  const subColor  = t ? t.palette.subtitleColor : '#B8860B';
+  const tagColor  = t ? t.palette.taglineColor  : '#8a6a20';
   const titleText = t ? t.name                  : 'Lights, Camera, Action!';
   const credit    = t ? t.productionCredit      : 'A Lights, Camera, Action! Production';
   const presents  = t ? t.presentsLine          : 'Presents';
   const tagline   = t ? t.tagline               : 'The Hollywood Draft Game';
-  const titleGrad = t ? t.palette.titleGradient : 'linear-gradient(135deg,#FFD700 0%,#FFA500 35%,#FF6B35 65%,#FFD700 100%)';
-  const sc        = t ? t.palette.statColors    : ['#FFD700','#FF6B6B','#6BAAFF','#7BDD88'];
+  const titleGrad = t ? t.palette.titleGradient : 'linear-gradient(90deg,#B8860B 0%,#FFD700 20%,#FFFACD 45%,#FFD700 70%,#B8860B 100%)';
+  const sc        = t ? t.palette.statColors    : ['#FFD700','#FF1E3C','#0057FF','#00CC44'];
   const tag       = t ? '<div style="background:' + t.introTagBg + ';border:0.5px solid ' + t.introTagBorder + ';border-radius:20px;display:inline-block;padding:4px 14px;font-size:11px;font-weight:600;color:' + t.introTagColor + ';margin-bottom:14px">' + t.introTag + '</div>' : '';
   return '<div style="background:' + bg + ';border-radius:var(--r-lg);padding:2rem 1.25rem 1.5rem;margin-bottom:1.25rem;text-align:center;border:1px solid ' + brd + '">'
     + '<div style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#5a5a40;margin-bottom:8px">' + credit + '</div>'
@@ -3188,77 +2966,11 @@ function renderResult() {
   const criticPool = isHorror ? criticPools.horror : isMusical ? criticPools.musical : isAction ? criticPools.action : isBiopic ? criticPools.biopic : criticPools.general;
   const cq = criticPool[Math.floor(Math.random() * criticPool.length)];
 
-  // Letterboxd reviews - genre and score aware
-  const lbPools = {
-    horror: [
-      { user:"horrorjunkie1987",          stars:"★★★★★", review: noms>6 ? "watched this at midnight alone and had to call my sister afterward. she was asleep. i called anyway." : "the last twenty minutes are going to live rent free in my head forever" },
-      { user:"scream_queen_anna",          stars:"★★★★",  review: boM>300 ? "people keep asking me why i keep rewatching it. i keep not having a good answer." : "the ending is the kind of thing you don't discuss with people who haven't seen it" },
-      { user:"practical_effects_pete",     stars: boM<100 ? "★★★" : "★★★★", review: boM<100 ? "not for everyone. it was for me." : "genre filmmaking operating at the level of actual art. we do not deserve this." },
-      { user:"sleepingwiththelight_on",    stars: noms>6 ? "★★★★★" : "★★★★", review: "the part where the camera just. stays. and stays. and STAYS. this is what dread actually feels like." },
-      { user:"elevated_horror_defender",   stars: noms>7 ? "★★★★★" : "★★★★", review: noms>7 ? `${dirName} has made the horror film i didn't know i needed. grief, atmosphere, devastation.` : "the kind of horror film you recommend to people who say they don't like horror films. and then they do." },
-      { user:"jumpscares_are_cowardice",   stars: boM>200 ? "★★★★" : "★★★★★", review: boM>200 ? "genuinely scary without being cheap about it. rare. extremely rare." : "six people walked out. the rest of us were changed. i envy no one." },
-      { user:"watched_it_at_3am_mistake",  stars:"★★★★★", review: "do not watch this alone at 3am having read nothing about it. or do. it is genuinely better that way." },
-      { user:"the_dread_sommelier",         stars: noms>8 ? "★★★★★" : "★★★★", review: "a film that makes the mundane terrifying and the terrifying mundane. this is the highest form of horror cinema." },
-      { user:"unwell_about_this_one",       stars:"★★★★★", review: `i am not okay. ${dirName} has done something irreversible to my relationship with ordinary rooms.` },
-      { user:"horror_letterboxd_royalty",   stars: boM<150 ? "★★★★★" : "★★★★", review: boM<150 ? "the theatrical run was too short. the home viewing haunts differently. both are correct." : "mainstream horror that forgot to be safe about it. the best possible version of that mistake." },
-    ],
-    musical: [
-      { user:"showtune_stephanie",          stars:"★★★★★", review: noms>7 ? "i am not okay. the second act is cinema." : "stood up in the theatre at the end. stranger next to me also stood up. we did not speak. we understood." },
-      { user:"broadway_to_film",            stars:"★★★★",  review: "the choreography. THE CHOREOGRAPHY. give the choreographer everything." },
-      { user:"cried_three_times",           stars: boM>400 ? "★★★★★" : "★★★★", review: boM>400 ? "the kind of film that makes you call people you haven't spoken to in years" : "not perfect but the musical numbers make you forgive everything else" },
-      { user:"humming_it_on_the_way_home",  stars: noms>7 ? "★★★★★" : "★★★★", review: "i have had the third song stuck in my head for eleven days. i have stopped trying to remove it." },
-      { user:"original_cast_recording_guy", stars: boM>300 ? "★★★★" : "★★★★★", review: boM>300 ? "the film translates the material. the cast transcends it." : "the album will outsell the film. the film deserves better. both are extraordinary." },
-      { user:"tap_dancer_at_heart",         stars:"★★★★★", review: `${leadName} dancing in the third act is one of the most purely joyful things i have witnessed in a cinema.` },
-    ],
-    action: [
-      { user:"imax_or_nothing",             stars: boM>500 ? "★★★★★" : "★★★★", review: boM>500 ? "saw it on the biggest screen i could find and it still wasn't big enough" : "the action sequences are genuinely incredible. the plot takes a well-deserved vacation." },
-      { user:"practical_stunt_appreciator", stars:"★★★★",  review: "the third act set piece is one of the best things i have seen in a cinema in five years. full stop." },
-      { user:"franchise_defender",          stars: boM>400 ? "★★★★" : "★★★", review: boM>400 ? "yes it is loud and excessive and yes i saw it three times" : "it is fine. better than the last one. worse than the first. the law holds." },
-      { user:"cinema_is_a_sport",           stars:"★★★★",  review: "my heart rate was elevated for ninety minutes. this is what the big screen was built for." },
-      { user:"explosions_as_art_form",      stars: boM>500 ? "★★★★★" : "★★★★", review: `${dirName} understands that spectacle requires stakes. the spectacle here is earned every single time.` },
-      { user:"reluctant_blockbuster_fan",   stars:"★★★★",  review: "i came for the action and stayed because the film turned out to be about something. i did not expect that." },
-    ],
-    prestige: [
-      { user:"letterboxd_essay_guy",        stars:"★★★★★", review: noms>8 ? `the way ${dirName} uses negative space in the third act is the most precise filmmaking i have witnessed this decade` : `this film understands something about grief that most films don't try to touch` },
-      { user:"watched_it_twice_already",    stars:"★★★★",  review: noms>7 ? "second viewing revealed things i missed. this is why we rewatch films." : "not easy but worth it. sat in my car for twenty minutes after." },
-      { user:"criterion_shelf_material",    stars: noms>8 ? "★★★★★" : "★★★★", review: noms>8 ? "shelf space cleared. this is a permanent addition." : "the performance alone is worth watching. everything else is a bonus." },
-      { user:"sat_in_silence_after",        stars: noms>9 ? "★★★★★" : "★★★★", review: "nobody in the theatre moved during the credits. we were all doing the same thing. processing." },
-      { user:"wept_in_a_good_way",          stars:"★★★★★", review: `${leadName} in the final scene does something i do not have the vocabulary to describe. i have been trying.` },
-      { user:"annual_rewatch_guaranteed",   stars: noms>7 ? "★★★★★" : "★★★★", review: "this has earned a permanent slot in my annual rewatch and i only just saw it. that is the highest compliment." },
-      { user:"film_changed_me_actually",    stars:"★★★★★", review: "i know people say this but i mean it: i am not the same person who sat down to watch this film." },
-    ],
-    flop: [
-      { user:"disappointed_fan",            stars:"★★",    review: "i wanted so much more from this. the ingredients were all there. something happened in the edit." },
-      { user:"money_well_spent_NOT",        stars:"★",     review: "i drove forty minutes to see this. i would like the forty minutes back." },
-      { user:"contrarian_take",             stars:"★★★",   review: "actually it is not as bad as everyone is saying. it is bad. but not THAT bad." },
-      { user:"watched_so_you_don't_have_to",stars:"★★",   review: "you know when a film just. forgets to be good halfway through. this is that film." },
-      { user:"studios_learning_nothing",    stars:"★★",    review: `${studioName} greenlit this. ${studioName} will not learn from this. this is the cycle.` },
-    ],
-    general: [
-      { user:"film_adjacent",               stars: boM>500 ? "★★★★★" : noms>7 ? "★★★★" : "★★★", review: boM>600 ? "the kind of film that reminds you why cinema exists as an art form and a social experience simultaneously" : noms>7 ? "sat with this for a week before writing anything. it deserves the time." : "good! not great. good. sometimes good is what you need." },
-      { user:"tuesday_night_moviegoer",     stars: noms>6 ? "★★★★" : "★★★", review: noms>6 ? "this is going to win everything and it deserves to win everything" : boM>400 ? "exactly what the trailer promised. no surprises. not always a bad thing." : "the third act lost me a little. the first two acts earned it back." },
-      { user:"woke_up_thinking_about_it",   stars: boM>500 || noms>8 ? "★★★★★" : "★★★★", review: boM>500 || noms>8 ? "woke up thinking about this film. the third night in a row. i have accepted my fate." : `${dirName} making their best film? i think so. fight me.` },
-      { user:"three_star_stan",             stars:"★★★",   review: boM<200 && noms<5 ? "not for me but i can see what it was going for. three stars feels right." : "the studio wanted a four-star film. they got a three-star one. the difference was probably the budget." },
-      { user:"just_here_for_the_vibes",     stars: noms>8 ? "★★★★★" : "★★★★", review: `${leadName} in this role. ${leadName}. i am not calm about it.` },
-      { user:"cinema_is_back",              stars: boM>600 ? "★★★★★" : "★★★★", review: boM>600 ? "people were standing outside in the rain waiting for the next screening. that is what cinema is." : "left the theatre and immediately texted four people. that is the whole review." },
-      { user:"annual_rewatch_material",     stars: noms>8 ? "★★★★★" : "★★★★", review: noms>8 ? "this film has earned a permanent slot in my annual rewatch and i only just saw it" : "recommend to people and then immediately worry they won't get it" },
-      { user:"loudly_crying_emoji",         stars: noms>7 ? "★★★★★" : "★★★★", review: `the scene where ${leadName} just. you know the one. i am not the same.` },
-      { user:"actually_a_critic",           stars: noms>8 ? "★★★★★" : boM>400 ? "★★★★" : "★★★", review: noms>8 ? `${dirName} has been building to this for twenty years. worth the wait.` : boM>400 ? "technically impeccable. emotionally calibrated. the year's most complete film." : "the ambition is real even when the execution falters. that counts." },
-      { user:"left_before_credits",         stars: boM<150 ? "★★" : "★★★", review: boM<150 ? "i have now seen this twice trying to understand why people love it. i still don't. i respect it." : "decent. the ending was not the ending i wanted but it was probably the right one." },
-      { user:"manifesting_a_sequel",        stars: boM>500 ? "★★★★★" : "★★★★", review: boM>500 ? "if they don't make a sequel i will never forgive anyone" : "watched the whole thing with my jaw slightly open. recommend this posture." },
-      { user:"the_algorithm_found_me",      stars: noms>6 ? "★★★★" : "★★★", review: `my fyp showed me a clip from this at 2am. watched the whole thing immediately. ${studioName} understood.` },
-      { user:"crying_in_public_advocate",   stars: noms>7 ? "★★★★★" : "★★★★", review: "cried in the theatre. not the sad kind. the overwhelmed kind. the i-did-not-know-cinema-could-do-this kind." },
-      { user:"film_bro_reformed",           stars: boM>400 || noms>7 ? "★★★★" : "★★★", review: boM>400 ? "i used to only watch films with subtitles. this changed something in me. i am not proud. i am grateful." : "better than i expected. worse than the hype. exactly what it needed to be." },
-      { user:"the_latenight_audience",      stars: noms>8 ? "★★★★★" : "★★★★", review: "saw this at the 10:30pm showing. the audience was exhausted and invested and absolutely silent at the right moments." },
-      { user:"recommended_by_a_stranger",   stars: noms>7 ? "★★★★★" : "★★★★", review: `a stranger on the train told me to see this. i did not get their name. thank you, stranger.` },
-      { user:"saw_it_twice_in_one_day",     stars:"★★★★★", review: `saw it at noon. walked out. bought a ticket for the 3pm. the second time was better. ${dirName} rewards attention.` },
-      { user:"defending_this_forever",      stars: boM<200 ? "★★★★★" : "★★★★", review: boM<200 ? "nobody saw this and i am angry about it on the film's behalf" : "the discourse around this was wrong. the film was right. the film is always right." },
-      { user:"post_film_silence_enjoyer",   stars: noms>9 ? "★★★★★" : "★★★★", review: "the credits rolled and the entire audience just. sat there. for two minutes. that is the review." },
-    ]
-  };
-
-  const lbPool = isHorror ? lbPools.horror : isMusical ? lbPools.musical : isAction ? lbPools.action : (noms>7 && boM<400) ? lbPools.prestige : (boM<150 && noms<4) ? lbPools.flop : lbPools.general;
-  const lbReview = lbPool[Math.floor(Math.random() * lbPool.length)];
+  // Store real critic quote on synopsis so share card can use it
+  if (S.synopsis) {
+    S.synopsis.criticQuote = cq.quote || '';
+    S.synopsis.criticName  = cq.critic || '';
+  }
 
   // Synergy panel
   // Chaos event log
@@ -3279,6 +2991,13 @@ function renderResult() {
     </div>` : '';
 
   const syn = S.synopsis;
+  // Letterboxd review  -  read from pre-computed synopsis values
+  const lbReview = {
+    stars:  syn?.lbStars  || '★★★★',
+    user:   syn?.lbUser   || 'letterboxd',
+    review: (syn?.lbReview || 'a film worth seeing.').replace(/\$\{[^}]+\}/g, '...'),
+  };
+
 
   const dailyBadge = DAILY_MODE ? ' <span style="background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">📅 Daily</span>' : '';
       const hardBadge = HARD_MODE ? ' <span style="background:var(--purple-bg);color:var(--purple);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:0.5px solid var(--purple)">🔒 Blind Draft</span>' : '';
@@ -3712,129 +3431,166 @@ function buildShareText() {
 // ── Share card  -  built as inline SVG/canvas so it renders on mobile ──
 function buildShareCardSVG() {
   if (!S.synopsis || !S.verdict) return '';
-  const v        = S.verdict;
-  const title    = (S.synopsis.title   || 'Untitled').slice(0, 36);
-  const tagline  = (S.synopsis.tagline || '').slice(0, 58);
-  const director = (S.picks[0]?.name   || '').slice(0, 24);
-  const lead     = (S.picks[1]?.name   || '').slice(0, 24);
-  const studio   = (S.picks[3]?.name   || '').slice(0, 22);
-  const genre    = (S.picks[5]?.name   || '').slice(0, 20);
-  const composer = (S.picks[6]?.name   || '').slice(0, 20);
-  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const v   = S.verdict;
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  // Critic quote  -  use synopsis stored value or pick from pools
-  const rawQuote = S.synopsis?.criticQuote || '';
-  const rawCritic= S.synopsis?.criticName  || '';
-  // Wrap long quotes
-  const quoteWords = rawQuote.split(' ');
-  let quoteLine1 = '', quoteLine2 = '';
-  quoteWords.forEach(w => {
-    if ((quoteLine1 + ' ' + w).trim().length <= 46) quoteLine1 = (quoteLine1 + ' ' + w).trim();
-    else if ((quoteLine2 + ' ' + w).trim().length <= 46) quoteLine2 = (quoteLine2 + ' ' + w).trim();
-  });
-  const hasQuote = quoteLine1.length > 0;
+  const title    = esc((S.synopsis.title   || 'Untitled').slice(0,34));
+  const tagline  = esc((S.synopsis.tagline || '').slice(0,55));
+  const director = esc((S.picks[0]?.name   || '').slice(0,24));
+  const lead     = esc((S.picks[1]?.name   || '').slice(0,24));
+  const support  = esc((S.picks[2]?.name   || '').slice(0,22));
+  const studio   = esc((S.picks[3]?.name   || '').slice(0,22));
+  const genre    = esc((S.picks[5]?.name   || '').slice(0,20));
+  const composer = esc((S.picks[6]?.name   || '').slice(0,22));
 
-  // Letterboxd-style one-liner from lbPools
-  const lbLine = (() => {
-    try {
-      const boM = S.boM||0; const noms = S.noms||0; const studioName = studio;
-      const dirName = director; const leadName = lead;
-      const g = genre.toLowerCase();
-      const pool = g.includes('horror') ? lbPools.horror :
-                   g.includes('musical') ? lbPools.musical :
-                   g.includes('action') || g.includes('blockbuster') ? lbPools.action :
-                   (noms >= 7 || boM < 150) ? lbPools.prestige : lbPools.general;
-      const entry = pool[Math.floor(Math.random()*pool.length)];
-      return (entry?.review || '').replace(/\$\{[^}]+\}/g,'...').slice(0,58);
-    } catch(e) { return ''; }
-  })();
+  // Verdict colors matching the game UI
+  const vBg    = v.bg  || '#1a1a16';
+  const vTc    = v.tc  || '#FAC775';
+  const vTitle = esc((v.title||'').replace(/[^\x20-\x7E]/g,'').trim().slice(0,44));
 
-  // Bonus line
-  const _topBonus = (S.bonuses||[]).find(b => b.pts > 0);
-  const _topSyn   = (S.activeSynergies||[])[0];
-  const bonusLine = _topBonus
-    ? esc(_topBonus.label + '  +' + _topBonus.pts + ' pts')
-    : _topSyn ? esc('Synergy: ' + (_topSyn.label||'').slice(0,36)) : '';
+  const wrapLine = (s,max) => {
+    const words = String(s||'').split(' '); let out=[],cur='';
+    words.forEach(w=>{ if(!w) return; if((cur+' '+w).trim().length<=max) cur=(cur+' '+w).trim(); else{if(cur)out.push(cur);cur=w;} });
+    if(cur) out.push(cur); return out;
+  };
 
-  const sig = [studio, genre, composer ? composer + ' score' : ''].filter(Boolean).join(' - ').slice(0,56);
+  // Critic quote  -  matches the purple left-border card in the game
+  const rawQuote  = (S.synopsis?.criticQuote||'').replace(/\$\{[^}]+\}/g,'...');
+  const rawCritic = esc(S.synopsis?.criticName||'');
+  const qLines    = wrapLine(rawQuote ? '\u201c'+rawQuote+'\u201d' : '', 44);
+  while(qLines.length < 2) qLines.push('');
+  const qH = 16 + (qLines.filter(Boolean).length * 16) + (rawCritic ? 16 : 0);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  // Letterboxd
+  const lbStars = String(S.synopsis?.lbStars||'\u2605\u2605\u2605\u2605').replace(/[^\x20-\x7E]/g,'*');
+  const lbUser  = esc(S.synopsis?.lbUser||'letterboxd');
+  const rawLb   = (S.synopsis?.lbReview||'a film worth seeing.').replace(/\$\{[^}]+\}/g,'...');
+  const lbLines = wrapLine(rawLb,44).slice(0,2);
+  while(lbLines.length<2) lbLines.push('');
+
+  const studioArticle = /^[AEIOUaeiou]/.test(S.picks[3]?.name||'') ? 'An' : 'A';
+
+  const topBonus = (S.bonuses||[]).find(b=>b.pts>0);
+  const topSyn   = (S.activeSynergies||[])[0];
+  const bonusStr = topBonus ? esc(topBonus.label+' +'+topBonus.pts+'pts')
+    : topSyn ? esc(topSyn.label.slice(0,36)+' synergy') : '';
+
+  // Theme palette
+  const th  = getActiveTheme();
+  const bg1 = th?'#0d0c00':'#050508';
+  const bg2 = th?'#0a0900':'#08040C';
+  const nR  = th?'#F5C518':'#FF1E3C';
+  const nB  = th?'#4A7EBC':'#0057FF';
+  const nG  = th?'#5DBB63':'#00CC44';
+  const gold= th?'#F5C518':'#C8820A';
+  const warm= th?'#E8D060':'#E8D4A0';
+  const dim = th?'#6a5500':'#5a3a30';
+  const dim2= th?'#9a8800':'#8a6040';
+  const surf= th?'#1a1800':'#100810';
+  const bord= th?'#3d3300':'#2a1020';
+  const purp= '#8B00FF';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
   <defs>
-    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0a08"/>
-      <stop offset="100%" stop-color="#141412"/>
+    <linearGradient id="cbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${bg1}"/>
+      <stop offset="100%" stop-color="${bg2}"/>
     </linearGradient>
-    <linearGradient id="gold2" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#FFD700"/>
-      <stop offset="50%" stop-color="#FFA500"/>
-      <stop offset="100%" stop-color="#FFD700"/>
+    <linearGradient id="cneon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="${nR}"/>
+      <stop offset="35%"  stop-color="${nB}"/>
+      <stop offset="65%"  stop-color="${nG}"/>
+      <stop offset="100%" stop-color="${nR}"/>
     </linearGradient>
+    <linearGradient id="cgold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="${gold}"/>
+      <stop offset="50%"  stop-color="${warm}"/>
+      <stop offset="100%" stop-color="${gold}"/>
+    </linearGradient>
+    <filter id="cglow" x="-20%" y="-100%" width="140%" height="400%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
-  <rect width="600" height="400" fill="url(#bg2)" rx="14"/>
-  <rect width="600" height="400" fill="none" stroke="#2a2a20" stroke-width="1" rx="14"/>
-  <rect x="0" y="0" width="600" height="4" fill="url(#gold2)" rx="2"/>
+  <!-- BG + border + neon top bar -->
+  <rect width="600" height="360" fill="url(#cbg)" rx="12"/>
+  <rect width="600" height="360" fill="none" stroke="${bord}" stroke-width="1.5" rx="12"/>
+  <rect x="0" y="0" width="600" height="6" fill="url(#cneon)" rx="3" filter="url(#cglow)"/>
+  <rect x="0" y="0" width="600" height="6" fill="url(#cneon)" rx="3" opacity="0.35"/>
 
-  <!-- Header -->
-  <text x="28" y="22" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="3">LIGHTS, CAMERA, ACTION!</text>
-  <text x="28" y="50" font-family="Georgia,serif" font-size="22" font-weight="900" font-style="italic" fill="url(#gold2)">${esc(title)}</text>
-  <text x="28" y="66" font-family="system-ui,sans-serif" font-size="10" fill="#7a6a40" font-style="italic">${esc(tagline)}</text>
+  <!-- Game label -->
+  <text x="30" y="23" font-family="system-ui,sans-serif" font-size="7.5" fill="${dim2}" letter-spacing="3.5">LIGHTS, CAMERA, ACTION!</text>
 
-  <line x1="28" y1="76" x2="572" y2="76" stroke="#252520" stroke-width="1"/>
+  <!-- Film title + tagline -->
+  <text x="30" y="52" font-family="Georgia,serif" font-size="26" font-weight="900" font-style="italic" fill="url(#cgold)" filter="url(#cglow)">${title}</text>
+  <text x="30" y="67" font-family="Georgia,serif" font-size="10" font-style="italic" fill="${dim2}">${tagline}</text>
 
-  <!-- Stats row  -  4 even columns -->
-  <text x="28"  y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#B5D4F4">$${S.boM}M</text>
-  <text x="28"  y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">BOX OFFICE</text>
+  <rect x="30" y="75" width="540" height="1" fill="url(#cneon)" opacity="0.3"/>
 
-  <text x="165" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FAC775">${S.noms} noms</text>
-  <text x="165" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">OSCAR - ${S.wins||0} WINS</text>
+  <!-- STATS ROW -->
+  <text x="30"  y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#A0C4E8">$${S.boM}M</text>
+  <text x="30"  y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">BOX OFFICE</text>
+  <text x="168" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="${gold}">${S.noms} noms</text>
+  <text x="168" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">OSCAR  ·  ${S.wins||0} WINS</text>
+  <text x="336" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#E83040">${S.rtCritic||0}%</text>
+  <text x="336" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">TOMATOMETER</text>
+  <text x="472" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#E07020">${S.rtAudience||0}%</text>
+  <text x="472" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">AUDIENCE</text>
 
-  <text x="336" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA320A">${S.rtCritic||0}%</text>
-  <text x="336" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">TOMATOMETER</text>
+  <rect x="30" y="112" width="540" height="0.5" fill="${bord}"/>
 
-  <text x="470" y="94" font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#FA8C00">${S.rtAudience||0}%</text>
-  <text x="470" y="106" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">AUDIENCE</text>
+  <!-- ── VERDICT BADGE  -  matches game UI style with v.bg / v.tc colors ── -->
+  <rect x="30" y="118" width="540" height="28" fill="${vBg}" rx="6"/>
+  <text x="300" y="137" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="${vTc}" text-anchor="middle">${vTitle}</text>
 
-  <line x1="28" y1="116" x2="572" y2="116" stroke="#252520" stroke-width="1"/>
+  <rect x="30" y="150" width="540" height="0.5" fill="${bord}" opacity="0.5"/>
 
-  <!-- Left column: crew | Right column: quote + letterboxd -->
-  <!-- LEFT: Director, Lead, Studio, Run sig -->
-  <text x="28"  y="132" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">DIRECTED BY</text>
-  <text x="28"  y="146" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(director)}</text>
+  <!-- LEFT COLUMN  x=30..285  -  billing block -->
+  <text x="30" y="166" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">DIRECTED BY</text>
+  <text x="30" y="179" font-family="Georgia,serif" font-size="14" font-weight="700" fill="${warm}">${director}</text>
 
-  <text x="28"  y="163" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STARRING</text>
-  <text x="28"  y="177" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f0efeb">${esc(lead)}</text>
+  <text x="30" y="193" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">STARRING</text>
+  <text x="30" y="206" font-family="Georgia,serif" font-size="14" font-weight="700" fill="${warm}">${lead}</text>
 
-  <text x="28"  y="194" font-family="system-ui,sans-serif" font-size="8"  fill="#4a4a38" letter-spacing="1">STUDIO</text>
-  <text x="28"  y="208" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#f0efeb">${esc(studio)}</text>
+  <text x="30" y="219" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">WITH</text>
+  <text x="30" y="231" font-family="Georgia,serif" font-size="12" fill="${warm}" opacity="0.8">${support}</text>
 
-  <text x="28"  y="222" font-family="system-ui,sans-serif" font-size="9"  fill="#5a5a3a">${esc(sig)}</text>
+  <text x="30" y="245" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">PRESENTED BY</text>
+  <text x="30" y="257" font-family="system-ui,sans-serif" font-size="10" fill="${dim2}">${studioArticle} ${studio} Film</text>
 
-  <!-- Vertical divider -->
-  <line x1="290" y1="120" x2="290" y2="300" stroke="#252520" stroke-width="0.5"/>
+  <text x="30" y="271" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">MUSIC BY</text>
+  <text x="30" y="282" font-family="system-ui,sans-serif" font-size="10" fill="${dim2}" opacity="0.85">${composer}</text>
 
-  <!-- RIGHT: Critic quote block -->
-  <text x="304" y="132" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">CRITICAL RECEPTION</text>
-  ${hasQuote ? `<text x="304" y="148" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">\u201C${esc(quoteLine1)}</text>
-  <text x="304" y="163" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#c8b86a">${quoteLine2 ? esc(quoteLine2) + '\u201D' : ''}</text>
-  <text x="304" y="${quoteLine2 ? 178 : 163}" font-family="system-ui,sans-serif" font-size="9" fill="#5a5a3a">${esc('- ' + rawCritic)}</text>` : `<text x="304" y="152" font-family="Georgia,serif" font-size="11" font-style="italic" fill="#5a5a3a">${esc(v.title||'')}</text>`}
+  <rect x="30" y="291" width="${Math.min(155,genre.length*7+20)}" height="16" fill="${surf}" rx="8" stroke="${bord}" stroke-width="0.5"/>
+  <text x="40" y="303" font-family="system-ui,sans-serif" font-size="8" fill="${nG}">${genre}</text>
 
-  <!-- Letterboxd one-liner -->
-  <text x="304" y="202" font-family="system-ui,sans-serif" font-size="8" fill="#4a4a38" letter-spacing="1">LETTERBOXD</text>
-  <text x="304" y="216" font-family="system-ui,sans-serif" font-size="9" fill="#8a8a6a" font-style="italic">${esc(lbLine.slice(0,46))}</text>
-  ${lbLine.length > 46 ? `<text x="304" y="229" font-family="system-ui,sans-serif" font-size="9" fill="#8a8a6a" font-style="italic">${esc(lbLine.slice(46))}</text>` : ''}
+  <!-- Column divider -->
+  <rect x="295" y="154" width="0.75" height="150" fill="${nR}" opacity="0.2" filter="url(#cglow)"/>
 
-  <line x1="28" y1="240" x2="572" y2="240" stroke="#252520" stroke-width="1"/>
+  <!-- RIGHT COLUMN  x=308..570 -->
 
-  <!-- Verdict + bonus -->
-  <rect x="28" y="249" width="${Math.min(320, (v.title||'').length * 8 + 24)}" height="24" fill="#1a1a16" rx="5" stroke="#3a3a28" stroke-width="0.5"/>
-  <text x="40" y="266" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#FFD700">${esc(v.title||'')}</text>
-  ${bonusLine ? `<text x="28" y="288" font-family="system-ui,sans-serif" font-size="9" fill="#7BDD88">${bonusLine}</text>` : ''}
+  <!-- ── CRITIC QUOTE  -  purple left-border card matching game UI ── -->
+  <rect x="308" y="156" width="262" height="${qH}" fill="${surf}" rx="0 6 6 0"/>
+  <rect x="308" y="156" width="3"   height="${qH}" fill="${purp}" rx="2 0 0 2"/>
+  <text x="318" y="170" font-family="Georgia,serif" font-size="11" font-style="italic" fill="${warm}">${esc(qLines[0])||'No critical consensus yet.'}</text>
+  ${qLines[1] ? `<text x="318" y="185" font-family="Georgia,serif" font-size="11" font-style="italic" fill="${warm}">${esc(qLines[1])}</text>` : ''}
+  ${rawCritic ? `<text x="318" y="${156+qH-6}" font-family="system-ui,sans-serif" font-size="9" fill="${dim2}">${rawCritic}</text>` : ''}
+
+  <!-- Letterboxd -->
+  <text x="308" y="${156+qH+18}" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">LETTERBOXD</text>
+  <text x="308" y="${156+qH+33}" font-family="system-ui,sans-serif" font-size="11" fill="${nR}" filter="url(#cglow)">${lbStars}</text>
+  <text x="368" y="${156+qH+33}" font-family="system-ui,sans-serif" font-size="8" fill="${dim2}">@${lbUser}</text>
+  <text x="308" y="${156+qH+47}" font-family="Georgia,serif" font-size="10" font-style="italic" fill="${warm}" opacity="0.75">${esc(lbLines[0])}</text>
+  ${lbLines[1] ? `<text x="308" y="${156+qH+61}" font-family="Georgia,serif" font-size="10" font-style="italic" fill="${warm}" opacity="0.75">${esc(lbLines[1])}</text>` : ''}
 
   <!-- Footer -->
-  <line x1="28" y1="310" x2="572" y2="310" stroke="#1e1e18" stroke-width="0.5"/>
-  <text x="28"  y="323" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" letter-spacing="1">LIGHTS-CAMERA-ACTION.APP</text>
-  <text x="572" y="323" font-family="system-ui,sans-serif" font-size="8" fill="#3a3a28" text-anchor="end">Play at https://lights-camera-action.app</text>
+  <rect x="30" y="320" width="540" height="0.5" fill="${bord}"/>
+  <text x="30"  y="335" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="2">LIGHTS-CAMERA-ACTION.APP</text>
+  <text x="570" y="335" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" text-anchor="end">lights-camera-action.app</text>
+
+  <!-- Bonus line bottom right -->
+  ${bonusStr ? `<text x="570" y="348" font-family="system-ui,sans-serif" font-size="7" fill="${nG}" text-anchor="end" opacity="0.85">${bonusStr}</text>` : ''}
 </svg>`;
 }
 
@@ -3849,9 +3605,9 @@ async function svgToBlob(svgStr) {
     img.onload = () => {
       clearTimeout(timer);
       const canvas = document.createElement('canvas');
-      canvas.width = 600; canvas.height = 400; // matches SVG viewBox
+      canvas.width = 600; canvas.height = 360; // matches SVG viewBox
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, 600, 400);
+      ctx.drawImage(img, 0, 0, 600, 360);
       URL.revokeObjectURL(url);
       canvas.toBlob(blob => resolve(blob), 'image/png', 0.82);
     };
