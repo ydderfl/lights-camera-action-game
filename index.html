@@ -3257,7 +3257,7 @@ function bind() {
         bo_m:         S.boM  || 0,
         noms:         S.noms || 0,
         wins:         S.wins || 0,
-        score:        (S.boM ?? 0) + ((S.noms ?? 0)*12) + ((S.wins ?? 0)*20) + (((S.rtCritic ?? 0)+(S.rtAudience ?? 0))/4) + (S.bonuses||[]).reduce((s,b)=>s+(b.pts??0),0),
+        score:        Math.round((S.boM ?? 0) + ((S.noms ?? 0)*12) + ((S.wins ?? 0)*20) + (((S.rtCritic ?? 0)+(S.rtAudience ?? 0))/4) + (S.bonuses||[]).reduce((s,b)=>s+(b.pts??0),0)),
         director:     S.picks[0]?.name || "",
         lead_actor:   S.picks[1]?.name || "",
         submitted_by: dName,
@@ -4153,9 +4153,9 @@ async function sbInsertDaily(row) {
 
 
 async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCritic, rtAudience, directorName) {
+  // Only include columns that exist in the walk_of_fame table schema
   const row = {
     film_title:    synopsis?.title  || "Untitled",
-    tagline:       synopsis?.tagline || "",
     verdict:       verdict?.title   || "",
     bo_m:          boM   || 0,
     noms:          noms  || 0,
@@ -4164,7 +4164,6 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
     rt_audience:   rtAudience || 0,
     director:      picks[0]?.name || "",
     lead_actor:    picks[1]?.name || "",
-    supporting:    picks[2]?.name || "",
     studio:        picks[3]?.name || "",
     genre:         picks[5]?.name || "",
     submitted_by:  directorName || "Anonymous",
