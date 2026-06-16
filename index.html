@@ -3434,7 +3434,9 @@ function bind() {
     S.chaosEvent = null;
 
     const chaosCount = (S.chaosHistory||[]).length;
-    if (!DAILY_MODE && chaosCount < 2) {
+    const _themeForCap = getActiveTheme();
+    const _chaosLimit = (_themeForCap?.id === "minions") ? Infinity : 2;
+    if (!DAILY_MODE && chaosCount < _chaosLimit) {
       const _theme     = getActiveTheme();
       const _themeEvts = (_theme?.chaosInjections||[]).map(e => ({...e, reroll:false, rerollRound:null}));
       // Themed mode: ONLY theme chaos fires. Normal mode: ONLY regular chaos.
