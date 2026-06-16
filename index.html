@@ -674,8 +674,34 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
   };
 
   // Pick letterboxd entry for share card (deterministic by score)
+  // Theme-specific Letterboxd entries
+  const _lbTheme = getActiveTheme();
+  const _lbMinions = [
+    { user:"banana_advocate_2024", stars:"★★★★★", review:"watched it with my nephew. he said bababoi. he was correct. i gave it five stars on his behalf." },
+    { user:"illumination_defender", stars:"★★★★", review:"people keep dismissing illumination. illumination keeps making $800M. not the dismissers." },
+    { user:"pharrell_was_robbed", stars:"★★★★★", review:"pharrell walked in uninvited and saved this film. give him everything." },
+    { user:"kevin_escaped_set", stars:"★★★★★", review:"kevin escaped the set during production. the footage of security looking for him is more entertaining than most films this year." },
+    { user:"bababoi_was_the_review", stars:"★★★★★", review:"bababoi." },
+    { user:"took_my_kids_cried", stars:"★★★★★", review:"took my kids. they laughed for 94 minutes. i cried twice. the minions did something to me." },
+    { user:"minion_truther", stars:"★★★★★", review:"the minions existed before gru. they will exist after gru. gru is temporary. the banana is eternal." },
+    { user:"gelato_understood", stars:"★★★★", review:"i do not speak minionese but i understood the gelato scene completely." },
+    { user:"stuart_did_nothing_wrong", stars:"★★★★★", review:"stuart is innocent. stuart has always been innocent. the film finally acknowledges this." },
+    { user:"gru_should_return", stars:"★★★", review:"the film is good. gru is not in it enough. this is my only note. i have had this note since 2015." },
+  ];
+  const _lbOdyssey = [
+    { user:"70mm_pilgrim", stars:"★★★★★", review:"three hours. i would have taken six. give me more." },
+    { user:"wept_for_the_dog", stars:"★★★★★", review:"i knew the dog scene was coming. i have known since school. i was not prepared. i will never be prepared." },
+    { user:"antinous_had_a_point", stars:"★★", review:"antinous had some valid points about resource allocation. the film does not explore this. two stars." },
+    { user:"penelope_actually_ran_ithaca", stars:"★★★★★", review:"penelope ran ithaca for twenty years and they call it his story. the film gives her the ending." },
+    { user:"practical_cyclops_supremacy", stars:"★★★★★", review:"the cyclops is practical effects. eleven months to build. you can tell. that is why it works." },
+    { user:"no_cgi_sirens", stars:"★★★★★", review:"the sirens sequence. no cgi. nolan confirmed it. you can feel the difference." },
+    { user:"calypso_deserved_better", stars:"★★★★", review:"she offered him immortality and he chose to go home. the film sits with how strange that choice actually is." },
+    { user:"sea_not_friendly", stars:"★★★★★", review:"the storm sequence in the second act. the sound design. the scale. this is what cinema is for." },
+    { user:"homer_in_imax", stars:"★★★★★", review:"i read the odyssey in school. i have been waiting for this film my entire life. it was worth it." },
+    { user:"circe_misunderstood", stars:"★★★★★", review:"she turned men into pigs because they were acting like pigs. the film understands this. five stars for accuracy." },
+  ];
   const _lbKey   = isFlop?'flop':isBlockbuster?'action':(isAwardsBait&&!isBlockbuster)?'prestige':'general';
-  const _lbPool  = lbPools[_lbKey] || lbPools.general;
+  const _lbPool  = (_lbTheme && _lbTheme.id === 'minions') ? _lbMinions : (_lbTheme && _lbTheme.id === 'odyssey') ? _lbOdyssey : lbPools[_lbKey] || lbPools.general;
   const _lbEntry = _lbPool[((boM||0)+(noms||0)*7) % _lbPool.length];
 
   // Pick a critic quote for share card
@@ -2754,14 +2780,59 @@ const THEMES = {
         { name:"Daniel Craig (Ajax)",          bo:14, oscar:10, era:"Epic",      known:"The greatest fighter at Troy after Achilles. He carries the weight of what war leaves behind." },
         { name:"The Sirens (Practical Effects)",bo:8, oscar:14, era:"Mythic",   known:"Three voices from no identifiable source. Nolan has confirmed they will not be CGI. The crew is concerned." },
       ],
-      screenplay: [
-        { name:"Epic Adaptation of Homer",          bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. Every high school English class is a marketing budget already paid." },
-        { name:"Original Epic Vision",              bo:17, oscar:13, era:"Epic",        known:"The director wrote it himself over five years. This is the definitive version. He will say so." },
-        { name:"Mythological Prestige Adaptation",  bo:13, oscar:15, era:"Prestige",    known:"Myth treated as journalism. The ancient world as living tissue. The Academy responds to this register." },
-        { name:"Literary Darkness Reframe",         bo:11, oscar:14, era:"Literary",    known:"The Odyssey as modern desolation. Nobody arrives home cleanly. The wine-dark sea takes something from everyone." },
-        { name:"Multi-Generational War Epic",       bo:13, oscar:14, era:"Epic",        known:"The war. The wandering. The return. Four storylines spanning twenty years. The Trojan Horse is act one." },
-        { name:"The Faithful Text",                 bo:14, oscar:16, era:"Classical",   known:"Every book. Every monster. Every god. Runtime is four hours and the Academy has cleared its evening." },
+            screenplay: [
+        { name:"Epic Adaptation of Homer", bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. Every high school English class is a marketing budget already paid." },
+        { name:"Original Epic Vision", bo:17, oscar:13, era:"Epic", known:"The director wrote it himself over five years. This is the definitive version. He will say so." },
+        { name:"Mythological Prestige Adaptation", bo:13, oscar:15, era:"Prestige", known:"Myth treated as journalism. The ancient world as living tissue." },
+        { name:"Literary Darkness Reframe", bo:11, oscar:14, era:"Literary", known:"The Odyssey as modern desolation. Nobody arrives home cleanly. The sea takes something from everyone." },
+        { name:"The Faithful Text: All 24 Books", bo:14, oscar:16, era:"Classical", known:"Every book. Every monster. Every god. Runtime is four hours. The Academy has cleared its evening." },
+        { name:"The Homecoming: Ithaca Only", bo:12, oscar:14, era:"Chamber", known:"No war. No monsters. Only the return. The palace. Penelope. The suitors. The reckoning." },
+        { name:"Troy to Ithaca: The Full Arc", bo:15, oscar:15, era:"Epic", known:"From the fall of Troy to the last suitor. Twenty years in one film." },
+        { name:"Penelope Odyssey", bo:11, oscar:16, era:"Prestige", known:"The same twenty years from Ithaca. The waiting. The weaving. The suitors who presume too much." },
+        { name:"The Cyclops Chapter", bo:14, oscar:10, era:"Thriller", known:"Only the island of the Cyclops. Eighty minutes. One cave. One monster. Nobody brought enough wine." },
+        { name:"Circe Island", bo:12, oscar:13, era:"Arthouse", known:"The year Odysseus spent with Circe. The men she turned. The reason he stayed. The reason he left." },
+        { name:"The Underworld", bo:11, oscar:15, era:"Prestige", known:"Book Eleven only. Odysseus descends to speak with the dead. Achilles. His mother. The things they say." },
+        { name:"The Sirens: A Documentary", bo:10, oscar:13, era:"Arthouse", known:"Shot entirely at sea. What the Sirens sing about. What it costs to hear it. Nobody left the island." },
+        { name:"Telemachus Rising", bo:12, oscar:12, era:"Coming-of-Age", known:"The son who grew up without a father. His journey to find news of Odysseus. The boy becoming the king." },
+        { name:"Nausicaa", bo:11, oscar:13, era:"Prestige", known:"The princess who found a broken hero on the beach. The kindness that made the rest possible." },
+        { name:"The Suitors: A Tragedy", bo:10, oscar:12, era:"Drama", known:"Told from Antinous perspective. The men who presumed too much. The wait that ended badly for everyone." },
+        { name:"Gods at War: Olympus", bo:15, oscar:11, era:"Epic", known:"The story told from the gods who argued over Odysseus for twenty years." },
+        { name:"Poseidon Grievance", bo:13, oscar:12, era:"Drama", known:"Why Poseidon hated Odysseus. What the Cyclops meant to him. A god sense of justice is not human." },
+        { name:"Athena Favourite", bo:12, oscar:14, era:"Prestige", known:"The goddess who walked among mortals to help one man. What she saw in him. What it cost her." },
+        { name:"The Bow of Odysseus", bo:14, oscar:13, era:"Thriller", known:"Only the contest. Only the bow. The suitors who could not draw it. The beggar who could." },
+        { name:"Twenty Years: A Time-Jump Epic", bo:15, oscar:14, era:"Epic", known:"The war. The wandering. The return. Three acts. Twenty years. One man trying to come home." },
+        { name:"The Cyclops: A Monster Memoir", bo:10, oscar:12, era:"Arthouse", known:"From Polyphemus perspective. He was minding his sheep. He had guests. The guests blinded him." },
+        { name:"Troy: The Fall", bo:15, oscar:13, era:"War", known:"The ten years before the Odyssey begins. The horse. The fire. The reason Odysseus could not come home yet." },
+        { name:"Calypso Island", bo:11, oscar:13, era:"Prestige", known:"Seven years. The nymph who offered immortality. The man who chose mortality and Ithaca instead." },
+        { name:"The Sea Is Not Friendly Here", bo:12, oscar:12, era:"Survival", known:"Every storm. Every wreck. Every time the sea tried to kill him. Practical effects. Malta. All of it." },
+        { name:"Ithaca: A State of Mind", bo:10, oscar:14, era:"Arthouse", known:"Home as concept. Home as memory. Home as the place you can no longer recognise when you arrive." },
+        { name:"The Lotus Eaters", bo:9, oscar:12, era:"Arthouse", known:"The island where you forget to go home. The men who did not mind. The man who had to drag them back." },
+        { name:"Scylla and Charybdis", bo:13, oscar:10, era:"Thriller", known:"The impossible choice between two monsters. Six men lost to Scylla. The alternative was everyone." },
+        { name:"The Land of the Dead", bo:11, oscar:14, era:"Horror", known:"Odysseus among the shades. The blood that makes them speak. The things the dead say when they can." },
+        { name:"Eumaeus: The Loyal Swineherd", bo:9, oscar:13, era:"Prestige", known:"The servant who stayed loyal for twenty years. The man who recognised Odysseus before anyone else." },
+        { name:"Argos", bo:8, oscar:15, era:"Drama", known:"The dog who waited twenty years and died the day his master returned. One scene. Entire critics careers." },
+        { name:"The Phaeacians Gift", bo:11, oscar:12, era:"Fantasy", known:"The people who built ships that sail by thought. The night they listened to Odysseus tell everything." },
+        { name:"Aeolus and the Bag of Winds", bo:10, oscar:11, era:"Fable", known:"The god of winds gave him every wind except the one he needed. His crew opened the bag." },
+        { name:"The Cattle of the Sun God", bo:11, oscar:10, era:"Drama", known:"The only rule: do not eat the cattle. They were starving. They ate the cattle. The sea swallowed them." },
+        { name:"Laestrygonians", bo:12, oscar:9, era:"Horror", known:"The island of cannibals. Twelve ships entered the harbour. One ship left. The rest were eaten." },
+        { name:"Odysseus in Disguise", bo:13, oscar:12, era:"Thriller", known:"The beggar who entered his own palace. The year he spent watching the suitors. The patience of a king." },
+        { name:"The Recognition of Odysseus", bo:11, oscar:14, era:"Drama", known:"Every moment someone recognises him. The nurse. The dog. Penelope last of all. The slow revelation." },
+        { name:"Telemachus Meets His Father", bo:12, oscar:13, era:"Drama", known:"The father and son who barely know each other. Twenty years. The awkwardness of reunion across an epic." },
+        { name:"Penelope and the Loom", bo:10, oscar:15, era:"Drama", known:"The shroud she wove by day and unravelled by night for three years. The intelligence the myths ignore." },
+        { name:"The Prophecy of Tiresias", bo:11, oscar:13, era:"Arthouse", known:"The blind prophet who told Odysseus what was coming. He was correct about everything." },
+        { name:"After the Odyssey", bo:10, oscar:14, era:"Prestige", known:"What happened after. The other prophecy. The oar mistaken for a winnowing fan. The end Tiresias described." },
+        { name:"Achilles in the Underworld", bo:13, oscar:13, era:"Prestige", known:"Achilles chose glory over a long life. In death he tells Odysseus he was wrong." },
+        { name:"The Bow Contest: Real Time", bo:14, oscar:11, era:"Thriller", known:"Eighty minutes in the great hall. The contest. The failure of the suitors. The reckoning." },
+        { name:"Agamemnon Warning", bo:10, oscar:13, era:"Drama", known:"From the underworld Agamemnon warns Odysseus about coming home. He was killed by his wife. He speaks from experience." },
+        { name:"The Island That Was Not There", bo:9, oscar:14, era:"Magical", known:"Aeaea. Ogygia. Islands that appear on no map. Where gods walk among mortals and time moves differently." },
+        { name:"One Hundred and Eight", bo:12, oscar:11, era:"Thriller", known:"The number of suitors Odysseus killed on the day he came home. An accounting." },
+        { name:"The Gods Assembly", bo:13, oscar:12, era:"Epic", known:"Every council on Olympus that decided the fate of one man for twenty years. Zeus presiding. Poseidon dissenting." },
+        { name:"Wine-Dark Sea", bo:11, oscar:15, era:"Prestige", known:"The Odyssey told through its most famous phrase. What the sea meant to the ancient world. What it took." },
+        { name:"Tell Me O Muse", bo:14, oscar:16, era:"Classical", known:"The first line. The invocation that began Western literature. This is the film it deserves." },
+        { name:"The Return of the King", bo:15, oscar:13, era:"Epic", known:"Not Tolkien. The original. The man who had been gone twenty years walking back into his own house." },
+        { name:"Argos and Odysseus", bo:8, oscar:16, era:"Drama", known:"Feature-length version of the dog who waited. Homer gave it three lines. This film gives it everything." },
       ],
+
       composer: [
         { name:"Hans Zimmer",          bo:16, oscar:14, era:"Epic",       known:"The natural Nolan choice. He will invent an ancient sound from instruments that do not yet exist." },
         { name:"Ludwig Goransson",     bo:15, oscar:13, era:"Epic",       known:"Oppenheimer. Tenet. Already inside the Nolan ecosystem. He knows what the director's silence sounds like." },
@@ -2783,36 +2854,82 @@ const THEMES = {
       ],
     },
     verdictOverrides: {
-      goat:        { title:"⚓ A voyage completed. The Academy wept. The gods approved.",         detail:"$900M. Ten years. The most anticipated film of the generation delivered on every promise." },
-      jugger:      { title:"🌊 The fleet has returned. The box office is underwater.",              detail:"Record opening weekend. Troy has fallen." },
-      darling:     { title:"🏆 The Academy has convened. Homer would have approved.",               detail:"Twelve nominations. The reviews are once-in-a-decade." },
-      prestige:    { title:"🎨 Prestige of the highest order.",                                     detail:"Playing in limited release. The 70mm screenings are sold out." },
-      hit:         { title:"✨ A crowd-pleasing odyssey. The audience followed willingly.",         detail:"Four-quadrant success." },
-      mid:         { title:"😐 The sirens sang. Nobody listened.",                                  detail:"Technically competent. Emotionally inert." },
-      flop:        { title:"💸 A journey begun and never completed. The sea took it.",              detail:"The studio is not returning calls." },
-      disaster:    { title:"🔥 This is what Polyphemus felt like. From the inside.",               detail:"A historic catastrophe." },
-      tax_writeoff:{ title:"📜 The Oracle at Delphi had warned them. They did not listen.",        detail:"The accountants are the only ones satisfied." },
+      goat:           { title:"⚓ A voyage completed. The Academy wept. The gods approved.", detail:"$900M. Ten years. The most anticipated film of the generation delivered on every promise. Homer would have approved. He would have demanded more sea." },
+      jugger:         { title:"🌊 The fleet has returned. The box office is underwater in the best sense.", detail:"Record opening weekend. Troy has fallen. Universal has greenlit the Iliad." },
+      franchise:      { title:"🏛️ A new mythology begins. The universe expands.", detail:"Universal has optioned the Iliad. The Aeneid is in development. You started something Homer started 3000 years ago and never finished." },
+      darling:        { title:"🏆 The Academy has convened. Homer would have approved of the nominations.", detail:"Twelve nominations. Critics are writing reviews they save for once a decade. The wine-dark sea has won Best Cinematography." },
+      prestige:       { title:"🎨 Prestige of the highest order. The cinematography alone.", detail:"Playing in limited release. The 70mm screenings are sold out through September. The practical Cyclops has its own Wikipedia page." },
+      hit:            { title:"✨ A crowd-pleasing odyssey. The audience followed willingly.", detail:"Four-quadrant success. The score is being played in lobbies across America. Nolan gave an interview about aspect ratio." },
+      sleeper:        { title:"🌱 The sirens sang quietly. Eventually, people listened.", detail:"Undersold opening. Word of mouth built it into something the studio did not expect. The director is philosophically unbothered." },
+      cult:           { title:"🕯️ The wine-dark sea claimed it. The internet will resurrect it.", detail:"Nobody came opening weekend. In five years it will be someone entire personality. The Cyclops scene is already a gif." },
+      mid:            { title:"😐 The sirens sang. Nobody listened.", detail:"Technically competent. Emotionally inert. Polyphemus has seen better. Even the Lotus Eaters were not sufficiently numbed." },
+      troubled:       { title:"🔧 Malta disagreed with the production. The sea always wins.", detail:"The reshoots were extensive. The Malta sequences required six additional months. The director is in Malta." },
+      overhyped:      { title:"📉 The voyage promised more than the harbour delivered.", detail:"The marketing campaign was brilliant. The film was fine. The Trojan Horse was genuine. The rest was a prop." },
+      flop:           { title:"💸 A journey begun and never completed. The sea took it.", detail:"The studio is not returning calls. The director has started a podcast about Greek mythology." },
+      disaster:       { title:"🔥 This is what Polyphemus felt like. From the inside.", detail:"A historic catastrophe. The Wikipedia page has forty-three citations. Business schools use it as a cautionary tale about budgeting for practical sea monsters." },
+      tax_writeoff:   { title:"📜 The Oracle at Delphi had warned them. They did not listen.", detail:"The accountants are the only ones who went home satisfied. Poseidon has issued a statement." },
+      streaming:      { title:"📺 The epic ended up on a streaming service. Nolan does not know.", detail:"Universal quietly moved it to the platform. The algorithm placed it between two reality shows. The Cyclops has 2.1 stars on the app." },
+      critic_darling: { title:"🖊️ The critics wept. The audience went to see something else.", detail:"Every major critic gave it five stars. It played in eleven cities. Nobody else saw it. They are all lying about having seen it." },
+      comeback_kid:   { title:"🌊 The hero returned. Nobody expected it. Nobody expected this.", detail:"Against all odds the film delivered something extraordinary. The Academy noticed late. The audience noticed first." },
     },
     chaosInjections: [
-      { round:1, chance:0.40, msg:"⚔️ DAY ONE RESHOOT: Nolan reshot the opening sequence three times on day one. He has not explained why. The crew understands. The studio does not.", penaltyBO:0, penaltyOS:2 },
-      { round:2, chance:0.40, msg:"🐴 THE TROJAN HORSE: A wooden horse arrived on set. Nobody ordered it. The doors opened. Eleven studio executives emerged with script notes. Production suspended four days. Nolan accepted none of the notes.", penaltyBO:-1, penaltyOS:2 },
-      { round:3, chance:0.38, msg:"⛵ MALTA: Production moved to Malta. A swell destroyed the practical longship on day one. The director called it authentic. The insurance company called it a claim.", penaltyBO:-1, penaltyOS:2 },
-      { round:4, chance:0.38, msg:"🌊 POSEIDON INTERVENES: The underwater unit flooded the soundstage at 3am. The rushes were extraordinary. The director kept everything.", penaltyBO:0, penaltyOS:3 },
+      // ROUND 1  -  day one
+      { round:1, chance:0.35, msg:"⚔️ DAY ONE RESHOOT: Nolan reshot the opening sequence three times on day one. He has not explained why. The crew understands. The studio does not.", penaltyBO:0, penaltyOS:2 },
+      { round:1, chance:0.30, msg:"📐 THE FORMAT DECISION: Nolan announced at 6am on day one that the aspect ratio will change three times during the film. The camera department has been briefed. Nobody else has.", penaltyBO:1, penaltyOS:2 },
+      { round:1, chance:0.28, msg:"🌊 THE SEA CONSULTANT: Nolan hired a maritime historian, a classics scholar, and a practical effects oceanographer. All three disagree about the wine-dark sea. Production is paused while they argue.", penaltyBO:0, penaltyOS:2 },
+      // ROUND 2  -  cast drama
+      { round:2, chance:0.35, msg:"🐴 THE TROJAN HORSE: A wooden horse arrived on set. Nobody ordered it. The doors opened. Eleven studio executives emerged with script notes. Nolan accepted none of the notes.", penaltyBO:-1, penaltyOS:2 },
+      { round:2, chance:0.30, msg:"🏛️ ATHENA INTERVENES: Cate Blanchett rewrote her own dialogue overnight. Nolan read it at 5am. He cancelled the day's shoot and incorporated everything. The studio was not consulted.", penaltyBO:0, penaltyOS:3 },
+      { round:2, chance:0.28, msg:"⚓ THE SHIP PROBLEM: The practical longship arrived from Norway. It is seventeen feet longer than the harbour in Malta can accommodate. Nolan considers this a creative opportunity.", penaltyBO:-1, penaltyOS:1 },
+      // ROUND 3  -  location
+      { round:3, chance:0.35, msg:"⛵ MALTA: A swell destroyed the practical longship on day one. The director called it authentic. The insurance company called it a claim. Both filed paperwork simultaneously.", penaltyBO:-1, penaltyOS:2 },
+      { round:3, chance:0.30, msg:"🔥 TROY BURNS: The practical Troy set caught fire during the night shoot. Nolan kept the cameras rolling. The footage is extraordinary. The set is gone. He is rebuilding it.", penaltyBO:-2, penaltyOS:3 },
+      { round:3, chance:0.28, msg:"🌿 THE OLIVE GROVE: Nolan spent four days filming in an olive grove that does not appear in any draft of the script. He says it will make sense in the edit. The editor is in Malta.", penaltyBO:0, penaltyOS:2 },
+      // ROUND 4  -  production
+      { round:4, chance:0.35, msg:"🌊 POSEIDON INTERVENES: The underwater unit flooded the soundstage at 3am. The rushes were extraordinary. The director kept everything. Universal approved the additional water budget.", penaltyBO:0, penaltyOS:3 },
+      { round:4, chance:0.30, msg:"🐑 THE FLOCK: Nolan insisted on real sheep for the Cyclops sequence. Two hundred sheep. On a soundstage. The animal wranglers have filed a formal statement. It is in the film.", penaltyBO:-1, penaltyOS:2 },
+      { round:4, chance:0.28, msg:"📜 THE HOMER DISPUTE: A classicist published an essay arguing the film misreads Book Nine. Nolan gave a two-hour response at a press junket. He was correct. The classicist has retracted.", penaltyBO:1, penaltyOS:2 },
+      // ROUND 5  -  buzz
       { round:5, chance:0.35, msg:"📸 THE LEAK: A single practical effects frame appeared online. The internet declared it the greatest image in cinema history. The marketing team cancelled the trailer. The image is the campaign.", penaltyBO:3, penaltyOS:2 },
+      { round:5, chance:0.30, msg:"🎭 THE CYCLOPS SCREEN TEST: Test footage of the practical Cyclops escaped. Reddit declared it the most frightening thing they have ever seen. The studio is pretending this was intentional.", penaltyBO:2, penaltyOS:3 },
+      { round:5, chance:0.28, msg:"📰 THE NOLAN PROFILE: A 12,000-word New Yorker profile ran. It discussed the film for 400 words. The rest covered his theories about analogue filmmaking and the nature of time. Both trended.", penaltyBO:1, penaltyOS:2 },
+      // ROUND 6  -  supernatural
       { round:6, chance:0.35, msg:"🧜 THE SIRENS: Three crew members reported hearing music from no identifiable source. One could not recall their cues for five days. The director kept every take.", penaltyBO:0, penaltyOS:3 },
+      { round:6, chance:0.30, msg:"⚡ ZEUS: Lightning struck the Malta set twice in one afternoon. No injuries. Nolan declared the footage usable. The cinematographer declared it miraculous. Both are correct.", penaltyBO:1, penaltyOS:3 },
+      { round:6, chance:0.28, msg:"🌀 CIRCE: The actress playing Circe refused to leave character between takes. For three weeks. The crew began bringing her offerings. The director considered this appropriate research.", penaltyBO:0, penaltyOS:2 },
+      // ROUND 7  -  post production
       { round:7, chance:0.33, msg:"🎬 THE ASPECT RATIO INTERVIEW: Nolan gave a forty-minute interview. He mentioned the story twice. The internet covered the format for 72 hours. Every other film was temporarily forgotten.", penaltyBO:2, penaltyOS:1 },
-      { round:8, chance:0.33, msg:"🏛️ THE CYCLOPS: The practical creature took eleven months to build. Nolan then requested two additional shots that required four more weeks in Malta. Universal approved in the same phone call.", penaltyBO:1, penaltyOS:3 },
-      { round:9, chance:0.30, msg:"🌅 THE RETURN: Nolan finished the final cut at 4:12am. He watched it alone. He called one person. He said: it is done. Three hours and seventeen minutes. Not a frame will be cut. Universal has agreed.", penaltyBO:3, penaltyOS:4 },
+      { round:7, chance:0.28, msg:"🎵 THE SCORE SESSION: Zimmer played the main theme to Nolan at 2am after twelve hours of recording. Nolan listened twice, said nothing, and asked for the whole thing to be rebuilt from a single lyre.", penaltyBO:0, penaltyOS:3 },
+      { round:7, chance:0.25, msg:"✂️ THE RUNTIME: The first assembly cut is four hours and fifty-two minutes. Nolan has described this as a starting point. Universal has described this as a negotiation.", penaltyBO:-1, penaltyOS:2 },
+      // ROUND 8  -  creature
+      { round:8, chance:0.33, msg:"🏛️ THE CYCLOPS: The practical creature took eleven months to build. Nolan requested two additional shots that required four more weeks in Malta. Universal approved in the same phone call.", penaltyBO:1, penaltyOS:3 },
+      { round:8, chance:0.28, msg:"🐉 SCYLLA: The six-headed practical creature required a custom crane. The crane required a permit. The permit required six months. Nolan built a second crane. The permit did not cover the second crane.", penaltyBO:-1, penaltyOS:3 },
+      { round:8, chance:0.25, msg:"🌊 THE CHARYBDIS SEQUENCE: Nolan built a functioning whirlpool on a soundstage in Malta. It destroyed the set. He rebuilt it. It destroyed the second set. The third is in the film and it is extraordinary.", penaltyBO:-1, penaltyOS:4 },
+      // ROUND 9  -  the return
+      { round:9, chance:0.35, msg:"🌅 THE RETURN: Nolan finished the final cut at 4:12am. He watched it alone. He called one person. He said: it is done. Three hours and seventeen minutes. Not a frame will be cut. Universal has agreed.", penaltyBO:3, penaltyOS:4 },
+      { round:9, chance:0.28, msg:"🏹 THE BOW SEQUENCE: The final twenty minutes of the film contain no dialogue. Only music, one bow, and one hundred and eight deaths. Test audiences were silent for eleven minutes after the credits.", penaltyBO:2, penaltyOS:4 },
+      { round:9, chance:0.25, msg:"🐕 ARGOS: Nolan added a single scene in the final cut that was not in any draft of the script. The dog who waited twenty years. Three seconds. Nobody in any test screening has not cried. Nobody.", penaltyBO:1, penaltyOS:5 },
     ],
     letterboxdExtra: [
-      { user:"70mm_or_nothing",     stars:"★★★★★", review:"three hours. i would have taken six." },
-      { user:"aegean_enjoyer",      stars:"★★★★★", review:"the audience applauded the ocean. the ocean did not acknowledge them. five stars." },
-      { user:"wept_about_a_boat",   stars:"★★★★★", review:"christopher nolan made me care about a boat. i have never cared about a boat before." },
-      { user:"imax_pilgrim",        stars:"★★★★★", review:"watched it in 70mm imax. i am a different person now." },
-      { user:"homer_would_approve", stars:"★★★★",  review:"three hours. i did not check my phone once. that is the whole review." },
+      { user:"70mm_or_nothing", stars:"★★★★★", review:"three hours. i would have taken six. give me more." },
+      { user:"aegean_enjoyer", stars:"★★★★★", review:"the audience applauded the ocean. the ocean did not acknowledge them. five stars." },
+      { user:"wept_about_a_boat", stars:"★★★★★", review:"nolan made me care about a boat. i have never cared about a boat before. i now care about this boat." },
+      { user:"imax_pilgrim", stars:"★★★★★", review:"watched it in 70mm imax. i am a different person now. do not watch it on your phone." },
+      { user:"homer_would_approve", stars:"★★★★★", review:"three hours and i did not check my phone once. that is the whole review." },
+      { user:"watched_it_twice", stars:"★★★★★", review:"the cyclops sequence. the cyclops SEQUENCE. who approved this level of practical effects. i love them." },
+      { user:"screamed_at_the_sirens", stars:"★★★★★", review:"the scene with the sirens. they did not use cgi. you can tell. that is why it works." },
+      { user:"antinous_was_right", stars:"★★", review:"actually antinous had some valid points about resource allocation. the film does not explore this. two stars." },
+      { user:"wept_for_argos", stars:"★★★★★", review:"i knew the dog scene was coming. i have known since i read the book in school. i was not prepared. i will never be prepared." },
+      { user:"penelope_was_robbed", stars:"★★★★★", review:"penelope ran ithaca for twenty years and they call it his story. the film gives her the ending." },
+      { user:"poseidon_was_wrong", stars:"★★★★", review:"poseidon was being dramatic. the blinding was an accident. the film agrees with me and i appreciate that." },
+      { user:"calypso_deserved_better", stars:"★★★★", review:"she offered him immortality and he chose to go home. the film sits with how strange that choice is. four stars." },
+      { user:"sea_not_friendly_here", stars:"★★★★★", review:"the storm sequence in the second act. the sound design. the scale. this is what cinema is for." },
+      { user:"circe_was_misunderstood", stars:"★★★★★", review:"she turned men into pigs because they were acting like pigs. the film understands this. five stars for accuracy." },
+      { user:"practical_cyclops_fan", stars:"★★★★★", review:"the cyclops is practical effects. eleven months to build. you can tell. that is why the scene works." },
     ],
+
     shareEmoji: "⚓",
-    shareTagline: "Can you match The Odyssey? Draft your epic.",
+        shareTagline: "The wine-dark sea awaits. Draft your epic voyage.",
   },
   minions: {
     id: "minions",
@@ -2837,21 +2954,78 @@ const THEMES = {
     presentsLine: "Despicably Presents",
     // Result screen overrides
     verdictOverrides: {
-      goat:       { title:"🍌 BABABOI. All-Time Classic.",           detail:"A film so beloved the Minions have adopted it as their own. $700M opening weekend. The franchise will never end." },
-      jugger:     { title:"💰 BANANA. Box Office Juggernaut.",       detail:"Record-shattering numbers. The Minions have taken the planet. Again. Sequel greenlit before the popcorn cooled." },
-      franchise:  { title:"🚀 Franchise Machine.",                   detail:"You didn't just make a movie. You made another universe for the Minions to inhabit. The toys are already in production." },
-      darling:    { title:"🌟 Awards Darling. Molto Bello.",         detail:"The Academy is confused but intrigued. Playing in 12 theatres. The Minions gave it five stars." },
-      prestige:   { title:"🎨 Prestige Drama. The Minions Approve.", detail:"Critics loved every frame. The Minions nodded approvingly. The tagline was 'Bello.'" },
-      hit:        { title:"✨ Crowd-Pleasing Hit. Gelato!",          detail:"Audiences loved it. Critics respected it. The Minions gave it four out of five bananas." },
-      blockbust:  { title:"🎯 Solid Blockbuster. Poopaye!",         detail:"Made real money. The Academy forgot it existed. The Minions did not." },
-      sleeper:    { title:"🌱 Sleeper Hit. Nobody Saw It Coming.",   detail:"The Minions found it on streaming. Word spread. Three thousand screens in week three." },
-      cult:       { title:"🕯️ Cult Classic. The Minions Claim It.", detail:"Nobody showed up. Then the Minions found it. In ten years it will be someone's entire personality." },
-      mid:        { title:"😐 Forgettable Mid. Underwhelming.",      detail:"Not bad enough to be memorable. The Minions shrugged. They still watched it twice." },
-      flop:       { title:"💸 Box Office Flop. Tatata...",           detail:"The studio lost $100M. The Minions were embarrassed on your behalf. The director has started a podcast." },
-      disaster:   { title:"🔥 Historic Disaster. Poulet Tikka Masala.", detail:"A catastrophe of historic proportions. Even the Minions couldn't save it. The Wikipedia page has eighteen citations." },
-      tax_writeoff:{ title:"🧾 Tax Write-Off. Non. Just Non.",       detail:"The accountants are the only ones happy. The Minions have moved on. The director is selling candles online." },
+      goat:         { title:"🍌 BABABOI. All-Time Classic. The Academy has learned Minionese.", detail:"The greatest animated film ever made according to every Minion. $1.1B worldwide. The children of the children who saw Despicable Me are bringing their own children now." },
+      jugger:       { title:"🍌 BANANA. $800M. The Formula Has Not Failed. It Will Not Fail.", detail:"Record opening weekend for Illumination. Again. The competition moved their release dates. Again. Pharrell is performing the score at the Oscars." },
+      franchise:    { title:"🟡 NEW VILLAIN CONFIRMED. The Universe Expands. The Banana Persists.", detail:"Universal has greenlit three sequels and two spinoffs before this film opened. The Minions are in all of them. This was never in question." },
+      darling:      { title:"🏆 THE MINION WHO WANTED AN OSCAR WAS RIGHT. He Was Right.", detail:"Stuart knew. Illumination now has Academy recognition for an animated Minions film. Stuart is giving a speech. Nobody told Stuart he was not nominated as an individual." },
+      prestige:     { title:"✨ MOLTO BELLO. The Critics Are Confused But Positive.", detail:"An Illumination film getting prestige reviews is unusual. The reviews contain the phrase banana seventeen times combined. All usages are positive." },
+      hit:          { title:"🍋 GELATO. Solid. Respectable. The Children Were Happy.", detail:"Above expectations. Below the all-time record. Pharrell has already started on the next one. Kevin has already escaped the set three times." },
+      sleeper:      { title:"💛 THE BANANA SCENE. Word Of Mouth Activated Late.", detail:"Quiet opening. Then the banana scene got out. Then everything changed. The studio called it organic marketing. They maintain this position." },
+      cult:         { title:"🕯️ POOPAYE. They Were Not Ready. In Ten Years They Will Be.", detail:"Nobody came. Then the midnight screenings started. Then the merchandise started. Then Stuart gave a lecture at a film school." },
+      mid:          { title:"😐 TATATA. The Minions Are Disappointed In You.", detail:"The Minions had notes. You did not listen to the Minions. The Minions predicted this outcome. Tatata." },
+      troubled:     { title:"😬 GRU HAD MORE NOTES. Production Was Complicated.", detail:"The Minions escaped during the third act reshoot. The schedule was renegotiated. Pharrell showed up uninvited and improved everything. It still did not come together." },
+      overhyped:    { title:"📉 THE EXPECTATIONS WERE BANANA-SIZED. THE FILM WAS NOT.", detail:"The trailer was extraordinary. The film was fine. The gap between expectation and reality will be discussed at every Illumination production meeting for three years." },
+      flop:         { title:"💸 NON. JUST NON. THE MINIONS HAVE ISSUED A STATEMENT.", detail:"The Minions have issued a statement written in Minionese. The studio has not been able to translate it. They are not sure they want to." },
+      disaster:     { title:"🔴 THE MINIONS ARE NOT RESPONSIBLE FOR THIS FILM.", detail:"The Minions have formally distanced themselves from this production. Kevin has been in talks with competing studios. Stuart has started a podcast. Bob cried." },
+      tax_writeoff: { title:"📊 THE ACCOUNTANTS ARE HAPPY. NOBODY ELSE IS. POOPAYE.", detail:"The studio made money in the technical sense. The Minions made nothing. Pharrell was paid. Gelato. That is all anyone will say about this production." },
+      sobad:        { title:"😅 SO BAD IT IS BABABOI. THE INTERNET HAS CLAIMED IT.", detail:"Critical disaster. Audience sensation. The most memed Minions film in franchise history. Stuart is on every major podcast. He is selling merchandise directly." },
+      streaming:    { title:"📺 STRAIGHT TO STREAMING. THE MINIONS ARE ON A SMALLER SCREEN.", detail:"Universal quietly moved it to the platform. The Minions arrived on your television on a Friday afternoon. They are fine with this. They are never not fine with this." },
+      comeback_kid: { title:"🍌 GRU RETURNED AND THE NUMBERS REFLECTED THIS.", detail:"Eight years since the last Gru-led entry. The audience remembered. The children who saw the first film are now adults bringing their own children. The cycle completes." },
     },
-    // Chaos overrides  -  Minion-flavored
+    optionInjections: {
+      screenplay: [
+        { name:"Minions Steal Something Big", bo:14, oscar:7, era:"Heist", known:"The Minions want it. They will take it. The plan involves a banana at every stage. The plan works despite this." },
+        { name:"Gru Reluctantly Returns", bo:15, oscar:8, era:"Villain", known:"He said he was done. He was not done. The Minions knew. They prepared accordingly." },
+        { name:"Minions Origin: Before Gru", bo:13, oscar:7, era:"Prequel", known:"Ancient Egypt. Napoleon. The Victorian era. The Minions have always existed and always wanted bananas." },
+        { name:"New Villain Needs Minions", bo:14, oscar:8, era:"Villain", known:"A new villain arrives. The Minions are not loyal. They are opportunistic. This is a feature not a bug." },
+        { name:"Banana Heist of the Century", bo:15, oscar:6, era:"Heist", known:"The biggest banana in recorded history is in a vault. The Minions have seventeen plans. Sixteen involve disguises." },
+        { name:"Minions vs The World", bo:14, oscar:7, era:"Action", known:"Every government issued a statement. The Minions cannot read. Everything is fine." },
+        { name:"Gru and the Minions: One Last Job", bo:16, oscar:9, era:"Finale", known:"He says it is the last one every time. They prepare as if it is the first. The audience knows the truth." },
+        { name:"Minions in Space: Zero Gravity Bananas", bo:14, oscar:6, era:"Sci-Fi", known:"NASA called. The Minions answered. Nobody at NASA authorised this. The shuttle has been repainted yellow." },
+        { name:"Minions Run For President", bo:15, oscar:5, era:"Political", known:"Kevin filed the paperwork incorrectly. He is on the ballot in seven states. The polls are inexplicable." },
+        { name:"The Minion Who Could Talk", bo:12, oscar:10, era:"Drama", known:"One Minion develops full sentences. He does not use this gift wisely. Nobody asked him to." },
+        { name:"Minions: The Musical", bo:14, oscar:9, era:"Musical", known:"Every song is about bananas. Fourteen songs. Pharrell wrote all fourteen over one weekend." },
+        { name:"Minions vs. Dinosaurs", bo:15, oscar:5, era:"Action", known:"A time machine. The Cretaceous period. The dinosaurs were not prepared. Neither was the script." },
+        { name:"Minions: The Documentary", bo:11, oscar:11, era:"Doc", known:"A serious filmmaker followed the Minions for two years. He won a Palme dOr. He has not recovered emotionally." },
+        { name:"Minions Start a Band", bo:13, oscar:7, era:"Musical", known:"Three Minions. Four instruments. One is not legally an instrument. They headlined Coachella." },
+        { name:"Minions Open a Restaurant", bo:12, oscar:7, era:"Comedy", known:"The health inspection report is classified. The Michelin inspector was never found. The reviews are five stars." },
+        { name:"Minions Invade Hollywood", bo:14, oscar:8, era:"Meta", known:"The Minions discover they are in a film. They have notes. The notes are incorporated. You are watching them now." },
+        { name:"A Minion Love Story", bo:12, oscar:9, era:"Romance", known:"Kevin falls in love with a particularly large banana. The film is surprisingly moving. Critics are confused." },
+        { name:"Minions Save Christmas", bo:16, oscar:7, era:"Holiday", known:"Santa asked for help. He should not have asked the Minions. Christmas was technically saved. Many other things were not." },
+        { name:"The Minion Who Wanted an Oscar", bo:11, oscar:14, era:"Meta", known:"Stuart decides the Minions deserve awards recognition. The campaign is unprecedented. The Academy has questions." },
+        { name:"Minions Run a Fortune 500 Company", bo:13, oscar:7, era:"Comedy", known:"The quarterly earnings call was described as unhinged. Revenue is up 340 percent. The board has no explanation." },
+        { name:"Minions vs. Godzilla", bo:16, oscar:5, era:"Kaiju", known:"Universal and Toho reached an agreement. The Minions reached Godzilla first. Godzilla was not expecting this." },
+        { name:"Minions at the Olympics", bo:13, oscar:6, era:"Sports", known:"The eligibility committee reviewed for eleven months. The Minions placed in four events. This is not possible." },
+        { name:"Minions Become Lawyers", bo:12, oscar:8, era:"Legal", known:"The bar exam results were disputed. The case went to the Supreme Court. The Minions represented themselves. They won." },
+        { name:"Minions Infiltrate the Vatican", bo:13, oscar:9, era:"Caper", known:"The Pope issued a warm statement. The Minions did not read it. It has been reissued in Minionese." },
+        { name:"A Minion Named Dave", bo:10, oscar:12, era:"Drama", known:"Dave wants more than bananas. What Dave wants is unclear even to Dave. Critics called it profound." },
+        { name:"Minions Discover the Internet", bo:15, oscar:6, era:"Comedy", known:"The first Minion meme predates the internet. The Minions did not know this. The servers did not survive." },
+        { name:"Minions Build a Theme Park", bo:15, oscar:6, era:"Comedy", known:"Universal approved it. The Minions built it overnight. Seventeen rides were not on the plans. All are open." },
+        { name:"Minions: The Long Goodbye", bo:12, oscar:10, era:"Drama", known:"Gru is retiring. The Minions are not. Three critics wept." },
+        { name:"Minions Raise a Baby Villain", bo:14, oscar:8, era:"Family", known:"The baby arrived in a basket. The Minions raised it. It says bababoi and has opinions on world domination." },
+        { name:"Inside a Minion Mind", bo:12, oscar:11, era:"Drama", known:"What does a Minion think about? 88 minutes. The answer involves bananas and something unexpectedly moving." },
+        { name:"Minions Found a Country", bo:15, oscar:7, era:"Political", known:"The UN recognised it in six months. The flag is yellow. The anthem is bababoi in three-part harmony." },
+        { name:"Minions: A Horror Film", bo:13, oscar:8, era:"Horror", known:"Ari Aster was briefly attached. He departed and left notes. The notes are in the film. It is not a horror film." },
+        { name:"Minions Win the World Cup", bo:16, oscar:5, era:"Sports", known:"FIFA reviewed the footage. The goal was legal under rules that technically existed. The trophy is banana-shaped." },
+        { name:"The Minion Code: A Thriller", bo:14, oscar:8, era:"Thriller", known:"A secret in every Minions film since 2010. A linguist found it. The code says bababoi. This might mean everything." },
+        { name:"Minions: One Went to Film School", bo:11, oscar:12, era:"Meta", known:"Phil attended film school. Phil has opinions. Illumination screened the short. This film incorporates Phil notes." },
+        { name:"Minions Versus Time Itself", bo:14, oscar:9, era:"Sci-Fi", known:"The physics are wrong in seventeen ways the film acknowledges. Time is defeated in act three. A banana is involved." },
+        { name:"A Minion Bucket List", bo:12, oscar:8, era:"Comedy-Drama", known:"The list has 847 items. All involve bananas. Items 1-846 are the same item worded differently. Item 847 is touching." },
+        { name:"Minions Accidentally Invent Democracy", bo:14, oscar:9, era:"Political", known:"They were dividing a banana fairly. The system has been adopted by four nations. The Minions have not been informed." },
+        { name:"Minions: The Prequel to the Prequel", bo:13, oscar:7, era:"Prequel", known:"Before the Minions existed something existed. The answer is bananas. Scientists are concerned about the timeline." },
+        { name:"Minions Go to the Moon", bo:14, oscar:6, era:"Sci-Fi", known:"They pressed every button. The shuttle launched. The moon has a new flag. It is yellow. It depicts a banana." },
+        { name:"All Minions Films Simultaneously", bo:18, oscar:4, era:"Event", known:"Every Minions film edited into one. Runtime: 11 hours. Seven left during hour three and returned for hours eight through eleven." },
+        { name:"Minions at War: A Very Yellow Conflict", bo:13, oscar:8, era:"War", known:"The war was about a banana. All wars are about a banana at some level. The Academy was interested." },
+        { name:"Minions: The Spa Day", bo:12, oscar:6, era:"Comedy", known:"The spa was not expecting them. The cucumber water is now banana water." },
+        { name:"Minions Go to Art School", bo:11, oscar:10, era:"Drama", known:"Bob thesis was a 40-foot banana sculpture. His professor resigned. The MoMA has acquired the piece." },
+        { name:"Minions: The Intervention", bo:12, oscar:9, era:"Drama", known:"Colleagues stage an intervention about Gru banana consumption. The Minions attend as support. They bring bananas." },
+        { name:"Minions Host a Talk Show", bo:13, oscar:6, era:"Comedy", known:"The network gave them a slot at 11:35pm. The guests are confused. The ratings are inexplicably excellent." },
+        { name:"Minions: One Goes to Therapy", bo:11, oscar:11, era:"Drama", known:"Kevin attends therapy. He cannot articulate the issue. The therapist has learned Minionese. The breakthroughs are banana-adjacent." },
+        { name:"Minions vs. The Moon", bo:15, oscar:6, era:"Action", known:"The moon looked at them funny. The Minions took this personally. The response was disproportionate. The moon has apologised." },
+        { name:"Gru Diary: A Tell-All", bo:13, oscar:8, era:"Biopic", known:"Gru wrote a memoir. The Minions have opinions about chapter seven. The publisher has lawyers." },
+        { name:"Minions: Corporate Espionage", bo:14, oscar:7, era:"Thriller", known:"The Minions infiltrate a competing supervillain corporation. They are very bad at subtlety. They succeed anyway." },
+      ],
+    },
     chaosInjections: [
       { round:1, chance:0.50, msg:"🍌 MINION TAKEOVER: Before you begin, a Minion has reviewed the options and selected one. The Minion is confident. The banana is implicit.", penaltyBO:1, penaltyOS:0, minionPick:true },
       { round:2, chance:0.45, msg:"🍌 THREE MINIONS ESCAPED: Last seen near craft services. Security briefed. A banana was left at the scene. Tracking up 12 points. Nobody is treating this as a problem.", penaltyBO:3, penaltyOS:0 },
@@ -3108,12 +3282,7 @@ function renderChoosing() {
   <div class="btn-row">
     <button class="btn-sm" id="reroll-btn" ${S.skipCat<=0?"disabled":""}>Reroll options (${S.skipCat} left)</button>
   </div>
-  ${S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.15);border:2px solid #F5C518;border-radius:12px;padding:12px 16px;margin-bottom:10px;text-align:center">
-    <div style="font-size:14px;font-weight:900;color:#F5C518;margin-bottom:6px">🍌 THE MINIONS HAVE ENACTED CREATIVE CONTROL 🍌</div>
-    <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their selection. They have exercised their contractual creative rights.</div>
-    <div style="font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;margin:6px 0">The Minions have selected: <span style="color:#F5C518">${S.minionAutoSelected.name}</span></div>
-    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining.</div>
-  </div>` : ''}
+  
   ${S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.15);border:2px solid #F5C518;border-radius:12px;padding:12px 16px;margin-bottom:10px;text-align:center">
     <div style="font-size:14px;font-weight:900;color:#F5C518;margin-bottom:6px">🍌 MINIONS ENACTED CREATIVE CONTROL 🍌</div>
     <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their pick. They have exercised their contractual creative rights.</div>
@@ -3192,7 +3361,20 @@ function renderResult() {
     ]
   };
 
-  const criticPool = isHorror ? criticPools.horror : isMusical ? criticPools.musical : isAction ? criticPools.action : isBiopic ? criticPools.biopic : criticPools.general;
+  const _rt = getActiveTheme();
+  const criticPool = (_rt && _rt.id === 'minions') ? [
+    { critic:"A.O. Scott, New York Times",      quote: boM>500 ? "Illumination has done it again. The formula works because it has always worked. The children know something the critics do not." : "Technically proficient. Emotionally calibrated. The Minions remain culturally indestructible." },
+    { critic:"Peter Travers, Rolling Stone",    quote: noms>6  ? "Bababoi. I said it. I stand by it. I watched it three times before filing this review." : "The children laughed. The adults smiled despite themselves. The formula functions." },
+    { critic:"Justin Chang, Los Angeles Times", quote: boM>600 ? "A summer event so total it functions less like a film and more like a seasonal weather pattern." : "Pharrell score is doing most of the emotional heavy lifting. This is not a criticism." },
+    { critic:"Manohla Dargis, New York Times",  quote: noms>8  ? "Against all reasonable expectations this Minions entry has something to say about the nature of loyalty. Bababoi." : "The Minions remain. The children remain. The banana remains. This is as it should be." },
+    { critic:"David Ehrlich, IndieWire",        quote: boM>400 ? "I went in prepared to be dismissive. I left humming something Pharrell did in the third act. My critical infrastructure has been compromised." : "The formula is not broken. They have not tried to fix it. This continues to be the correct decision." },
+  ] : (_rt && _rt.id === 'odyssey') ? [
+    { critic:"A.O. Scott, New York Times",      quote: noms>10 ? "A voyage completed. The most fully realised epic adaptation in the history of cinema. Homer would have approved. He would have demanded more sea." : noms>7 ? "Nolan has made the Odyssey film the form has been waiting for. The wine-dark sea is on screen and it is extraordinary." : "The ambition is total. The execution falls slightly short of the myth. The myth is very high." },
+    { critic:"Manohla Dargis, New York Times",  quote: boM>700 ? "The gods have intervened. No other explanation for what Nolan has achieved with Homer at this scale. An extraordinary film." : noms>8 ? "Three hours in the company of Odysseus and I did not check my phone once. This is the highest praise I can offer." : "Grand and technically masterful. The emotional centre requires patience the film earns." },
+    { critic:"Peter Bradshaw, The Guardian",    quote: noms>9  ? "Five stars. A civilisational event. The Cyclops sequence alone justifies cinema as an art form." : boM>500 ? "Nolan has conquered Homer and in doing so has reminded us what the epic form is for." : "Magnificent in its ambition and occasionally uneven in its intimacy. The sea is always right." },
+    { critic:"David Ehrlich, IndieWire",        quote: boM>600 ? "The year best film and it is not close. A three-hour argument for the continued existence of IMAX." : noms>7 ? "The Sirens sequence will be discussed for decades. Nolan did not use CGI. You can tell. That is why it works." : "A serious film about a serious subject made by the most serious filmmaker working. Mostly it earns its seriousness." },
+    { critic:"Anthony Lane, The New Yorker",    quote: noms>10 ? "Nolan has always been reaching for something ancient. He has finally found it. The Odyssey was always what he was making." : boM>400 ? "Three hours feel like an afternoon spent with something genuinely great. The production design team deserve their own ceremony." : "The film aspires to Homer and in aspiring does things most cinema cannot imagine attempting." },
+  ] : isHorror ? criticPools.horror : isMusical ? criticPools.musical : isAction ? criticPools.action : isBiopic ? criticPools.biopic : criticPools.general;
   const cq = criticPool[Math.floor(Math.random() * criticPool.length)];
 
   // Store real critic quote on synopsis so share card can use it
@@ -3439,10 +3621,9 @@ function bind() {
       }
       S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(basePool, cat.opts, S.dailyRng) : getRandom(basePool, cat.opts);
       // If director is locked (e.g. Nolan for Odyssey), pre-select position 0
-      if (_lockedVal && cat.key === 'director' && S.opts[0]?.name === _lockedVal) {
-        S.selIdx = 0;
-      }
-      S.selIdx=null; S.spinning=false; S.phase="choosing"; render();
+      const _dirPreselect = _lockedVal && cat.key === 'director' && S.opts[0]?.name === _lockedVal;
+      S.selIdx = _dirPreselect ? 0 : null;
+      S.spinning=false; S.phase="choosing"; render();
     }, 650);
   });
   $("skip-btn")?.addEventListener("click", ()=>{
@@ -4496,20 +4677,20 @@ function renderGlobalEntries() {
   const rankClass = ["gold","silver","bronze"];
   const visible = globalExpanded ? sorted : sorted.slice(0, 10);
   const rows = visible.map((e, i) => {
-    const byLine = (e.submitted_by && e.submitted_by !== "Anonymous")
-      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    const byLine = (e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== "Anonymous")
+      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
     return `<div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
       <div class="lb-info">
-        <div class="lb-title">${e.film_title||"Untitled"}</div>
+        <div class="lb-title">${e.filmTitle||e.film_title||"Untitled"}</div>
         <div class="lb-verdict">${e.verdict||""}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||""} &nbsp;·&nbsp; ${e.lead_actor||""}${byLine}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||""} &nbsp;·&nbsp; ${e.leadActor||e.lead_actor||""}${byLine}</div>
       </div>
       <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.boM||e.bo_m||0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
-        ${e.rt_critic ? `<div class="lb-score-row" style="color:#FA320A">🍅 ${e.rt_critic}%</div>` : ''}
-        ${e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rt_audience}%</div>` : ''}
+        ${e.rtCritic||e.rt_critic ? `<div class="lb-score-row" style="color:#FA320A">🍅 ${e.rtCritic||e.rt_critic}%</div>` : ''}
+        ${e.rtAudience||e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rtAudience||e.rt_audience}%</div>` : ''}
       </div>
     </div>`;
   }).join("");
@@ -4551,16 +4732,16 @@ async function renderStandaloneDailyBoard() {
     return;
   }
   list.innerHTML = entries.map((e,i) => {
-    const by = (e.submitted_by && e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    const by = (e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
     return '<div class="lb-entry">'
       + '<div class="lb-rank-num ' + (rankClass[i]||'') + '">' + (medals[i]||i+1) + '</div>'
       + '<div class="lb-info">'
-      + '<div class="lb-title">' + (e.film_title||'Untitled') + '</div>'
+      + '<div class="lb-title">' + (e.filmTitle||e.film_title||'Untitled') + '</div>'
       + '<div class="lb-verdict">' + (e.verdict||'') + '</div>'
-      + '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + (e.director||'') + ' · ' + (e.lead_actor||'') + by + '</div>'
+      + '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + (e.director||'') + ' · ' + (e.leadActor||e.lead_actor||'') + by + '</div>'
       + '</div>'
       + '<div class="lb-scores">'
-      + '<div class="lb-score-row" style="color:var(--blue)">💰 $' + (e.bo_m||0) + 'M</div>'
+      + '<div class="lb-score-row" style="color:var(--blue)">💰 $' + (e.boM||e.bo_m||0) + 'M</div>'
       + '<div class="lb-score-row" style="color:var(--amber)">🏆 ' + (e.noms||0) + ' noms</div>'
       + '</div></div>';
   }).join('') + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Daily board resets at midnight</div>';
@@ -4594,16 +4775,16 @@ async function renderDailyLeaderboard() {
   const medals = ["🥇","🥈","🥉"];
   const rankClass = ["gold","silver","bronze"];
   list.innerHTML = entries.map((e,i) => {
-    const by = e.submitted_by && e.submitted_by !== 'Anonymous' ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
+    const by = e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== 'Anonymous' ? ' <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
     return `<div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
       <div class="lb-info">
-        <div class="lb-title">${e.film_title||'Untitled'}</div>
+        <div class="lb-title">${e.filmTitle||e.film_title||'Untitled'}</div>
         <div class="lb-verdict">${e.verdict||''}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.lead_actor||''}${by}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.leadActor||e.lead_actor||''}${by}</div>
       </div>
       <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.boM||e.bo_m||0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
       </div>
     </div>`;
