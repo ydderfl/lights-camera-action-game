@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Lights, Camera, Action!  -  The Hollywood Draft Game">
 <meta name="twitter:description" content="Draft your director, cast, studio and genre. Chase box office records and Oscar glory  -  or total infamy. New daily challenge every day.">
 <meta name="twitter:image" content="https://lights-camera-action.app/og-image.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Lights, Camera, Action!","description":"Draft your director, cast, studio and genre. Chase box office records and Oscar glory.","url":"https://lights-camera-action.app","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Lights, Camera, Action!","description":"Draft your director, cast, studio and genre. Chase box office records and Oscar glory.","url":"https://lights-camera-action.app","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F3AC;</text></svg>">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -87,8 +87,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 @media (max-width: 400px) { .choices-grid { grid-template-columns: 1fr; } }
 .choice { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 10px 11px; cursor: pointer; transition: border-color 0.12s, background 0.12s; -webkit-tap-highlight-color: transparent; }
 .choice:hover { border-color: var(--border2); background: var(--surface2); }
-.choice.sel { border: 2px solid var(--theme-sel-color, var(--purple)); background: var(--theme-sel-bg, var(--purple-bg)); }
-.choice:hover:not(.sel) { border-color: var(--theme-sel-color, var(--border2)); }
+.choice.sel { border: 2px solid var(--purple); background: var(--purple-bg); }
 .choice-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 1px; line-height: 1.3; white-space: normal; word-break: break-word; }
 .choice-known { font-size: 10px; color: var(--text3); margin-bottom: 5px; line-height: 1.3; font-style: italic; }
 .choice-era { font-size: 10px; color: var(--text3); margin-bottom: 5px; }
@@ -343,7 +342,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   <div class="share-toast" id="share-toast"></div>
 </div>
 <script>
-
 
 // ── Synopsis Generator ──────────────────────────────────────────────────────
 function generateFilmTitle(picks) {
@@ -1651,15 +1649,7 @@ const DATA = {
     // ── Wildcard ──
     { name:"First-Time Filmmaker",   bo:5,  oscar:13, era:"Debut",        known:"Whatever this is, it has never been made before" },
     { name:"Dirty Films",            bo:7,  oscar:14, era:"Indie",        known:"Brokeback Mountain, A Single Man" },
-      { name:"Miramax",                  bo:10, oscar:12, era:"Prestige",   known:"The awards factory before the fall. The films remain. The legacy is complicated." },
-    { name:"Sony Pictures Classics",   bo:7,  oscar:13, era:"Prestige",   known:"They distributed Crouching Tiger. Hidden Dragon. Marriage Story. They find things." },
-    { name:"BBC Film",                 bo:8,  oscar:12, era:"British",    known:"The Full Monty. Secrets and Lies. The King's Speech. British prestige on a public broadcasting budget." },
-    { name:"StudioCanal",              bo:9,  oscar:10, era:"European",   known:"European arthouse with commercial reach. Paddington. Blue Is the Warmest Colour." },
-    { name:"Lionsgate",                bo:12, oscar:8,  era:"Commercial", known:"John Wick. Hunger Games. They find franchises in places others overlooked." },
-    { name:"XYZ Films",                bo:6,  oscar:9,  era:"Indie",      known:"They produced The Raid. They have exceptional taste and a very small budget." },
-    { name:"Focus Features",           bo:9,  oscar:12, era:"Prestige",   known:"Brokeback Mountain. Atonement. Their logo on a poster means something specific to a specific audience." },
-    { name:"FilmNation Entertainment", bo:8,  oscar:11, era:"Prestige",   known:"Arrival. The Imitation Game. They finance the films that win awards before anyone notices." },
-],
+  ],
 
   screenplay: [
     { name:"Original Screenplay",            bo:12, oscar:18, era:"Original" },
@@ -1684,17 +1674,7 @@ const DATA = {
     { name:"AI-Assisted Script",             bo:7,  oscar:5,  era:"Experimental" },
     { name:"Spec Script (Unknown Writer)",   bo:9,  oscar:14, era:"Original" },
     { name:"Docudrama Hybrid",               bo:10, oscar:15, era:"Prestige" },
-      { name:"Inspired by True Events",         bo:12, oscar:11, era:"Prestige",    known:"A stranger-than-fiction basis that gives critics permission to take it seriously" },
-    { name:"Original Arthouse Spec",     bo:7,  oscar:14, era:"Arthouse",   known:"Written on spec for no studio. A24 acquired it after Sundance. The writer has one other credit." },
-    { name:"Pulitzer Prize-Winning Novel",     bo:11, oscar:14, era:"Prestige",   known:"The adaptation rights took eleven years. The author has approval over casting. She used it." },
-    { name:"Long-Gestating Original",          bo:10, oscar:12, era:"Prestige",   known:"The writer carried this for fifteen years. Every draft is better than the last. This is the last draft." },
-    { name:"Ensemble Original",   bo:13, oscar:11, era:"Ensemble",   known:"Fifteen characters. Three storylines. One night. The casting breakdown is sixteen pages." },
-    { name:"Foreign Language Remake",          bo:11, oscar:9,  era:"Remake",     known:"The original won the Palme d'Or. The remake has been tried twice. This is the third attempt." },
-    { name:"Unadaptable Cult Novel",         bo:8,  oscar:13, era:"Arthouse",   known:"Every filmmaker who read it said it couldn't be done. This filmmaker did not read those interviews." },
-    { name:"Docudrama (Living Subjects)",      bo:10, oscar:12, era:"Prestige",   known:"Three of the subjects have lawyers. One has already issued a statement. The film has not opened yet." },
-    { name:"Silent-Era Homage",                bo:6,  oscar:13, era:"Arthouse",   known:"No dialogue. Practical effects. Shot on 35mm. The studio took eleven months to approve the pitch." },
-    { name:"Multi-Generational Epic",          bo:12, oscar:13, era:"Epic",       known:"The screenplay covers four generations and eighty years. The runtime will be discussed at length." },
-],
+  ],
 
   genre: [
     { name:"Epic Drama",                  bo:14, oscar:18, era:"Prestige" },
@@ -1831,18 +1811,6 @@ const DATA = {
     { name:"Terence Blanchard",       bo:8,  oscar:13, era:"Prestige",      known:"BlacKkKlansman, Da 5 Bloods, Jungle Fever" },
     { name:"Henry Jackman",           bo:13, oscar:10, era:"Blockbuster",   known:"Captain America Winter Soldier, Wreck-It Ralph, X-Men First Class" },
     { name:"Lorne Balfe",             bo:12, oscar:10, era:"Blockbuster",   known:"Mission Impossible Fallout, Black Widow, The Lego Batman Movie" },
-    { name:"Caroline Shaw",              bo:6,  oscar:12, era:"Classical",   known:"Pulitzer Prize at 30. The youngest ever. Her string writing would make a score unlike anything." },
-    { name:"Arca",                        bo:4,  oscar:10, era:"Electronic",  known:"FKA Twigs, Bjork. The most alien sound in contemporary music applied to cinema." },
-    { name:"Ryoji Ikeda",                 bo:4,  oscar:9,  era:"Experimental",known:"Data as music. The score would be frequencies and information. Divisive does not cover it." },
-    { name:"Floating Points",             bo:7,  oscar:11, era:"Electronic",  known:"Promises with Pharoah Sanders. The most beautiful record of 2020. A film score would be extraordinary." },
-    { name:"Jon Brion",                   bo:8,  oscar:11, era:"Indie",       known:"Magnolia. Eternal Sunshine. Punch-Drunk Love. He is the unofficial composer of PTA's soul." },
-    { name:"Ennio Morricone",             bo:12, oscar:13, era:"Classic",     known:"The master. His estate manages his catalogue. There is talk of using previously unreleased material." },
-    { name:"John Powell",                 bo:14, oscar:9,  era:"Animation",   known:"How to Train Your Dragon. The most emotionally precise animation composer working." },
-    { name:"Mychael Danna",              bo:10, oscar:11, era:"Prestige",    known:"Life of Pi Oscar. His scores inhabit the space between culture and cosmos." },
-    { name:"Hauschka",                    bo:6,  oscar:11, era:"Arthouse",    known:"Lionel Messi-adjacent. His prepared piano creates texture that exists nowhere else." },
-    { name:"Colin Stetson",              bo:5,  oscar:10, era:"Horror",      known:"Hereditary. The saxophone as existential dread. Nobody anticipated this would work." },
-    { name:"Geoff Barrow and Ben Salisbury", bo:7, oscar:11, era:"Sci-Fi",  known:"Ex Machina. Annihilation. The electronic score as threat made sonic." },
-    { name:"Nils Frahm",                 bo:7,  oscar:11, era:"Arthouse",    known:"His piano work has scored a thousand film trailers. An actual score would be the real thing." },
 ],
 
   budget: [
@@ -1872,13 +1840,7 @@ const DATA = {
     { name:"Kickstarter ($200K to $1M)",       bo:5,  oscar:12, era:"Grassroots" },
     { name:"European Co-Production ($8M to $20M)", bo:9, oscar:15, era:"Indie" },
     { name:"Overseas Co-Finance ($50M to $100M)", bo:13, oscar:13, era:"Global" },
-      { name:"Crowdfunded ($5M to $15M)",         bo:5,  oscar:8,  era:"Indie",      known:"The campaign raised $5M in 72 hours. The community has opinions about everything." },
-    { name:"Tax Credit Co-Production ($40M)",   bo:9,  oscar:9,  era:"Indie",      known:"Financed through six countries. Each country has notes. None of the notes agree." },
-    { name:"Streaming Exclusive ($80M to $100M)",bo:8, oscar:10, era:"Streaming",  known:"Netflix said yes without reading page two. The director is either thrilled or horrified." },
-    { name:"Academy-Scale Prestige ($50M to $70M)",bo:10,oscar:12,era:"Prestige",  known:"Enough to make it properly. Not enough to make it lavishly. The restraint shows in the best way." },
-    { name:"Animation Standard ($120M to $150M)",bo:14, oscar:10, era:"Animation", known:"The Illumination sweet spot. Every dollar is on screen. None of it was wasted." },
-    { name:"European Co-Production ($25M to $40M)",bo:7,oscar:12, era:"European",  known:"Cannes financing. German tax money. UK completion bond. Everybody gets a credit. Nobody gets final cut." },
-],
+  ],
 
   season: [
     { name:"Summer Tentpole (May to Jul)",    bo:20, oscar:6,  era:"Peak" },
@@ -2435,75 +2397,6 @@ const SYNERGIES = [
   { names:["Slow Burn Thriller","Park Chan-wook"],    boBonus:1, osBonus:4, label:"Park x Slow Burn",        msg:"Oldboy. Decision to Leave. The slow burn is not a genre for him  -  it is a moral framework. The film will be three steps ahead of the audience at all times." },
   { names:["Slow Burn Thriller","A24"],               boBonus:1, osBonus:3, label:"A24 Slow Burn",           msg:"A24 has infinite patience for the slow burn. Their audience has been trained to wait for the third act by everything else on their slate." },
   { names:["Slow Burn Thriller","Cate Blanchett"],    boBonus:1, osBonus:4, label:"Blanchett x Slow Burn",   msg:"Tar was a slow burn psychological portrait that she dominated from the first frame. The genre is where her range has the most room to operate." },
-  // ── MINIONS UNIVERSE SYNERGIES ─────────────────────────────────────────────
-  { names:["Kyle Balda","Universal / Illumination"],    boBonus:3, osBonus:2, label:"Balda x Illumination Home",     msg:"The house director returns to the house. Every Minion on the lot has been briefed. The bananameter is off the charts." },
-  { names:["Pierre Coffin","Universal / Illumination"], boBonus:3, osBonus:2, label:"Coffin x Minions",              msg:"The voice of every Minion is also the co-director of every Minion film. This is the most vertically integrated performance in cinema." },
-  { names:["Steve Carell (Gru)","Universal / Illumination"], boBonus:3, osBonus:3, label:"Carell x Illumination",   msg:"Gru is home. The accent is back. The children in every country on earth have already been told." },
-  { names:["Pharrell Williams","Animated"],             boBonus:2, osBonus:2, label:"Pharrell x Animation",         msg:"Happy. The Minions danced to it in 2013 and the world has not recovered. He is doing it again." },
-  { names:["Heitor Pereira","Universal / Illumination"],boBonus:2, osBonus:2, label:"Pereira x Illumination",       msg:"He has scored every Minion film. He knows the exact frequency at which a Minion's giggle must land. The data is proprietary." },
-  { names:["Kevin Hart","Animated"],                    boBonus:3, osBonus:1, label:"Hart x Animation",             msg:"The most naturally animated human performer alive. The Minions have already drawn his caricature. It is accurate and unflattering." },
-  { names:["Animated","Summer Tentpole (May to Jul)"],  boBonus:3, osBonus:2, label:"Animation Summer Domination",  msg:"July 4 weekend. The Minions have arrived. The competition has been briefed. They have cancelled their release dates." },
-  { names:["Animated","Universal / Illumination"],      boBonus:4, osBonus:2, label:"Illumination Animation Machine",msg:"The formula. The yellow cylinders. The $800M opening. The sequel already greenlit. The children already dressed in overalls." },
-  { names:["Steve Carell (Gru)","Animated"],            boBonus:4, osBonus:2, label:"Gru Returns",                  msg:"In 47 countries, children who were babies when the first film came out are now old enough to bring their own children. The cycle continues." },
-
-  // ── ODYSSEY / NOLAN UNIVERSE SYNERGIES ────────────────────────────────────
-  { names:["Christopher Nolan","Universal Pictures"],   boBonus:3, osBonus:3, label:"Nolan Returns to Universal",   msg:"After the Warner Bros split, Universal opened the chequebook with historical generosity. The relationship begins with The Odyssey. It will not end there." },
-  { names:["Christopher Nolan","Epic Drama"],           boBonus:3, osBonus:4, label:"Nolan x Epic",                 msg:"Dunkirk. Interstellar. Oppenheimer. He scales every film to the limits of what cinema can hold. The Odyssey is the limit he has been building toward." },
-  { names:["Christopher Nolan","Hans Zimmer"],          boBonus:2, osBonus:3, label:"Nolan x Zimmer Reunion",       msg:"Inception. The Dark Knight. Interstellar. The score that made time feel like it was folding. They are doing it again with the wine-dark sea." },
-  { names:["Christopher Nolan","Ludwig Goransson"],     boBonus:2, osBonus:3, label:"Nolan x Goransson Continues",  msg:"Oppenheimer rewrote what a score could carry. The Odyssey is the next experiment. The violin is already tuned to something ancient." },
-  { names:["Christopher Nolan","IMAX Global Event"],    boBonus:3, osBonus:2, label:"Nolan IMAX",                   msg:"He is the only director for whom IMAX was invented retroactively. Every frame will fill every pixel. The siege of Troy will take up the entire sky." },
-  { names:["Christopher Nolan","Matt Damon (Odysseus)"],boBonus:2, osBonus:3, label:"Nolan x Damon",               msg:"The Martian already told this story in miniature. Now Nolan is telling it with ten years and a sea monster and the full weight of Western civilisation." },
-  { names:["Christopher Nolan","Cillian Murphy"],       boBonus:2, osBonus:3, label:"Nolan x Murphy Reunion",       msg:"Oppenheimer. He carries existential dread in his face without moving a single feature. Odysseus carries the same weight. Murphy is already the only choice." },
-  { names:["Homer (Adapted  -  The Odyssey)","Epic Drama"],boBonus:2, osBonus:4, label:"Homer Adaptation",           msg:"3000 years of pre-awareness. Every high school English class is a marketing budget line. The source material has no copyright and infinite cultural authority." },
-  { names:["Epic Drama","IMAX Global Event"],           boBonus:3, osBonus:2, label:"Epic IMAX Event",              msg:"The format demands the screen. The screen demands the format. The audience will travel to the largest screen in their city and feel it was worth the journey." },
-  { names:["Universal Pictures","Epic Drama"],          boBonus:2, osBonus:2, label:"Universal Epic",              msg:"Gladiator. Schindler's List. Universal has the infrastructure for the kind of epic production that requires its own ZIP code." },
-  { names:["Lupita Nyong'o (Penelope)","Epic Drama"],   boBonus:1, osBonus:4, label:"Penelope Waits",              msg:"The loyalty and the grief and the twenty-year vigil. Nyong'o finds the interior of every role. Penelope has never been given this much interior to find." },
-  { names:["Cate Blanchett (Athena)","Universal Pictures"], boBonus:1, osBonus:3, label:"Blanchett x Athena",      msg:"The goddess of wisdom dressed as a mortal, visible only to Odysseus. Blanchett has been playing divine interference since Galadriel. She knows the register." },
-  { names:["Anthony Hopkins (Poseidon)","Epic Drama"],  boBonus:1, osBonus:3, label:"Hopkins x Poseidon",          msg:"The grievance of a god is not a human grievance. Hopkins plays entities that have decided, on principle, to ruin someone. This is his natural state." },
-  // ════════════════════════════════════════════════════════════════
-  // MINIONS UNIVERSE  -  EXCLUSIVE SYNERGIES
-  // ════════════════════════════════════════════════════════════════
-  { names:["Steve Carell (Gru)","Kyle Balda"],           boBonus:4, osBonus:3, label:"Gru x His Director",           msg:"Balda has directed every Gru film since Despicable Me 3. This is not a collaboration. This is a marriage. The bananameter has no number high enough for what is about to happen." },
-  { names:["Steve Carell (Gru)","Heitor Pereira"],       boBonus:3, osBonus:2, label:"Gru x Pereira Score",          msg:"Pereira has scored every moment of Gru's life. He knows the exact note that plays when Gru pretends not to care. He will play it again. The audience will pretend not to cry again." },
-  { names:["Steve Carell (Gru)","Pierre Coffin (Minions)"],boBonus:4,osBonus:2,label:"Gru and His Minions United",   msg:"The villain and his army. The accent and the bababoi. The franchise did not need to work this hard to be this good. Here we are. Here they are. Here the banana is." },
-  { names:["Pierre Coffin (Minions)","Heitor Pereira"],  boBonus:3, osBonus:2, label:"Coffin x Pereira Sound",       msg:"The voice and the sound. Every Minion noise and every musical note in the franchise comes from these two men. The universe sounds like them because they invented what it sounds like." },
-  { names:["Kyle Balda","Pharrell Williams"],            boBonus:3, osBonus:2, label:"Balda x Pharrell",             msg:"Rise of Gru. The Pharrell score changed everything about what an animated film could feel like. Balda and Pharrell understand joy at a molecular level." },
-  { names:["Pierre Coffin (Minions)","Pharrell Williams"],boBonus:3,osBonus:3, label:"Coffin x Pharrell",            msg:"Both men invented languages. Coffin invented how Minions speak. Pharrell invented what happiness sounds like in 2013. They are the same vocabulary in two different arts." },
-  { names:["Universal / Illumination","Animated"],       boBonus:5, osBonus:2, label:"Illumination Machine",         msg:"The machine. The yellow cylinders. The inevitable $800M. The sequel greenlit before this one opens. The children already dressed in overalls. The formula has never failed. It will not fail now." },
-  { names:["Universal / Illumination","Summer Tentpole (May to Jul)"],boBonus:5,osBonus:1,label:"Illumination Summer",msg:"July 4 weekend belongs to the Minions. This is now a meteorological and cultural fact. The competition moved their films two months in advance." },
-  { names:["Universal / Illumination","Animation Standard ($120M to $150M)"],boBonus:4,osBonus:2,label:"Illumination Budget Sweet Spot",msg:"$120M-150M is the Illumination number. Every dollar is on screen. The Minions cost less to render than a single Pixar background and generate more box office per frame than any animation in history." },
-  { names:["Kevin Hart","Universal / Illumination"],     boBonus:4, osBonus:1, label:"Hart x Illumination",          msg:"The most naturally kinetic human performer alive joins the most kinetic animated franchise. The energy level on set was described as sustainable only by the Minions themselves." },
-  { names:["Will Ferrell","Universal / Illumination"],   boBonus:3, osBonus:2, label:"Ferrell x Illumination",       msg:"Megamind was a proof of concept. Ferrell in the Illumination universe doing villain energy is the logical conclusion of both careers reaching the same destination simultaneously." },
-  { names:["Julie Andrews","Animated"],                  boBonus:2, osBonus:4, label:"Andrews x Animation",          msg:"She gave Shrek its dignity. She will give this film something nobody anticipated: genuine pathos embedded in an animated feature about yellow creatures who want bananas more than anything." },
-  { names:["Brian Lynch (Original Minions Story)","Universal / Illumination"],boBonus:3,osBonus:2,label:"Lynch x Illumination",msg:"He wrote the original Minions film and The Secret Life of Pets. He knows when to put the banana in the scene and when to make them wait for it. The timing is everything." },
-  { names:["Cinco Paul (Despicable Me Legacy)","Steve Carell (Gru)"],boBonus:3,osBonus:3,label:"Paul x Gru",        msg:"He co-wrote the original Despicable Me. He invented the emotional architecture of a supervillain learning to love. The Academy cried without understanding why. He understood why." },
-  { names:["Steve Carell (Gru)","Holiday Animated Event (Nov-Dec)"],boBonus:3,osBonus:2,label:"Gru at Christmas",   msg:"A Gru Christmas film. The children's letters to Santa this year will primarily request Minion items and one specific wish: that Gru does not ruin Christmas again. He will." },
-  { names:["Pharrell Williams","Summer Tentpole (May to Jul)"],boBonus:3,osBonus:2,label:"Pharrell Summer",         msg:"Happy arrived in summer and became the sound of that entire summer globally for three consecutive years. A Minions summer with Pharrell is not a film release. It is a seasonal event like solstice." },
-  { names:["Animated","Holiday Animated Event (Nov-Dec)"],boBonus:4,osBonus:2,label:"Animation Holiday",            msg:"Thanksgiving weekend. Parents. Children. Animated film. $400M domestic. The formula has four ingredients and they are all present and correct." },
-
-  // ════════════════════════════════════════════════════════════════
-  // THE ODYSSEY UNIVERSE  -  EXCLUSIVE SYNERGIES
-  // ════════════════════════════════════════════════════════════════
-  { names:["Christopher Nolan","Homer (Adapted  -  The Odyssey)"],boBonus:3,osBonus:5,label:"Nolan x Homer",          msg:"Nolan adapting Homer is the sentence that ends arguments about what cinema is for. The source material is 3000 years old. The filmmaker has spent five years preparing. They were always going to meet here." },
-  { names:["Christopher Nolan","Matt Damon (Odysseus)"],       boBonus:3,osBonus:3,label:"Nolan x Damon Odysseus",  msg:"The Martian was already a quiet Odyssey. The astronaut who returns from impossible circumstances. Nolan has seen this. Damon has lived it twice. The casting is a recognition not a decision." },
-  { names:["Christopher Nolan","Oscar Isaac (Odysseus)"],      boBonus:2,osBonus:4,label:"Nolan x Isaac Odysseus",  msg:"Inside Llewyn Davis told the story of a man who cannot return because home no longer exists in the form he left it. This is the Odyssey. Isaac has already played it. Now he plays it at the scale Homer intended." },
-  { names:["Homer (Adapted  -  The Odyssey)","Epic Drama"],      boBonus:2,osBonus:5,label:"Homer x Epic Drama",      msg:"3000 years of pre-awareness. Every high school English class is a marketing budget line that has already been paid. The source material is the best-known story in Western civilisation." },
-  { names:["Homer (Adapted  -  The Odyssey)","Awards Season (Nov to Dec)"],boBonus:1,osBonus:5,label:"Homer Awards",   msg:"The Academy has been waiting its entire existence to nominate a proper Odyssey adaptation. Every voter read it in school. Several have it memorised. The campaign requires no explanation." },
-  { names:["Homer (Adapted  -  The Odyssey)","IMAX Global Event"],boBonus:3,osBonus:3,label:"Homer IMAX",             msg:"The wine-dark sea on a six-storey screen. The Cyclops filling an IMAX frame. The Sirens in Dolby Atmos. This is what the format was invented for. Homer would have approved. He would have demanded it." },
-  { names:["Lupita Nyong'o (Penelope)","Christopher Nolan"],   boBonus:2,osBonus:4,label:"Nyong'o x Nolan",         msg:"Nolan has never directed a performance like the one Nyong'o will give as Penelope. She has never been given a role with this much interior silence to fill. Twenty years of waiting. She will not rush a single frame." },
-  { names:["Cate Blanchett (Athena)","Homer (Adapted  -  The Odyssey)"],boBonus:1,osBonus:4,label:"Blanchett Athena", msg:"The goddess who walks among mortals visible only to the hero. Blanchett has played divine interference since Galadriel. She knows the register. She has been preparing for this specific role for twenty-five years." },
-  { names:["Anthony Hopkins (Poseidon)","Epic Drama"],         boBonus:1,osBonus:4,label:"Hopkins Poseidon",         msg:"The sea god's grievance against Odysseus is personal and operatic and sustained across ten years. Hopkins plays entities that have decided on principle to ruin someone. This is his natural emotional state." },
-  { names:["Tilda Swinton (Circe)","Christopher Nolan"],       boBonus:1,osBonus:4,label:"Swinton x Nolan",         msg:"Not human energy. Nolan has never worked with someone this alien. Swinton has never had material this mythologically precise. The sorceress who turns men into pigs deserves exactly this actress and no other." },
-  { names:["Hans Zimmer","Homer (Adapted  -  The Odyssey)"],     boBonus:3,osBonus:3,label:"Zimmer x Homer",           msg:"Dune gave us the sound of another civilisation's mythology. The Odyssey needs the sound of this civilisation's mythology as it existed before cinema existed. Zimmer will invent it from materials that do not yet exist." },
-  { names:["Ludwig Goransson","Homer (Adapted  -  The Odyssey)"],boBonus:2,osBonus:4,label:"Goransson x Homer",       msg:"Oppenheimer's score was built on the anxiety of knowledge. The Odyssey's score needs to be built on the anxiety of return. Goransson knows that anxiety from a different project. He will now build it larger." },
-  { names:["Howard Shore","Epic Drama"],                       boBonus:2,osBonus:4,label:"Shore x Mythology",        msg:"The Lord of the Rings established that mythological scores require a composer willing to invent an entire musical culture from nothing. Shore did this once for Tolkien. He will do it again for Homer." },
-  { names:["Universal Pictures","IMAX Global Event"],          boBonus:3,osBonus:2,label:"Universal IMAX",           msg:"Universal has the infrastructure for a truly global simultaneous IMAX release. The logistics alone require a separate production office. Nolan has been using that office for three years." },
-  { names:["Eric Roth (Prestige Epic)","Epic Drama"],          boBonus:2,osBonus:4,label:"Roth x Epic Drama",        msg:"The Curious Case. Munich. Forrest Gump. He writes the long journey home. The Odyssey is the original long journey home. He was always going to be attached to this project." },
-  { names:["Tony Kushner (Epic Adaptation)","Homer (Adapted  -  The Odyssey)"],boBonus:1,osBonus:5,label:"Kushner x Homer",msg:"Angels in America understood myth as living tissue. Lincoln treated history as mythology. Kushner adapting Homer is the most qualified writer meeting the most qualified source material in the history of the adaptation." },
-  { names:["Paul Mescal (Odysseus)","Universal Pictures"],     boBonus:2,osBonus:4,label:"Mescal x Universal Odyssey",msg:"Gladiator II established him in the epic register. He is younger than every previous Odysseus. He carries the exhaustion of the journey in his face before the journey has begun. Universal signed him first." },
-  { names:["Surprise IMAX Weekend (Any)","Christopher Nolan"], boBonus:4,osBonus:2,label:"Nolan Dark-Drop",          msg:"No trailer. No poster. One date posted on social media. The IMAX booking servers went down within eleven minutes of the post. This has happened before. It will keep happening until Nolan decides to stop." },
-  { names:["Epic Scale ($200M to $250M)","Christopher Nolan"], boBonus:3,osBonus:3,label:"Nolan Epic Budget",        msg:"$200M-250M. He will spend it on practical effects, 70mm cameras, and rebuilding a portion of ancient Troy in a field in Malta. Every dollar will be on screen. None of it will involve a computer." },
-  { names:["Max Richter","Epic Drama"],                        boBonus:1,osBonus:4,label:"Richter x Odyssey",        msg:"On the Nature of Daylight became the unofficial score of thoughtful cinema for a decade. The Odyssey needs a composer who understands grief as civilisational weight. Richter has been writing that score for years in other films." },
 ];
 
 function detectSynergies(picks) {
@@ -2818,124 +2711,6 @@ function picksSoFar() {
 
 // ── THEMED EVENTS ────────────────────────────────────────────────────────
 const THEMES = {
-  odyssey: {
-    id: "odyssey",
-    name: "The Odyssey Opens",
-    subtitle: "An Epic Ten Years in the Making",
-    tagline: "The Hollywood Draft Game  -  The Odyssey Edition",
-    dates: ["2026-07-17","2026-07-18","2026-07-19","2026-07-20"],
-    palette: {
-      titleGradient: "linear-gradient(135deg,#1E6FD4 0%,#C8A84B 35%,#2A8A6A 65%,#1E6FD4 100%)",
-      glow: "rgba(200,168,75,0.50)",
-      bg: "#040810",
-      border: "#1a2030",
-      subtitleColor: "#5a7090",
-      taglineColor: "#4a5a70",
-      statColors: ["#C8A84B","#1E6FD4","#C8A84B","#2A8A6A"],
-    },
-    introTag: "⚓ The Odyssey opens this weekend. Draft your epic.",
-    introTagColor: "#C8A84B",
-    introTagBg: "rgba(200,168,75,0.10)",
-    introTagBorder: "rgba(200,168,75,0.30)",
-    productionCredit: "A Universal Pictures Production",
-    presentsLine: "In Association With Syncopy Films",
-    tagline: "The Hollywood Draft Game",
-    verdictOverrides: {
-      goat:        { title:"⚓ A voyage completed. The Academy wept. The gods approved.",       detail:"$900M. Ten years. The most anticipated film of the generation delivered on every promise." },
-      jugger:      { title:"🌊 The fleet has returned. The box office is underwater.",          detail:"Record opening weekend. Troy has fallen. The sequel is already being discussed in hushed tones." },
-      franchise:   { title:"🏛️ A new mythology begins.",                                       detail:"Universal has optioned the Iliad. The Aeneid is in development. You started something." },
-      darling:     { title:"🏆 The Academy has convened. Homer would have approved.",           detail:"Twelve nominations. Critics are writing the kind of reviews they save for once a decade." },
-      prestige:    { title:"🎨 Prestige of the highest order. The cinematography alone.",       detail:"Playing in limited release. The 70mm screenings are sold out through September." },
-      hit:         { title:"✨ A crowd-pleasing odyssey. The audience followed willingly.",     detail:"Four-quadrant success. The score is being played in lobbies across America." },
-      blockbust:   { title:"🎯 Solid voyage. Not every hero makes it home.",                   detail:"Profitable. Respectable. The kind of film that ages better than its reviews suggest." },
-      sleeper:     { title:"🌱 The sirens sang. Eventually, people listened.",                 detail:"Undersold opening. Word of mouth built it into something the studio didn't expect." },
-      cult:        { title:"🕯️ The wine-dark sea claimed it. The internet will resurrect it.", detail:"Nobody came opening weekend. In five years it will be someone's entire personality." },
-      mid:         { title:"😐 The sirens sang. Nobody listened.",                             detail:"Technically competent. Emotionally inert. Polyphemus has seen better." },
-      flop:        { title:"💸 A journey begun and never completed. The sea took it.",         detail:"The studio is not returning calls. The director has started a podcast about Greek mythology." },
-      disaster:    { title:"🔥 This is what Polyphemus felt like. From the inside.",           detail:"A historic catastrophe. The Wikipedia page has forty-three citations and a disambiguation note." },
-      tax_writeoff:{ title:"📜 The Oracle at Delphi had warned them. They did not listen.",    detail:"The accountants are the only ones who went home satisfied. The gods are not pleased." },
-    },
-    chaosInjections: [
-      { round:1, chance:0.40, msg:"⚔️ DAY ONE RESHOOT: Nolan reshot the opening sequence three times on day one. He has not explained why. The crew understands. The studio does not. Production is already two days behind schedule and has never felt more on track.", penaltyBO:0, penaltyOS:2 },
-      { round:2, chance:0.40, msg:"🐴 THE TROJAN HORSE: A wooden horse arrived on set. Nobody ordered it. Security investigated. The doors opened. Eleven studio executives emerged with script notes. Production suspended four days. Nolan accepted none of the notes. Production resumed.", penaltyBO:-1, penaltyOS:2 },
-      { round:3, chance:0.38, msg:"⛵ MALTA: Production moved to Malta. The Mediterranean disagreed. A swell destroyed the practical longship on day one. The director called it authentic. The insurance company called it a claim. Both filed paperwork simultaneously.", penaltyBO:-1, penaltyOS:2 },
-      { round:4, chance:0.38, msg:"🌊 POSEIDON INTERVENES: The underwater unit flooded the soundstage at 3am. Nobody was hurt. The rushes from the water were extraordinary. The director kept everything. The studio asked no questions. The soundstage has been rebuilt.", penaltyBO:0, penaltyOS:3 },
-      { round:5, chance:0.35, msg:"📸 THE LEAK: A single practical effects frame appeared online. No source identified. The internet declared it the greatest image in cinema history. The marketing team cancelled the official trailer. The image is the campaign.", penaltyBO:3, penaltyOS:2 },
-      { round:6, chance:0.35, msg:"🧜 THE SIRENS: During the sea sequence three crew members reported hearing music from no identifiable source. One could not recall their cues for five days. The director reviewed the performances from those five days. He kept every take.", penaltyBO:0, penaltyOS:3 },
-      { round:7, chance:0.33, msg:"🎬 THE ASPECT RATIO INTERVIEW: Nolan gave a forty-minute interview. He mentioned the story twice. He discussed format for thirty-eight minutes. The internet covered it for 72 hours. Every other film in production was temporarily forgotten.", penaltyBO:2, penaltyOS:1 },
-      { round:8, chance:0.33, msg:"🏛️ THE CYCLOPS: The practical creature took eleven months to build. Test audiences gave it a standing ovation. Nolan watched the reaction in silence. He then requested two additional shots that required four more weeks in Malta. Universal approved in the same phone call.", penaltyBO:1, penaltyOS:3 },
-      { round:9, chance:0.30, msg:"🌅 THE RETURN: Nolan finished the final cut at 4:12am. He watched it alone. He called one person. He said: it is done. The running time is three hours and seventeen minutes. He will not cut a frame. Universal has agreed. The voyage is complete.", penaltyBO:3, penaltyOS:4 },
-    ],
-
-    letterboxdExtra: [
-      { user:"70mm_or_nothing",       stars:"★★★★★", review:"three hours. i would have taken six." },
-      { user:"aegean_enjoyer",        stars:"★★★★★", review:"the audience applauded the ocean. the ocean did not acknowledge them. five stars." },
-      { user:"wept_about_a_boat",     stars:"★★★★★", review:"christopher nolan made me care about a boat. i have never cared about a boat before." },
-      { user:"imax_pilgrim",          stars:"★★★★★", review:"watched it in 70mm imax. i am a different person now. do not watch it on your phone." },
-      { user:"homer_would_approve",   stars:"★★★★",  review:"it is three hours long and i did not check my phone once. that is the whole review." },
-    ],
-    lockedPicks: {
-      studio: "Universal Pictures",
-      genre:  "Epic Drama",
-    },
-    optionInjections: {
-      director: [
-        { name:"Christopher Nolan",  bo:20, oscar:16, era:"Epic",    known:"The Odyssey director  -  the one everyone is going to see" },
-        { name:"Denis Villeneuve",   bo:18, oscar:15, era:"Epic",    known:"Dune. Arrival. The natural competitor in this space." },
-        { name:"Ridley Scott",       bo:17, oscar:14, era:"Epic",    known:"Gladiator. Kingdom of Heaven. He lives here." },
-        { name:"Zack Snyder",        bo:15, oscar:8,  era:"Epic",    known:"300. Epic visuals, divisive reception. The fanbase is enormous." },
-        { name:"Peter Jackson",      bo:17, oscar:15, era:"Epic",    known:"LOTR. He knows mythology. He knows scope." },
-        { name:"David Lean",         bo:16, oscar:16, era:"Classic", known:"Lawrence of Arabia. Bridge on the River Kwai. The original epic." },
-      ],
-      lead: [
-        { name:"Matt Damon (Odysseus)", bo:16, oscar:10, era:"Epic", known:"The Martian. Saving Private Ryan. He comes home from impossible places." },
-        { name:"Tom Hanks (Odysseus)",  bo:17, oscar:14, era:"Epic", known:"Cast Away is already a modern Odyssey. Close the loop." },
-        { name:"Oscar Isaac (Odysseus)",bo:14, oscar:12, era:"Prestige", known:"Inside Llewyn Davis. The Odyssey structure is already in his DNA." },
-        { name:"Paul Mescal (Odysseus)",bo:13, oscar:13, era:"Prestige", known:"Gladiator II. Already in epic territory. Younger, rawer." },
-        { name:"Cillian Murphy",        bo:15, oscar:14, era:"Epic",    known:"Oppenheimer. He carries the weight of worlds without showing it." },
-        { name:"Joel Edgerton",         bo:12, oscar:9,  era:"Epic",    known:"Troy. Australian gravitas for Greek mythology." },
-        { name:"Chris Hemsworth",       bo:16, oscar:8,  era:"Action",  known:"Thor energy. The gods are already familiar with him." },
-      ],
-      supporting: [
-        { name:"Lupita Nyong'o (Penelope)",   bo:13, oscar:13, era:"Prestige", known:"Waiting. Loyal. Devastating. The casting writes itself." },
-        { name:"Cate Blanchett (Athena)",     bo:14, oscar:15, era:"Prestige", known:"A goddess who meddles. Her natural register." },
-        { name:"Nicole Kidman (Circe)",       bo:13, oscar:13, era:"Prestige", known:"The witch-goddess. Kidman makes even mythology feel psychological." },
-        { name:"Tilda Swinton (Circe)",       bo:11, oscar:13, era:"Arthouse", known:"Not human energy. Exactly right for a sorceress." },
-        { name:"Anthony Hopkins (Poseidon)",  bo:13, oscar:13, era:"Classic",  known:"The antagonist god. Hopkins was born to play divine grievance." },
-        { name:"Idris Elba (Poseidon)",       bo:14, oscar:11, era:"Epic",     known:"The storm given form. He looks like the sea is afraid of him." },
-        { name:"Daniel Craig (Menelaus)",     bo:14, oscar:10, era:"Epic",     known:"The war that started it all. Craig plays men who outlive their purpose." },
-      ],
-      screenplay: [
-        { name:"Homer (Adapted  -  The Odyssey)",     bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. The Academy loves a classic adaptation." },
-        { name:"Christopher Nolan (Original Vision)", bo:17, oscar:13, era:"Epic",    known:"He wrote it himself. This is the definitive version. He will say so." },
-        { name:"Tony Kushner (Epic Adaptation)",    bo:13, oscar:15, era:"Prestige",  known:"Angels in America. Lincoln. He handles mythology like journalism." },
-        { name:"Cormac McCarthy (Darkness Reframe)", bo:11, oscar:14, era:"Literary", known:"The Odyssey as American desolation. Nobody survives this cleanly." },
-        { name:"Eric Roth (Prestige Epic)",         bo:14, oscar:13, era:"Prestige",  known:"Forrest Gump. Munich. The Curious Case. He writes the long journey home." },
-      ],
-      composer: [
-        { name:"Hans Zimmer",          bo:16, oscar:14, era:"Epic",    known:"The natural Nolan choice. The score will shake foundations." },
-        { name:"Ludwig Goransson",     bo:15, oscar:13, era:"Epic",    known:"Oppenheimer. Tenet. Already in the Nolan ecosystem." },
-        { name:"Howard Shore",         bo:15, oscar:14, era:"Epic",    known:"LOTR. Epic mythology already lives in his catalogue." },
-        { name:"Ennio Morricone",      bo:14, oscar:13, era:"Classic", known:"The master of ancient-feeling scores. The gods would approve." },
-        { name:"Ryuichi Sakamoto",     bo:11, oscar:12, era:"Arthouse",known:"Merry Christmas Mr Lawrence. The score as civilisational weight." },
-        { name:"Max Richter",          bo:12, oscar:11, era:"Prestige",known:"On the Nature of Daylight became the sound of longing. Natural fit." },
-        { name:"Johann Johannsson",    bo:11, oscar:12, era:"Arthouse",known:"Arrival. The score that made space feel like grief. Legacy pick." },
-      ],
-      budget: [
-        { name:"Epic Scale ($200M to $250M)",    bo:17, oscar:12, era:"Epic",    known:"The Odyssey budget. IMAX. Practical sea effects. Malta." },
-        { name:"Mega ($250M to $350M)",          bo:18, oscar:10, era:"Epic",    known:"When Nolan wants to rebuild Troy and actually set it on fire." },
-        { name:"All-In ($350M+)",                bo:16, oscar:9,  era:"Epic",    known:"Cleopatra in 1963 dollars. Historic either way." },
-      ],
-      season: [
-        { name:"Summer Tentpole (May to Jul)",   bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date." },
-        { name:"IMAX Global Event",              bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The only correct way to watch this film." },
-        { name:"Awards Season (Nov to Dec)",     bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world." },
-      ],
-    },
-    shareEmoji: "⚓",
-    shareTagline: "Can you match The Odyssey? Draft your epic.",
-    pillExtras: ["Odyssey-coded options", "Epic scale scoring", "Aegean chaos events", "Homer-tier verdicts"],
-  },
   minions: {
     id: "minions",
     name: "Lights, Camera, Banana!",
@@ -2975,34 +2750,10 @@ const THEMES = {
     },
     // Chaos overrides  -  Minion-flavored
     chaosInjections: [
-      // ROUND 1  -  chaos from the very first pick
-      { round:1, chance:0.55, msg:"🍌 MINION TAKEOVER: Before you even begin, a Minion has reviewed the options and selected one. The Minion is confident. The banana is implicit. Resistance is noted but discouraged.", penaltyBO:1, penaltyOS:0, minionPick:true },
-      { round:1, chance:0.40, msg:"🍌 ORIENTATION DAY: Three Minions arrived on set this morning claiming to be producers. They have lanyards. Nobody knows who gave them lanyards. They have opinions about round one.", penaltyBO:2, penaltyOS:0 },
-      // ROUND 2
-      { round:2, chance:0.50, msg:"🍌 MINION CASTING INPUT: A Minion has entered the session and pointed at one of the options. The point was definitive. The Minion has not moved. Everyone is waiting.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:2, chance:0.45, msg:"🍌 THREE MINIONS ESCAPED: Last seen near craft services. Security briefed. A banana was left at the scene. Tracking up 12 points. Nobody is treating this as a problem.", penaltyBO:3, penaltyOS:0 },
-      // ROUND 3
-      { round:3, chance:0.50, msg:"🍌 MINION SCRIPT NOTES: A Minion has reviewed the options and circled one. The circle is drawn in banana. The logic is internally consistent if you accept banana as a moral framework.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:3, chance:0.45, msg:"💛 THE BANANA SCENE: Unscripted. A Minion found a banana during filming. Fifteen minutes of usable footage. The director kept all of it. It is now the emotional centrepiece of act two.", penaltyBO:2, penaltyOS:1 },
-      // ROUND 4
-      { round:4, chance:0.50, msg:"🍌 MINION BUDGET REVIEW: The Minions examined the budget options and selected one. Their financial reasoning consists of the word gelato repeated eleven times. The number they chose is not the conservative one.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:4, chance:0.42, msg:"😤 GRU HAD NOTES: Steve Carell reviewed the script overnight. Seventeen pages. All about accent trajectory in the second act. Production paused 48 hours. He was completely correct. The director thanked him in writing.", penaltyBO:1, penaltyOS:2 },
-      // ROUND 5
-      { round:5, chance:0.50, msg:"🍌 MINION GENRE COMMITTEE: Three Minions convened. They selected unanimously. They appear to have misread the brief. They are extremely confident. One is holding a banana as a gavel.", penaltyBO:1, penaltyOS:0, minionPick:true },
-      { round:5, chance:0.42, msg:"🎤 GRU CAMEO CONFIRMED: Steve Carell tweeted a photo of himself holding a banana. Tracking vertical. The studio called it organic. It was not organic. Tracking went vertical again.", penaltyBO:4, penaltyOS:0 },
-      // ROUND 6
-      { round:6, chance:0.50, msg:"🍌 MINION DIRECTOR SELECTION: A Minion knocked the options board off the wall. One card landed face-up. The Minion is pointing at it insistently with a banana. This is being treated as binding.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:6, chance:0.42, msg:"👶 THE ANTI-VILLAIN ACADEMY: A school visited the set. Twelve children defected to the Minions. Two are now junior story consultants. Their third-act notes were better than the studio's full script coverage.", penaltyBO:2, penaltyOS:1 },
-      // ROUND 7
-      { round:7, chance:0.50, msg:"🍌 MINION COMPOSER PICK: The Minions entered the music session. One sat at the piano. Cannot play piano. Has selected a composer by sitting on the relevant contract. The composer has accepted this.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:7, chance:0.42, msg:"🍌 PHARRELL SHOWED UP: Nobody called him. Synthesiser. Three fully formed ideas. All three are now in the film. One is called Gelato. It will be at every children's birthday party for eleven consecutive years.", penaltyBO:3, penaltyOS:2 },
-      // ROUND 8
-      { round:8, chance:0.50, msg:"🍌 MINION RELEASE STRATEGY: The Minions examined the release window options and selected one by sitting on it. The date is July 4. They circled it in banana three times. They are not wrong about this.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:8, chance:0.42, msg:"🎪 THE TEST SCREENING: 80% children under eight. Continuous laughter for 91 minutes. Three adults cried. The film was not trying to make adults cry. It did not try. It happened anyway. Notes were minimal.", penaltyBO:2, penaltyOS:1 },
-      // ROUND 9
-      { round:9, chance:0.55, msg:"🌍 BABABOI MOMENT: Trailer dropped. Final frame: a Minion says bababoi directly to camera and holds a banana toward the lens. Viewed 200 million times in 48 hours. The film does not exist yet. Everything is banana. Bababoi.", penaltyBO:4, penaltyOS:1 },
+      { round:3, chance:0.10, msg:"🍌 Minion Sighting: A Minion was spotted on set. Nobody knows how. Trending worldwide. Opening weekend tracking just moved up.", penaltyBO:3, penaltyOS:0 },
+      { round:5, chance:0.08, msg:"💛 Banana Scene: An improvised banana gag made it into the cut. Test audiences gave it a standing ovation. The studio is confused but supportive.", penaltyBO:2, penaltyOS:1 },
+      { round:7, chance:0.08, msg:"🎤 Gru Cameo Rumour: Someone on set posted a blurry photo. The internet has decided it is Steve Carell. Opening weekend tracking has gone vertical.", penaltyBO:3, penaltyOS:0 },
     ],
-
     // Letterboxd overrides
     letterboxdExtra: [
       { user:"banana_certified",     stars:"★★★★★", review:"did not come here for prestige cinema and i was not disappointed. bababoi." },
@@ -3012,107 +2763,6 @@ const THEMES = {
       { user:"illumination_enjoyer", stars:"★★★★★", review:"the banana scene alone is worth the ticket price. i have seen it four times. i will see it again." },
     ],
     // Share text override
-    // Locked picks  -  studio always Illumination, genre always Animated
-    lockedPicks: {
-      studio: "Universal / Illumination",
-      genre:  "Animated",
-    },
-    // Weighted option injections  -  these flood the pool so Minions-adjacent picks appear
-    optionInjections: {
-      director: [
-        { name:"Kyle Balda",       bo:14, oscar:8,  era:"Animation", known:"Minions, Despicable Me 3, The Lorax" },
-        { name:"Chris Renaud",     bo:15, oscar:9,  era:"Animation", known:"Despicable Me, The Secret Life of Pets" },
-        { name:"Pierre Coffin",    bo:13, oscar:9,  era:"Animation", known:"Minions, Despicable Me franchise" },
-        { name:"Brad Ableson",     bo:11, oscar:7,  era:"Animation", known:"Minions: Rise of Gru" },
-        { name:"Patrick Delage",   bo:10, oscar:7,  era:"Animation", known:"Illumination shorts" },
-        { name:"Chris Meledandri", bo:15, oscar:8,  era:"Producer",  known:"Illumination founder  -  Despicable Me universe" },
-      ],
-      lead: [
-        { name:"Steve Carell (Gru)", bo:16, oscar:9, era:"Animation", known:"Despicable Me, Minions  -  Gru's voice" },
-        { name:"Pierre Coffin (Minions)", bo:14, oscar:7, era:"Animation", known:"Voice of all Minions  -  Kevin, Stuart, Bob" },
-        { name:"Jason Statham",    bo:14, oscar:6,  era:"Action",    known:"Rise of Gru  -  villain energy" },
-        { name:"Taraji P. Henson", bo:13, oscar:9,  era:"Drama",     known:"Wild card casting  -  Illumination's next move" },
-        { name:"Michelle Yeoh",    bo:12, oscar:14, era:"Prestige",  known:"Everything Everywhere  -  could she do animation?" },
-        { name:"Will Ferrell",     bo:14, oscar:7,  era:"Comedy",    known:"Megamind reunion energy" },
-        { name:"Kevin Hart",       bo:15, oscar:5,  era:"Comedy",    known:"The obvious Illumination pick" },
-      ],
-      supporting: [
-        { name:"Julie Andrews",    bo:12, oscar:12, era:"Classic",   known:"The Dame adds class to anything. Even banana films." },
-        { name:"Russell Brand",    bo:11, oscar:6,  era:"Comedy",    known:"Rock of Ages voice energy" },
-        { name:"Jon Hamm",         bo:12, oscar:8,  era:"Drama",     known:"Villain casting Illumination keeps returning to" },
-        { name:"Steve Coogan",     bo:11, oscar:8,  era:"Comedy",    known:"British comedy voice  -  inevitable" },
-        { name:"Miranda Cosgrove", bo:10, oscar:7,  era:"Comedy",    known:"She grew up in Despicable Me and she knows it" },
-        { name:"Dana Gaier",       bo:9,  oscar:6,  era:"Animation", known:"Edith  -  the most underrated Despicable Me character" },
-      ],
-      screenplay: [
-        { name:"Minions Steal Something Big",                bo:14, oscar:7,  era:"Heist",       known:"The Minions want it. They will take it. The plan involves a banana at every stage. The plan works despite this." },
-        { name:"Gru Reluctantly Returns",                    bo:15, oscar:8,  era:"Villain",     known:"He said he was done. He was not done. The Minions knew he was not done. They prepared accordingly." },
-        { name:"Minions Origin: Before Gru",                 bo:13, oscar:7,  era:"Prequel",     known:"Ancient Egypt. Napoleon. The Victorian era. The Minions have always existed and have always wanted bananas." },
-        { name:"New Villain Needs Minions",                  bo:14, oscar:8,  era:"Villain",     known:"A new villain arrives. The Minions are not loyal. They are opportunistic. This is a feature not a bug." },
-        { name:"Banana Heist of the Century",                bo:15, oscar:6,  era:"Heist",       known:"The biggest banana in recorded history is in a vault. The Minions have seventeen plans. Sixteen involve disguises." },
-        { name:"Minions vs The World",                       bo:14, oscar:7,  era:"Action",      known:"Every government issued a statement. The Minions have not read them. The Minions cannot read. Everything is fine." },
-        { name:"Gru and the Minions: One Last Job",          bo:16, oscar:9,  era:"Finale",      known:"He says it is the last one every time. They prepare as if it is the first. The audience knows the truth." },
-        { name:"Minions in Space: Zero Gravity Bananas",     bo:14, oscar:6,  era:"Sci-Fi",      known:"NASA called. The Minions answered. Nobody at NASA authorised this. The shuttle has been repainted yellow." },
-        { name:"Minions Run For President",                  bo:15, oscar:5,  era:"Political",   known:"Kevin filed the paperwork incorrectly. He is now on the ballot in seven states. The polls are inexplicable." },
-        { name:"The Minion Who Could Talk",                  bo:12, oscar:10, era:"Drama",       known:"One Minion develops full sentences. He does not use this gift wisely. Nobody asked him to." },
-        { name:"Minions: The Musical",                       bo:14, oscar:9,  era:"Musical",     known:"Every song is about bananas. There are fourteen songs. Pharrell wrote all fourteen over one weekend." },
-        { name:"Minions vs. Dinosaurs",                      bo:15, oscar:5,  era:"Action",      known:"A time machine. The Cretaceous period. The dinosaurs were not prepared for this. Neither was the script." },
-        { name:"Minions: The Documentary",                   bo:11, oscar:11, era:"Doc",         known:"A serious filmmaker followed the Minions for two years. He won a Palme d'Or. He has not recovered emotionally." },
-        { name:"Minions Start a Band",                       bo:13, oscar:7,  era:"Musical",     known:"Three Minions. Four instruments. One is not legally an instrument. They headlined Coachella." },
-        { name:"Minions Open a Restaurant",                  bo:12, oscar:7,  era:"Comedy",      known:"The health inspection report is classified. The Michelin inspector was never found. The reviews are five stars." },
-        { name:"Minions Invade Hollywood",                   bo:14, oscar:8,  era:"Meta",        known:"The Minions discover they are in a film. They have notes. The notes have been incorporated. You are watching those notes now." },
-        { name:"Minions: Time Bandits",                      bo:13, oscar:8,  era:"Adventure",   known:"Julius Caesar. Cleopatra. The Minions. History is not what you think it is. The banana was always involved." },
-        { name:"A Minion's Love Story",                      bo:12, oscar:9,  era:"Romance",     known:"Kevin falls in love with a particularly large banana. The film is surprisingly moving. Critics are confused." },
-        { name:"Minions Save Christmas",                     bo:16, oscar:7,  era:"Holiday",     known:"Santa asked for help. He should not have asked the Minions. Christmas was technically saved. Many other things were not." },
-        { name:"The Minion Who Wanted an Oscar",             bo:11, oscar:14, era:"Meta",        known:"Stuart decides the Minions deserve awards recognition. The campaign is unprecedented. The Academy has questions." },
-        { name:"Minions Run a Fortune 500 Company",          bo:13, oscar:7,  era:"Comedy",      known:"The quarterly earnings call was described as unhinged. Revenue is up 340%. The board has no explanation." },
-        { name:"Minions vs. Godzilla",                       bo:16, oscar:5,  era:"Kaiju",       known:"Universal and Toho reached an agreement. The Minions reached Godzilla first. Godzilla was not expecting this." },
-        { name:"Minions at the Olympics",                    bo:13, oscar:6,  era:"Sports",      known:"The eligibility committee reviewed for eleven months. The Minions competed in seven events. Placed in four. Impossible." },
-        { name:"Minions Become Lawyers",                     bo:12, oscar:8,  era:"Legal",       known:"The bar exam results were disputed. The case went to the Supreme Court. The Minions represented themselves. They won." },
-        { name:"Minions Infiltrate the Vatican",             bo:13, oscar:9,  era:"Caper",       known:"The Pope issued a warm statement. The Minions did not read it. It has been reissued in Minionese." },
-        { name:"Minions and Cats: An Unlikely Alliance",     bo:12, oscar:7,  era:"Buddy",       known:"The cats did not choose this. The internet response was unprecedented. Two sequels greenlit before release." },
-        { name:"A Minion Named Dave: A Character Study",     bo:10, oscar:12, era:"Drama",       known:"Dave wants more than bananas. What Dave wants is unclear even to Dave. Critics called it profound." },
-        { name:"Minions Discover the Internet",              bo:15, oscar:6,  era:"Comedy",      known:"The first Minion meme predates the internet. The Minions did not know this. The servers did not survive the revelation." },
-        { name:"Minions vs. The Tax Man",                    bo:12, oscar:7,  era:"Drama",       known:"The audit began as routine. The financial records are written in banana on seventeen thousand pages of yellow paper." },
-        { name:"Minions Build a Theme Park",                 bo:15, oscar:6,  era:"Comedy",      known:"Universal approved the concept. The Minions built it overnight. Seventeen rides were not on the plans. All are open." },
-        { name:"Minions: The Long Goodbye",                  bo:12, oscar:10, era:"Drama",       known:"Gru is retiring. The Minions are not. The film treats this tension with unexpected gravity. Three critics wept." },
-        { name:"Minions Raise a Baby Villain",               bo:14, oscar:8,  era:"Family",      known:"The baby arrived in a basket. The Minions raised it as their own. It says bababoi and has opinions about world domination." },
-        { name:"Inside a Minion's Mind",                     bo:12, oscar:11, era:"Animated Drama",known:"What does a Minion think about? 88 minutes exploring this. The answer involves bananas and something unexpectedly moving." },
-        { name:"Minions Found a Country",                    bo:15, oscar:7,  era:"Political",   known:"The UN recognised it in six months. The flag is yellow. The anthem is bababoi in three-part harmony. Tourism is exceptional." },
-        { name:"Minions: A Horror Film",                     bo:13, oscar:8,  era:"Horror",      known:"Ari Aster was briefly attached. He departed and left notes. The notes are in the film. It is not a horror film." },
-        { name:"Minions Win the World Cup",                  bo:16, oscar:5,  era:"Sports",      known:"FIFA reviewed the footage. The goal was legal under rules that technically existed. The trophy is now banana-shaped." },
-        { name:"The Minion Code: A Thriller",                bo:14, oscar:8,  era:"Thriller",    known:"A secret in every Minions film since 2010. A linguist found it. The code says bababoi. This might mean everything." },
-        { name:"Minions: One Went to Film School",           bo:11, oscar:12, era:"Meta",        known:"Phil attended film school. Phil has opinions. Illumination screened Phil's short. This film incorporates Phil's notes." },
-        { name:"Minions Versus Time Itself",                 bo:14, oscar:9,  era:"Sci-Fi",      known:"The physics are wrong in seventeen ways the film acknowledges. Time is defeated in act three. A banana is involved." },
-        { name:"A Minion's Bucket List",                     bo:12, oscar:8,  era:"Comedy-Drama", known:"Stuart's list has 847 items. All involve bananas. Items 1-846 are the same item worded differently. Item 847 is touching." },
-        { name:"Minions Accidentally Invent Democracy",      bo:14, oscar:9,  era:"Political",   known:"They were dividing a banana fairly. The system has been adopted by four nations. The Minions have not been informed." },
-        { name:"Minions: The Prequel to the Prequel",        bo:13, oscar:7,  era:"Prequel",     known:"Before the Minions existed something existed. The answer is bananas. Scientists are concerned about the timeline." },
-        { name:"Minions Go to the Moon",                     bo:14, oscar:6,  era:"Sci-Fi",      known:"They pressed every button. The shuttle launched. The moon has a new flag. It is yellow. It depicts a banana." },
-        { name:"All Minions Films Simultaneously",           bo:18, oscar:4,  era:"Event",       known:"Every Minions film edited into one. Runtime: 11 hours. Seven left during hour three and returned for hours eight through eleven." },
-        { name:"Minions at War: A Very Yellow Conflict",     bo:13, oscar:8,  era:"War",         known:"The war was about a banana. All wars are, the film argues, about a banana at some level. The Academy was interested." },
-        { name:"Minions: The Spa Day",                       bo:12, oscar:6,  era:"Comedy",      known:"The spa was not expecting them. The hot stone treatment did not go as described. The cucumber water is now banana water." },
-        { name:"Minions Go to Art School",                   bo:11, oscar:10, era:"Drama",       known:"Bob's thesis was a 40-foot banana sculpture. His professor resigned. The MoMA has acquired the piece." },
-        { name:"Minions: The Intervention",                  bo:12, oscar:9,  era:"Drama",       known:"Gru's colleagues stage an intervention about his banana consumption. The Minions attend as support. They bring bananas." },
-        { name:"Minions Host a Talk Show",                   bo:13, oscar:6,  era:"Comedy",      known:"The network gave them a slot at 11:35pm. The guests are confused. The ratings are inexplicably excellent." },
-        { name:"Minions: One Goes to Therapy",               bo:11, oscar:11, era:"Drama",       known:"Kevin attends therapy. He cannot articulate the issue. The therapist has learned Minionese. The breakthroughs are banana-adjacent." },
-        { name:"Minions vs. The Moon",                       bo:15, oscar:6,  era:"Action",      known:"The moon looked at them funny. The Minions took this personally. The response was disproportionate. The moon has been apologised to." },
-      ],
-      composer: [
-        { name:"Heitor Pereira",   bo:12, oscar:8,  era:"Animation", known:"Minions, Despicable Me franchise composer" },
-        { name:"Pharrell Williams", bo:14, oscar:9, era:"Pop",       known:"Despicable Me 3 score + Happy. Yes, that Happy." },
-        { name:"Hans Zimmer",      bo:16, oscar:12, era:"Epic",      known:"Could he do Minions? Yes. Would he? Unknown." },
-        { name:"Mark Mothersbaugh", bo:11, oscar:8, era:"Animation", known:"DEVO founder turned Lego Movie composer. Perfect energy." },
-      ],
-      budget: [
-        { name:"Studio Animation ($150M to $180M)", bo:15, oscar:10, era:"Animation", known:"The Illumination sweet spot  -  Maximum banana for buck" },
-        { name:"Major Animation ($120M to $150M)",  bo:13, oscar:9,  era:"Animation", known:"Modest by Pixar standards. Lavish by every other standard." },
-        { name:"Franchise Tentpole ($180M+)",       bo:16, oscar:8,  era:"Animation", known:"When Illumination really wants to make a statement" },
-      ],
-      season: [
-        { name:"Summer Tentpole (May to Jul)",      bo:16, oscar:8, era:"Summer",   known:"Where Minions live and thrive. July 4 weekend. Always." },
-        { name:"Holiday Animated Event (Nov-Dec)",  bo:15, oscar:9, era:"Holiday",  known:"The other natural habitat. Gift-giving season and animated chaos." },
-      ],
-    },
     shareEmoji: "🍌",
     shareTagline: "Can you beat my score? Bababoi.",
     // Intro pill bonus text
@@ -3120,82 +2770,9 @@ const THEMES = {
   }
 };
 
-// getActiveTheme defined above with toggle support
-
-// ── Theme override management ─────────────────────────────────────────────
-let THEME_OVERRIDE = localStorage.getItem('lca_theme_override') || null;
-
-function activateThemeWithHelp(id) {
-  // Toggle theme AND show the relevant how-to-play popup
-  toggleTheme(id);
-  const p = document.getElementById('how-to-play-panel');
-  if (p) {
-    p.style.display = 'block';
-    const reg = document.getElementById('htp-regular');
-    const min = document.getElementById('htp-minions');
-    const ody = document.getElementById('htp-odyssey');
-    // After toggle, THEME_OVERRIDE is now set (or null if we just turned it off)
-    const nowActive = THEME_OVERRIDE;
-    if (reg) reg.style.display = !nowActive ? 'block' : 'none';
-    if (min) min.style.display = nowActive === 'minions' ? 'block' : 'none';
-    if (ody) ody.style.display = nowActive === 'odyssey' ? 'block' : 'none';
-    if (!nowActive) p.style.display = 'none'; // if toggled off, hide panel
-  }
-}
-
-function toggleTheme(id) {
-  if (THEME_OVERRIDE === id) {
-    // Turn off
-    THEME_OVERRIDE = null;
-    localStorage.removeItem('lca_theme_override');
-  } else {
-    // Turn on
-    THEME_OVERRIDE = id;
-    localStorage.setItem('lca_theme_override', id);
-  }
-  updateThemeButtons();
-  render(); // Re-render home screen with new theme
-}
-
 function getActiveTheme() {
-  // Manual override takes priority
-  if (THEME_OVERRIDE && THEMES[THEME_OVERRIDE]) return THEMES[THEME_OVERRIDE];
-  // URL param for testing
-  const urlTheme = new URLSearchParams(window.location.search).get('theme');
-  if (urlTheme && THEMES[urlTheme]) return THEMES[urlTheme];
-  // Auto date-based activation
   const today = new Date().toISOString().slice(0,10);
   return Object.values(THEMES).find(t => t.dates.includes(today)) || null;
-}
-
-function updateThemeButtons() {
-  const mBtn = document.getElementById('theme-minions-btn');
-  const oBtn = document.getElementById('theme-odyssey-btn');
-  const status = document.getElementById('theme-status');
-  if (!mBtn || !oBtn) return;
-
-  // Reset both
-  mBtn.style.borderColor = 'rgba(245,197,24,0.35)';
-  mBtn.style.background  = 'rgba(245,197,24,0.08)';
-  oBtn.style.borderColor = 'rgba(200,168,75,0.35)';
-  oBtn.style.background  = 'rgba(30,111,212,0.08)';
-
-  const dBtn = document.getElementById('theme-default-btn');
-  if (THEME_OVERRIDE === 'minions') {
-    mBtn.style.borderColor = '#F5C518';
-    mBtn.style.background  = 'rgba(245,197,24,0.20)';
-    if (status) status.textContent = '🍌 Minions mode active  -  Go Bananas!';
-  } else if (THEME_OVERRIDE === 'odyssey') {
-    oBtn.style.borderColor = '#C8A84B';
-    oBtn.style.background  = 'rgba(30,111,212,0.20)';
-    if (status) status.textContent = '⚓ Odyssey mode active  -  Sail the Seas!';
-  } else {
-    // Check auto date
-    if (dBtn) dBtn.style.display = 'none';
-    const auto = Object.values(THEMES).find(t => t.dates.includes(new Date().toISOString().slice(0,10)));
-    if (auto && status) status.textContent = auto.id === 'minions' ? '🍌 Auto-activated: Minions Weekend' : '⚓ Auto-activated: The Odyssey Opens';
-    else if (status) status.textContent = '';
-  }
 }
 
 function buildIntroHero(t) {
@@ -3249,55 +2826,16 @@ function renderIntro() {
     <div style="text-align:center;margin-top:12px">
       <button id="how-to-play-btn" style="background:none;border:none;color:var(--text3);font-size:12px;text-decoration:underline;cursor:pointer">How to Play</button>
     </div>
-
-    <!-- Theme toggle buttons -->
-    <div id="theme-toggle-panel" style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
-      <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.15em;color:var(--text3);text-align:center;margin-bottom:2px">Special Events</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button id="theme-minions-btn" onclick="activateThemeWithHelp('minions')" style="
-          flex:1;max-width:200px;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(245,197,24,0.35);
-          background:rgba(245,197,24,0.08);color:#F5C518;font-size:12px;font-weight:600;
-          cursor:pointer;transition:all 0.2s;text-align:left;line-height:1.4">
-          🍌 Go Bananas<br><span style="font-size:10px;font-weight:400;opacity:0.7">Lights, Camera, Banana! mode</span>
-        </button>
-        <button id="theme-odyssey-btn" onclick="activateThemeWithHelp('odyssey')" style="
-          flex:1;max-width:200px;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(200,168,75,0.35);
-          background:rgba(30,111,212,0.08);color:#C8A84B;font-size:12px;font-weight:600;
-          cursor:pointer;transition:all 0.2s;text-align:left;line-height:1.4">
-          ⚓ Sail the Seas<br><span style="font-size:10px;font-weight:400;opacity:0.7">The Odyssey Opens mode</span>
-        </button>
-      </div>
-      <div id="theme-status" style="text-align:center;font-size:10px;color:var(--text3);min-height:16px"></div>
-      <div style="text-align:center;margin-top:4px"><button id="theme-default-btn" onclick="toggleTheme(null)" style="display:none;background:none;border:none;color:var(--text3);font-size:11px;text-decoration:underline;cursor:pointer">Return to regular draft</button></div>
-    </div>
     <div id="how-to-play-panel" style="display:none;background:var(--surface2);border-radius:var(--r-lg);padding:1.1rem;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6">
-      <div id="htp-regular">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
-        <div style="margin-bottom:8px"><strong>9 rounds.</strong> Each round: Director, Lead, Supporting, Studio, Screenplay, Genre, Composer, Budget, Release. Pick one of 4-8 options.</div>
-        <div style="margin-bottom:8px"><strong>Synergies fire automatically.</strong> A24 + Awards Season. Nolan + Zimmer. PTA + Greenwood. Right combos = bonuses. Wrong ones = penalties.</div>
-        <div style="margin-bottom:8px"><strong>Chaos</strong> strikes mid-draft. Max 2 per draft. Roll with it.</div>
-        <div style="margin-bottom:8px"><strong>Production Bonuses</strong> at the end: All-Star Draft, Prestige Sweep, Cultural Crossover.</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:8px">Submit to Walk of Fame for the global leaderboard. Play Daily Draft to compete on the same picks as everyone else.</div>
-      </div>
-      <div id="htp-minions" style="display:none">
-        <div style="font-size:13px;font-weight:700;color:#F5C518;margin-bottom:10px">🍌 How to Play - Lights, Camera, Banana!</div>
-        <div style="margin-bottom:8px"><strong style="color:#F5C518">Mission:</strong> Produce the greatest Minions film ever made. Studio locked to Universal/Illumination. Genre locked to Animated. You are inside the banana now.</div>
-        <div style="margin-bottom:8px"><strong>Options are Illumination-weighted.</strong> Kyle Balda. Pierre Coffin. Pharrell Williams. Steve Carell as Gru. Kevin Hart. The names you know dominate the pool.</div>
-        <div style="margin-bottom:8px"><strong>Chaos is Minion-only in this mode.</strong> Minions escape. Gru has seventeen pages of notes. Pharrell shows up uninvited. Regular Hollywood chaos does not cross the banana line.</div>
-        <div style="margin-bottom:8px"><strong>Synergies:</strong> Gru + Illumination + Pharrell is nuclear. Lars von Trier + Illumination is a creative emergency.</div>
-        <div style="margin-bottom:8px"><strong>Verdicts speak Minion.</strong> BABABOI = all-time classic. BANANA = $800M. Tatata = they are disappointed. Poopaye = it is over.</div>
-        <div style="font-size:11px;color:#8a7200;margin-top:8px">Bababoi. That is all the instructions you need.</div>
-      </div>
-      <div id="htp-odyssey" style="display:none">
-        <div style="font-size:13px;font-weight:700;color:#C8A84B;margin-bottom:10px">⚓ How to Play - The Odyssey Opens</div>
-        <div style="margin-bottom:8px"><strong style="color:#C8A84B">Mission:</strong> Produce an epic worthy of Homer. Studio locked to Universal. Genre locked to Epic Drama. You are making the film that will be compared to Nolan's for thirty years.</div>
-        <div style="margin-bottom:8px"><strong>Options are epic-weighted.</strong> Directors: Nolan, Villeneuve, Ridley Scott, Peter Jackson. Odysseus candidates: Matt Damon, Tom Hanks, Cillian Murphy. Gods: Blanchett as Athena, Hopkins as Poseidon, Kidman as Circe.</div>
-        <div style="margin-bottom:8px"><strong>Chaos comes from the text.</strong> The Trojan Horse arrives on set and studio executives pour out with notes. Production moves to Malta and the sea objects. Poseidon floods the soundstage. The Sirens affect the crew. Production reports, not metaphors.</div>
-        <div style="margin-bottom:8px"><strong>Synergies reward the epic.</strong> Nolan + Zimmer + IMAX + Universal = civilisational event. Homer + Epic Drama + Awards Season = the formula. Chaos only fires from the Odyssey pool in this mode.</div>
-        <div style="margin-bottom:8px"><strong>Verdicts speak epic register.</strong> A voyage completed. The gods approved. Or: the sea took it. Not all heroes make it home.</div>
-        <div style="font-size:11px;color:#5a7090;margin-top:8px">The wine-dark sea awaits. Draft wisely.</div>
-      </div>
-    </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
+      <div style="margin-bottom:8px"><strong>9 rounds.</strong> Each round you spin for a category  -  Director, Lead Actor, Supporting Actor, Studio, Screenplay, Genre, Composer, Budget, and Release Strategy.</div>
+      <div style="margin-bottom:8px"><strong>Choose one of 4-8 options</strong> in each round. Every pick has a Box Office score and an Oscar score. Higher is better  -  but not always safer.</div>
+      <div style="margin-bottom:8px"><strong>Synergies fire automatically.</strong> Certain combinations of picks unlock bonus or penalty modifiers. Jonny Greenwood + Paul Thomas Anderson. A24 + Awards Season. Michael Bay + Arthouse. Draft smart.</div>
+      <div style="margin-bottom:8px"><strong>Chaos events</strong> can hit at any time (max 2 per draft). A director walks out. The script leaks. A test screening goes catastrophically wrong. Roll with it.</div>
+      <div style="margin-bottom:8px"><strong>Production Bonuses</strong> are awarded at the end for exceptional draft patterns  -  All-Star Draft, Prestige Sweep, Cultural Crossover, and more.</div>
+      <div style="margin-bottom:8px"><strong>Your result</strong> combines box office gross, Oscar nominations and wins, Tomatometer, Audience Score, and any bonuses into a final score and verdict.</div>
+      <div style="margin-bottom:8px"><strong>You get:</strong> 1 round skip · 1 option reroll · Hard Mode (no scores visible)</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">Submit your film to Walk of Fame to appear on the global leaderboard. Play the Daily Draft to compete with everyone worldwide on the same picks.</div>
     </div>
   </div>`;
 }
@@ -3339,29 +2877,12 @@ function statsHtml(o) {
 function renderChoosing() {
   const cat = CATEGORIES[S.round];
   const showKnown = ["director","lead","supporting","composer"].includes(cat.key);
-  // Inject theme colors into :root so choice cards match
-  // MINION TAKEOVER: Minions auto-pick AND auto-advance after 2.5s  -  no player input
-  if (S.minionTakeover > 0 && S.opts && S.opts.length && !S.minionAutoSelected) {
-    const autoIdx = Math.floor(Math.random() * S.opts.length);
-    S.selIdx = autoIdx;
-    S.minionAutoSelected = { idx: autoIdx, name: S.opts[autoIdx]?.name };
-
-  }
-  const _th = getActiveTheme();
-  const _thSelColor = _th?.id === 'minions' ? '#F5C518' :
-                      _th?.id === 'odyssey' ? '#C8A84B' : 'var(--purple)';
-  const _thSelBg    = _th?.id === 'minions' ? 'rgba(245,197,24,0.13)' :
-                      _th?.id === 'odyssey' ? 'rgba(200,168,75,0.12)' : 'var(--purple-bg)';
-  document.documentElement.style.setProperty('--theme-sel-color', _thSelColor);
-  document.documentElement.style.setProperty('--theme-sel-bg',    _thSelBg);
   return `${scoreBar()}${progressBar()}
   <div class="round-row"><span class="round-badge">Round ${S.round+1} of ${CATEGORIES.length}  -  Pick your ${cat.label}</span></div>
   ${picksSoFar()}
   <div class="choices-title">Choose one ${cat.icon} ${cat.label}</div>
-  ${S.minionOverride ? `<div style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.4);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:11px;color:#F5C518;text-align:center">🍌 A Minion has made a selection. You may override it  -  if you dare.</div>` : ''}
   <div class="choices-grid">
     ${S.opts.map((o,i)=>`<div class="choice ${S.selIdx===i?"sel":""}" data-i="${i}">
-      ${S.minionOverride && S.minionOverride.idx !== undefined && S.minionOverride.idx===i ? `<div style="font-size:9px;color:#F5C518;font-weight:700;letter-spacing:0.1em;margin-bottom:3px">🍌 MINION'S PICK</div>` : ''}
       <div class="choice-name">${o.name}</div>
       ${showKnown && o.known ? `<div class="choice-known">Known for: ${o.known}</div>` : `<div class="choice-era">${o.era}</div>`}
       <div class="choice-stats">
@@ -3372,15 +2893,7 @@ function renderChoosing() {
   <div class="btn-row">
     <button class="btn-sm" id="reroll-btn" ${S.skipCat<=0?"disabled":""}>Reroll options (${S.skipCat} left)</button>
   </div>
-  ${S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.15);border:2px solid #F5C518;border-radius:12px;padding:14px 16px;margin-bottom:10px;text-align:center">
-    <div style="font-size:14px;font-weight:900;color:#F5C518;letter-spacing:0.05em;margin-bottom:6px">🍌 THE MINIONS HAVE ENACTED CREATIVE CONTROL 🍌</div>
-    <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their selection. They have exercised their contractual creative rights for this round.</div>
-    <div style="font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;margin:6px 0">The Minions have selected: <span style="color:#F5C518">${S.minionAutoSelected.name}</span></div>
-    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining. Please acknowledge below.</div>
-  </div>` : ''}
-  <button class="btn" id="confirm-btn" ${S.selIdx===null?"disabled":""}>
-    ${S.minionAutoSelected ? '🍌 Acknowledge Minion Creative Control →' : 'Confirm Pick →'}
-  </button>`;
+  <button class="btn" id="confirm-btn" ${S.selIdx===null?"disabled":""}>Confirm Pick →</button>`;
 }
 
 function renderResult() {
@@ -3603,20 +3116,8 @@ function bind() {
   $("start-btn")?.addEventListener("click", ()=>{ DAILY_MODE=false; S=fresh(); S.phase="rolling"; render(); });
   $("how-to-play-btn")?.addEventListener("click", ()=>{
     const p = document.getElementById("how-to-play-panel");
-    if (!p) return;
-    const showing = p.style.display === "block";
-    p.style.display = showing ? "none" : "block";
-    if (!showing) {
-      const th = getActiveTheme();
-      const reg = document.getElementById("htp-regular");
-      const min = document.getElementById("htp-minions");
-      const ody = document.getElementById("htp-odyssey");
-      if (reg) reg.style.display = !th ? "block" : "none";
-      if (min) min.style.display = th?.id==="minions" ? "block" : "none";
-      if (ody) ody.style.display = th?.id==="odyssey" ? "block" : "none";
-    }
+    if (p) p.style.display = p.style.display === "none" ? "block" : "none";
   });
-  updateThemeButtons();
   $("daily-start-btn")?.addEventListener("click", ()=>{
     DAILY_MODE=true; S=fresh(); S.dailyRng=mulberry32(getDailySeed()); S.phase="rolling"; render();
   });
@@ -3639,22 +3140,6 @@ function bind() {
       let basePool = personCats2.includes(cat.key)
         ? DATA[cat.key].filter(p => !usedNames2.has(p.name))
         : DATA[cat.key];
-
-      // ── THEME OPTION INJECTION ──
-      // Each theme can front-load its own options into the pool so they appear more often
-      const _activeTheme = getActiveTheme();
-      if (_activeTheme?.optionInjections?.[cat.key]) {
-        const injected = _activeTheme.optionInjections[cat.key]
-          .filter(p => !usedNames2.has(p.name));
-        // Prepend injected options  -  they'll dominate the random picks
-        basePool = [...injected, ...basePool.filter(p => !injected.some(i => i.name === p.name))];
-      }
-      // Locked picks: if theme locks a category, force it
-      if (_activeTheme?.lockedPicks?.[cat.key]) {
-        const locked = _activeTheme.lockedPicks[cat.key];
-        const lockedOpt = basePool.find(p => p.name === locked) || { name: locked, bo: 14, oscar: 14, era: 'Special', known: _activeTheme.name };
-        basePool = [lockedOpt, ...basePool.filter(p => p.name !== locked)];
-      }
       // Studio restrictions
       if ((cat.key === 'budget' || cat.key === 'season') && basePool.length) {
         const studioPick2 = S.picks[3];
@@ -3733,15 +3218,6 @@ function bind() {
     const picked = S.opts[S.selIdx];
     S.picks.push(picked);
     S.lastPickFeedback = getPickFeedback(picked, S.round);
-    // MINION REVENGE: if player overrode a Minion pick, Minions take next 2 rounds
-    if (S.minionOverride && S.minionOverride.idx !== undefined && S.selIdx !== S.minionOverride.idx) {
-      S.minionTakeover = 2; // Minions control next 2 rounds
-      S.minionTakeoverMsg = true;
-    }
-    S.minionOverride = null;
-    S.minionTakeoverMsg = false;
-    S.minionAutoSelected = null;
-    if (S.minionTakeover > 0) S.minionTakeover--;
     S.round++; S.selIdx=null;
     // Clear any previous chaos banner before checking for new one
     S.chaosEvent = null;
@@ -3750,26 +3226,13 @@ function bind() {
     if (!DAILY_MODE && chaosCount < 2) {
       const _theme     = getActiveTheme();
       const _themeEvts = (_theme?.chaosInjections||[]).map(e => ({...e, reroll:false, rerollRound:null}));
-      // Themed mode: ONLY theme chaos fires. Normal mode: ONLY regular chaos.
-      let eligible;
-      if (_theme && _themeEvts.length) {
-        eligible = _themeEvts.filter(e => e.round === S.round);
-      } else {
-        eligible = CHAOS_EVENTS.filter(e => e.round === S.round);
-      }
-      const _boost = (_theme && _themeEvts.length) ? 3.5 : 1;
-      const ev = eligible.find(e => Math.random() < e.chance * _boost);
+      const eligible   = [...CHAOS_EVENTS, ..._themeEvts].filter(e => e.round===S.round);
+      const ev = eligible.find(e => Math.random()<e.chance);
       if (ev) {
         S.chaosEvent = ev;
         S.chaosModBO += (ev.penaltyBO||0);
         S.chaosModOS += (ev.penaltyOS||0);
         S.chaosHistory = [...(S.chaosHistory||[]), ev.msg.slice(0,40)];
-        // MINION TAKEOVER: a Minion picks for you
-        if (ev.minionPick && S.opts && S.opts.length) {
-          const mIdx = Math.floor(Math.random() * S.opts.length);
-          S.selIdx = mIdx;
-          S.minionOverride = { idx: mIdx, name: S.opts[mIdx]?.name };
-        }
         if (ev.reroll && ev.rerollRound !== null && ev.rerollRound !== undefined) {
           S.picks = S.picks.slice(0, ev.rerollRound);
           S.round = ev.rerollRound;
@@ -3824,25 +3287,6 @@ function switchTab(tab) {
     renderWalkOfFame();
     const ap = document.getElementById('wof-achievements');
     if (ap) ap.innerHTML = renderAchievementsPanel();
-    // Fetch global leaderboard from Supabase
-    const glList = document.getElementById('global-lb-list');
-    if (glList) {
-      glList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Loading global board...</div>';
-      sbFetchWoF(50).then(rows => {
-        if (!rows || !rows.length) {
-          glList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">No global entries yet. Be the first!</div>';
-          return;
-        }
-        globalEntries = rows.map(r => ({
-          id: r.id, filmTitle: r.film_title, verdict: r.verdict,
-          boM: r.bo_m, noms: r.noms, wins: r.wins, score: r.score||0,
-          rtCritic: r.rt_critic, rtAudience: r.rt_audience,
-          director: r.director, leadActor: r.lead_actor,
-          submittedBy: r.submitted_by, createdAt: r.created_at,
-        }));
-        renderGlobalEntries();
-      });
-    }
   }
   if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
   if (tab==='daily') { renderStandaloneDailyBoard(); }
@@ -4635,17 +4079,6 @@ function renderAchievementsPanel() {
 const SB_URL = "https://vebndlyvfrxbrwsiwtbj.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlYm5kbHl2ZnJ4YnJ3c2l3dGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3OTI0NjIsImV4cCI6MjA5NjM2ODQ2Mn0._S5KbhWvL6JGN2OhddY_-4Ht-PKhWRtNR538ayiFxDI";
 
-async function sbFetchWoF(limit = 50) {
-  try {
-    const res = await fetch(
-      SB_URL + "/rest/v1/walk_of_fame?select=*&order=score.desc&limit=" + limit,
-      { headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY } }
-    );
-    if (!res.ok) return [];
-    return await res.json();
-  } catch(e) { return []; }
-}
-
 async function sbInsert(row) {
   try {
     const res = await fetch(SB_URL + "/rest/v1/walk_of_fame", {
@@ -4727,7 +4160,6 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
     bo_m:          boM   || 0,
     noms:          noms  || 0,
     wins:          wins  || 0,
-    score:         Math.round((boM||0) + ((noms||0)*12) + ((wins||0)*20) + (((rtCritic||0)+(rtAudience||0))/4)),
     rt_critic:     rtCritic   || 0,
     rt_audience:   rtAudience || 0,
     director:      picks[0]?.name || "",
@@ -4755,8 +4187,8 @@ function renderGlobalEntries() {
   const list = document.getElementById("global-lb-list");
   if (!list || !globalEntries.length) return;
   let sorted = [...globalEntries];
-  if (globalSort === 'score')    sorted.sort((a,b) => (b.score||b.boM||b.bo_m||0) - (a.score||a.bo_m||0));
-  if (globalSort === 'bo')       sorted.sort((a,b) => (b.boM||b.bo_m||0) - (a.bo_m||0));
+  if (globalSort === 'score')    sorted.sort((a,b) => (b.score||b.bo_m||0) - (a.score||a.bo_m||0));
+  if (globalSort === 'bo')       sorted.sort((a,b) => (b.bo_m||0) - (a.bo_m||0));
   if (globalSort === 'oscar')    sorted.sort((a,b) => (b.noms||0) - (a.noms||0));
   if (globalSort === 'wins')     sorted.sort((a,b) => (b.wins||0) - (a.wins||0));
   if (globalSort === 'rt')       sorted.sort((a,b) => (b.rt_critic||0) - (a.rt_critic||0));
@@ -4766,20 +4198,20 @@ function renderGlobalEntries() {
   const rankClass = ["gold","silver","bronze"];
   const visible = globalExpanded ? sorted : sorted.slice(0, 10);
   const rows = visible.map((e, i) => {
-    const byLine = (e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== "Anonymous")
-      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
+    const byLine = (e.submitted_by && e.submitted_by !== "Anonymous")
+      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
     return `<div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
       <div class="lb-info">
         <div class="lb-title">${e.film_title||"Untitled"}</div>
         <div class="lb-verdict">${e.verdict||""}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||""} &nbsp;·&nbsp; ${e.leadActor||e.lead_actor||""}${byLine}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||""} &nbsp;·&nbsp; ${e.lead_actor||""}${byLine}</div>
       </div>
       <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.boM||e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
-        ${e.rtCritic||e.rt_critic ? `<div class="lb-score-row" style="color:#FA320A">🍅 ${e.rtCritic||e.rt_critic}%</div>` : ''}
-        ${e.rtAudience||e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rtAudience||e.rt_audience}%</div>` : ''}
+        ${e.rt_critic ? `<div class="lb-score-row" style="color:#FA320A">🍅 ${e.rt_critic}%</div>` : ''}
+        ${e.rt_audience ? `<div class="lb-score-row" style="color:#FA8C00">🍿 ${e.rt_audience}%</div>` : ''}
       </div>
     </div>`;
   }).join("");
@@ -4821,16 +4253,16 @@ async function renderStandaloneDailyBoard() {
     return;
   }
   list.innerHTML = entries.map((e,i) => {
-    const by = (e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
+    const by = (e.submitted_by && e.submitted_by !== 'Anonymous') ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
     return '<div class="lb-entry">'
       + '<div class="lb-rank-num ' + (rankClass[i]||'') + '">' + (medals[i]||i+1) + '</div>'
       + '<div class="lb-info">'
-      + '<div class="lb-title">' + (e.filmTitle||e.film_title||'Untitled') + '</div>'
+      + '<div class="lb-title">' + (e.film_title||'Untitled') + '</div>'
       + '<div class="lb-verdict">' + (e.verdict||'') + '</div>'
-      + '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + (e.director||'') + ' · ' + (e.leadActor||e.lead_actor||'') + by + '</div>'
+      + '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + (e.director||'') + ' · ' + (e.lead_actor||'') + by + '</div>'
       + '</div>'
       + '<div class="lb-scores">'
-      + '<div class="lb-score-row" style="color:var(--blue)">💰 $' + (e.boM||e.bo_m||0) + 'M</div>'
+      + '<div class="lb-score-row" style="color:var(--blue)">💰 $' + (e.bo_m||0) + 'M</div>'
       + '<div class="lb-score-row" style="color:var(--amber)">🏆 ' + (e.noms||0) + ' noms</div>'
       + '</div></div>';
   }).join('') + '<div style="font-size:11px;color:var(--text3);text-align:center;padding:10px 0;border-top:0.5px solid var(--border);margin-top:8px">Daily board resets at midnight</div>';
@@ -4864,16 +4296,16 @@ async function renderDailyLeaderboard() {
   const medals = ["🥇","🥈","🥉"];
   const rankClass = ["gold","silver","bronze"];
   list.innerHTML = entries.map((e,i) => {
-    const by = e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== 'Anonymous' ? ' <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
+    const by = e.submitted_by && e.submitted_by !== 'Anonymous' ? ' <span style="color:var(--amber)">by ' + e.submitted_by + '</span>' : '';
     return `<div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
       <div class="lb-info">
-        <div class="lb-title">${e.filmTitle||e.film_title||'Untitled'}</div>
+        <div class="lb-title">${e.film_title||'Untitled'}</div>
         <div class="lb-verdict">${e.verdict||''}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.leadActor||e.lead_actor||''}${by}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${e.director||''} · ${e.lead_actor||''}${by}</div>
       </div>
       <div class="lb-scores">
-        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.boM||e.bo_m||0}M</div>
+        <div class="lb-score-row" style="color:var(--blue)">💰 $${e.bo_m||0}M</div>
         <div class="lb-score-row" style="color:var(--amber)">🏆 ${e.noms||0} noms</div>
       </div>
     </div>`;
@@ -4896,8 +4328,6 @@ async function renderGlobalLeaderboard() {
 render();
 // Wire share buttons after initial render
 // wireShareButtons called via bind() on result phase
-
-
 </script>
 </body>
 </html>
