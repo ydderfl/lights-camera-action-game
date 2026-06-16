@@ -841,14 +841,8 @@ function renderWalkOfFame() {
 }
 
 
-function switchTab(tab) {
-  document.getElementById("page-game").classList.toggle("hidden", tab !== "game");
-  document.getElementById("page-wof").classList.toggle("active", tab === "wof");
-  document.getElementById("page-wof").style.display = tab === "wof" ? "block" : "none";
-  document.getElementById("tab-game").classList.toggle("active", tab === "game");
-  document.getElementById("tab-wof").classList.toggle("active", tab === "wof");
-  if (tab === "wof") renderWalkOfFame();
-}
+// switchTab defined below
+
 
 const CATEGORIES = [
   { key:"director",   label:"Director",         icon:"🎬", opts:8 },
@@ -2711,6 +2705,103 @@ function picksSoFar() {
 
 // ── THEMED EVENTS ────────────────────────────────────────────────────────
 const THEMES = {
+  odyssey: {
+    id: "odyssey",
+    name: "The Odyssey Opens",
+    subtitle: "An Epic Ten Years in the Making",
+    tagline: "The Hollywood Draft Game - The Odyssey Edition",
+    dates: ["2026-07-17","2026-07-18","2026-07-19","2026-07-20"],
+    palette: {
+      titleGradient: "linear-gradient(135deg,#1E6FD4 0%,#C8A84B 35%,#2A8A6A 65%,#1E6FD4 100%)",
+      bg: "#040810", border: "#1a2030", subtitleColor: "#5a7090", taglineColor: "#4a5a70",
+      statColors: ["#C8A84B","#1E6FD4","#C8A84B","#2A8A6A"],
+    },
+    introTag: "⚓ The Odyssey opens this weekend. Draft your epic.",
+    introTagColor: "#C8A84B",
+    introTagBg: "rgba(200,168,75,0.10)",
+    introTagBorder: "rgba(200,168,75,0.30)",
+    productionCredit: "A Universal Pictures Production",
+    presentsLine: "In Association With Syncopy Films",
+    lockedPicks: { studio: "Universal Pictures", genre: "Epic Drama" },
+    optionInjections: {
+      director: [
+        { name:"Christopher Nolan",  bo:20, oscar:16, era:"Epic",    known:"The Odyssey director. The one everyone is going to see." },
+        { name:"Denis Villeneuve",   bo:18, oscar:15, era:"Epic",    known:"Dune. Arrival. The natural competitor in this space." },
+        { name:"Ridley Scott",       bo:17, oscar:14, era:"Epic",    known:"Gladiator. Kingdom of Heaven. He lives here." },
+        { name:"Peter Jackson",      bo:17, oscar:15, era:"Epic",    known:"LOTR. He knows mythology. He knows scope." },
+        { name:"David Lean",         bo:16, oscar:16, era:"Classic", known:"Lawrence of Arabia. The original epic." },
+      ],
+      lead: [
+        { name:"Matt Damon (Odysseus)", bo:16, oscar:10, era:"Epic",     known:"The Martian. Saving Private Ryan. He comes home from impossible places." },
+        { name:"Tom Hanks (Odysseus)",  bo:17, oscar:14, era:"Epic",     known:"Cast Away is already a modern Odyssey." },
+        { name:"Oscar Isaac (Odysseus)",bo:14, oscar:12, era:"Prestige", known:"Inside Llewyn Davis. The Odyssey structure is in his DNA." },
+        { name:"Paul Mescal (Odysseus)",bo:13, oscar:13, era:"Prestige", known:"Gladiator II. Already in epic territory." },
+        { name:"Cillian Murphy",        bo:15, oscar:14, era:"Epic",     known:"Oppenheimer. He carries the weight of worlds." },
+        { name:"Chris Hemsworth",       bo:16, oscar:8,  era:"Action",   known:"Thor energy. The gods are already familiar with him." },
+      ],
+      supporting: [
+        { name:"Cate Blanchett (Athena)",     bo:14, oscar:15, era:"Prestige", known:"A goddess who meddles. Her natural register." },
+        { name:"Nicole Kidman (Circe)",       bo:13, oscar:13, era:"Prestige", known:"The witch-goddess. Kidman makes mythology feel psychological." },
+        { name:"Tilda Swinton (Circe)",       bo:11, oscar:13, era:"Arthouse", known:"Not human energy. Exactly right for a sorceress." },
+        { name:"Anthony Hopkins (Poseidon)",  bo:13, oscar:13, era:"Classic",  known:"The antagonist god. Hopkins plays divine grievance." },
+        { name:"Idris Elba (Poseidon)",       bo:14, oscar:11, era:"Epic",     known:"The storm given form." },
+        { name:"Lupita Nyong'o (Penelope)",   bo:13, oscar:13, era:"Prestige", known:"Waiting. Loyal. Devastating." },
+      ],
+      screenplay: [
+        { name:"Epic Adaptation of Homer",         bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. The Academy loves this." },
+        { name:"Original Epic Vision",             bo:17, oscar:13, era:"Epic",        known:"The director wrote it. This is the definitive version." },
+        { name:"Mythological Prestige Adaptation", bo:13, oscar:15, era:"Prestige",    known:"Myth treated as journalism. The Academy responds." },
+        { name:"Literary Darkness Reframe",        bo:11, oscar:14, era:"Literary",    known:"The Odyssey as modern desolation. Nobody arrives home cleanly." },
+        { name:"Multi-Generational War Epic",      bo:13, oscar:14, era:"Epic",        known:"The war. The aftermath. The return. Twenty years." },
+      ],
+      composer: [
+        { name:"Hans Zimmer",          bo:16, oscar:14, era:"Epic",    known:"The natural Nolan choice. The score will shake foundations." },
+        { name:"Ludwig Goransson",     bo:15, oscar:13, era:"Epic",    known:"Oppenheimer. Tenet. Already in the Nolan ecosystem." },
+        { name:"Howard Shore",         bo:15, oscar:14, era:"Epic",    known:"LOTR. Epic mythology lives in his catalogue." },
+        { name:"Max Richter",          bo:12, oscar:11, era:"Prestige",known:"On the Nature of Daylight. The score of longing." },
+      ],
+      budget: [
+        { name:"Epic Scale ($200M to $250M)",    bo:17, oscar:12, era:"Epic",    known:"The Odyssey budget. IMAX. Practical sea effects. Malta." },
+        { name:"Mega ($250M to $350M)",          bo:18, oscar:10, era:"Epic",    known:"When Nolan wants to rebuild Troy and actually set it on fire." },
+      ],
+      season: [
+        { name:"Summer Tentpole (May to Jul)",   bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date." },
+        { name:"IMAX Global Event",              bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The only correct way." },
+        { name:"Awards Season (Nov to Dec)",     bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world." },
+      ],
+    },
+    verdictOverrides: {
+      goat:        { title:"⚓ A voyage completed. The Academy wept. The gods approved.",         detail:"$900M. Ten years. The most anticipated film of the generation delivered on every promise." },
+      jugger:      { title:"🌊 The fleet has returned. The box office is underwater.",              detail:"Record opening weekend. Troy has fallen." },
+      darling:     { title:"🏆 The Academy has convened. Homer would have approved.",               detail:"Twelve nominations. The reviews are once-in-a-decade." },
+      prestige:    { title:"🎨 Prestige of the highest order.",                                     detail:"Playing in limited release. The 70mm screenings are sold out." },
+      hit:         { title:"✨ A crowd-pleasing odyssey. The audience followed willingly.",         detail:"Four-quadrant success." },
+      mid:         { title:"😐 The sirens sang. Nobody listened.",                                  detail:"Technically competent. Emotionally inert." },
+      flop:        { title:"💸 A journey begun and never completed. The sea took it.",              detail:"The studio is not returning calls." },
+      disaster:    { title:"🔥 This is what Polyphemus felt like. From the inside.",               detail:"A historic catastrophe." },
+      tax_writeoff:{ title:"📜 The Oracle at Delphi had warned them. They did not listen.",        detail:"The accountants are the only ones satisfied." },
+    },
+    chaosInjections: [
+      { round:1, chance:0.40, msg:"⚔️ DAY ONE RESHOOT: Nolan reshot the opening sequence three times on day one. He has not explained why. The crew understands. The studio does not.", penaltyBO:0, penaltyOS:2 },
+      { round:2, chance:0.40, msg:"🐴 THE TROJAN HORSE: A wooden horse arrived on set. Nobody ordered it. The doors opened. Eleven studio executives emerged with script notes. Production suspended four days. Nolan accepted none of the notes.", penaltyBO:-1, penaltyOS:2 },
+      { round:3, chance:0.38, msg:"⛵ MALTA: Production moved to Malta. A swell destroyed the practical longship on day one. The director called it authentic. The insurance company called it a claim.", penaltyBO:-1, penaltyOS:2 },
+      { round:4, chance:0.38, msg:"🌊 POSEIDON INTERVENES: The underwater unit flooded the soundstage at 3am. The rushes were extraordinary. The director kept everything.", penaltyBO:0, penaltyOS:3 },
+      { round:5, chance:0.35, msg:"📸 THE LEAK: A single practical effects frame appeared online. The internet declared it the greatest image in cinema history. The marketing team cancelled the trailer. The image is the campaign.", penaltyBO:3, penaltyOS:2 },
+      { round:6, chance:0.35, msg:"🧜 THE SIRENS: Three crew members reported hearing music from no identifiable source. One could not recall their cues for five days. The director kept every take.", penaltyBO:0, penaltyOS:3 },
+      { round:7, chance:0.33, msg:"🎬 THE ASPECT RATIO INTERVIEW: Nolan gave a forty-minute interview. He mentioned the story twice. The internet covered the format for 72 hours. Every other film was temporarily forgotten.", penaltyBO:2, penaltyOS:1 },
+      { round:8, chance:0.33, msg:"🏛️ THE CYCLOPS: The practical creature took eleven months to build. Nolan then requested two additional shots that required four more weeks in Malta. Universal approved in the same phone call.", penaltyBO:1, penaltyOS:3 },
+      { round:9, chance:0.30, msg:"🌅 THE RETURN: Nolan finished the final cut at 4:12am. He watched it alone. He called one person. He said: it is done. Three hours and seventeen minutes. Not a frame will be cut. Universal has agreed.", penaltyBO:3, penaltyOS:4 },
+    ],
+    letterboxdExtra: [
+      { user:"70mm_or_nothing",     stars:"★★★★★", review:"three hours. i would have taken six." },
+      { user:"aegean_enjoyer",      stars:"★★★★★", review:"the audience applauded the ocean. the ocean did not acknowledge them. five stars." },
+      { user:"wept_about_a_boat",   stars:"★★★★★", review:"christopher nolan made me care about a boat. i have never cared about a boat before." },
+      { user:"imax_pilgrim",        stars:"★★★★★", review:"watched it in 70mm imax. i am a different person now." },
+      { user:"homer_would_approve", stars:"★★★★",  review:"three hours. i did not check my phone once. that is the whole review." },
+    ],
+    shareEmoji: "⚓",
+    shareTagline: "Can you match The Odyssey? Draft your epic.",
+  },
   minions: {
     id: "minions",
     name: "Lights, Camera, Banana!",
@@ -2750,10 +2841,24 @@ const THEMES = {
     },
     // Chaos overrides  -  Minion-flavored
     chaosInjections: [
-      { round:3, chance:0.10, msg:"🍌 Minion Sighting: A Minion was spotted on set. Nobody knows how. Trending worldwide. Opening weekend tracking just moved up.", penaltyBO:3, penaltyOS:0 },
-      { round:5, chance:0.08, msg:"💛 Banana Scene: An improvised banana gag made it into the cut. Test audiences gave it a standing ovation. The studio is confused but supportive.", penaltyBO:2, penaltyOS:1 },
-      { round:7, chance:0.08, msg:"🎤 Gru Cameo Rumour: Someone on set posted a blurry photo. The internet has decided it is Steve Carell. Opening weekend tracking has gone vertical.", penaltyBO:3, penaltyOS:0 },
+      { round:1, chance:0.50, msg:"🍌 MINION TAKEOVER: Before you begin, a Minion has reviewed the options and selected one. The Minion is confident. The banana is implicit.", penaltyBO:1, penaltyOS:0, minionPick:true },
+      { round:2, chance:0.45, msg:"🍌 THREE MINIONS ESCAPED: Last seen near craft services. Security briefed. A banana was left at the scene. Tracking up 12 points. Nobody is treating this as a problem.", penaltyBO:3, penaltyOS:0 },
+      { round:2, chance:0.40, msg:"🍌 MINION CASTING INPUT: A Minion entered the session and pointed at one of the options. Nobody stopped them. The Minion seems certain.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:3, chance:0.45, msg:"💛 THE BANANA SCENE: Unscripted. A Minion found a banana during filming. Fifteen minutes of usable footage. The director kept all of it.", penaltyBO:2, penaltyOS:1 },
+      { round:3, chance:0.40, msg:"🍌 MINION SCRIPT NOTES: A Minion reviewed the options and circled one. The circle is drawn in banana. The logic is internally consistent.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:4, chance:0.42, msg:"😤 GRU HAD NOTES: Steve Carell reviewed the script overnight. Seventeen pages. All about accent trajectory in the second act. Production paused 48 hours. He was completely correct.", penaltyBO:1, penaltyOS:2 },
+      { round:4, chance:0.38, msg:"🍌 MINION BUDGET REVIEW: The Minions examined the budget options and selected one. Their financial reasoning consists of the word gelato repeated eleven times.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:5, chance:0.42, msg:"🎤 GRU CAMEO CONFIRMED: Steve Carell confirmed via Twitter with a photo of a banana. Tracking went vertical. The studio called it organic. It was not organic.", penaltyBO:4, penaltyOS:0 },
+      { round:5, chance:0.38, msg:"🍌 MINION GENRE COMMITTEE: Three Minions convened and unanimously selected a genre option. They appear to have misread the brief. They are very confident.", penaltyBO:1, penaltyOS:0, minionPick:true },
+      { round:6, chance:0.40, msg:"👶 THE ANTI-VILLAIN ACADEMY: A school visited the set. Twelve children defected to the Minions. Two were employed as junior consultants. Their notes were better than the studio's.", penaltyBO:2, penaltyOS:1 },
+      { round:6, chance:0.36, msg:"🍌 MINION DIRECTOR SELECTION: A Minion knocked the options board off the wall. One card landed face-up. The Minion is pointing at it insistently. This is being treated as binding.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:7, chance:0.40, msg:"🍌 PHARRELL SHOWED UP: Nobody called him. Synthesiser. Three ideas. All three are now in the film. One is called Gelato. It will play at every children's birthday party for eleven years.", penaltyBO:3, penaltyOS:2 },
+      { round:7, chance:0.35, msg:"🍌 MINION COMPOSER PICK: The Minions entered the music session. One sat at the piano. They cannot play piano. They selected a composer by sitting on the relevant contract.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:8, chance:0.40, msg:"🎪 THE TEST SCREENING: 80% children under eight. Continuous laughter. Three adults cried. The film was not trying to make adults cry. It did not need to try.", penaltyBO:2, penaltyOS:1 },
+      { round:8, chance:0.35, msg:"🍌 MINION RELEASE STRATEGY: The Minions decided when this film should open. They communicated via a calendar covered in banana stains. The date is July 4. They are not wrong.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:9, chance:0.45, msg:"🌍 BABABOI MOMENT: The trailer dropped. Final frame: a Minion says bababoi directly to camera. Viewed 200 million times. The film does not exist yet. Everything is banana. Bababoi.", penaltyBO:4, penaltyOS:1 },
     ],
+
     // Letterboxd overrides
     letterboxdExtra: [
       { user:"banana_certified",     stars:"★★★★★", review:"did not come here for prestige cinema and i was not disappointed. bababoi." },
@@ -2771,6 +2876,9 @@ const THEMES = {
 };
 
 function getActiveTheme() {
+  if (THEME_OVERRIDE && THEMES[THEME_OVERRIDE]) return THEMES[THEME_OVERRIDE];
+  const urlTheme = new URLSearchParams(window.location.search).get('theme');
+  if (urlTheme && THEMES[urlTheme]) return THEMES[urlTheme];
   const today = new Date().toISOString().slice(0,10);
   return Object.values(THEMES).find(t => t.dates.includes(today)) || null;
 }
@@ -2802,6 +2910,64 @@ function buildIntroHero(t) {
     + '</div></div>';
 }
 
+// ── Theme override management ──────────────────────────────────────────────
+let THEME_OVERRIDE = localStorage.getItem('lca_theme_override') || null;
+
+function toggleTheme(id) {
+  if (id === null || THEME_OVERRIDE === id) {
+    THEME_OVERRIDE = null;
+    localStorage.removeItem('lca_theme_override');
+  } else {
+    THEME_OVERRIDE = id;
+    localStorage.setItem('lca_theme_override', id);
+  }
+  updateThemeButtons();
+  render();
+}
+
+function activateThemeWithHelp(id) {
+  toggleTheme(id);
+  const p = document.getElementById('how-to-play-panel');
+  if (!p) return;
+  p.style.display = 'block';
+  const reg = document.getElementById('htp-regular');
+  const min = document.getElementById('htp-minions');
+  const ody = document.getElementById('htp-odyssey');
+  const nowActive = THEME_OVERRIDE;
+  if (reg) reg.style.display = !nowActive ? 'block' : 'none';
+  if (min) min.style.display = nowActive === 'minions' ? 'block' : 'none';
+  if (ody) ody.style.display = nowActive === 'odyssey' ? 'block' : 'none';
+  if (!nowActive) p.style.display = 'none';
+}
+
+function updateThemeButtons() {
+  const mBtn = document.getElementById('theme-minions-btn');
+  const oBtn = document.getElementById('theme-odyssey-btn');
+  const dBtn = document.getElementById('theme-default-btn');
+  const status = document.getElementById('theme-status');
+  if (!mBtn || !oBtn) return;
+  mBtn.style.borderColor = 'rgba(245,197,24,0.35)';
+  mBtn.style.background  = 'rgba(245,197,24,0.08)';
+  oBtn.style.borderColor = 'rgba(200,168,75,0.35)';
+  oBtn.style.background  = 'rgba(30,111,212,0.08)';
+  if (THEME_OVERRIDE === 'minions') {
+    mBtn.style.borderColor = '#F5C518';
+    mBtn.style.background  = 'rgba(245,197,24,0.20)';
+    if (status) status.textContent = '🍌 Minions mode active';
+    if (dBtn) dBtn.style.display = 'inline';
+  } else if (THEME_OVERRIDE === 'odyssey') {
+    oBtn.style.borderColor = '#C8A84B';
+    oBtn.style.background  = 'rgba(30,111,212,0.20)';
+    if (status) status.textContent = '⚓ Odyssey mode active';
+    if (dBtn) dBtn.style.display = 'inline';
+  } else {
+    if (dBtn) dBtn.style.display = 'none';
+    if (status) status.textContent = '';
+  }
+}
+
+// Replace existing getActiveTheme if present  -  this is the definitive version
+
 function renderIntro() {
   const streak = getDailyStreak();
   const doneToday = hasDoneDaily();
@@ -2825,6 +2991,19 @@ function renderIntro() {
     <button class="btn" id="start-btn" style="max-width:240px;margin:0 auto;display:block">Action! Start Directing →</button>
     <div style="text-align:center;margin-top:12px">
       <button id="how-to-play-btn" style="background:none;border:none;color:var(--text3);font-size:12px;text-decoration:underline;cursor:pointer">How to Play</button>
+    </div>
+    <div id="theme-toggle-panel" style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.15em;color:var(--text3);text-align:center;margin-bottom:2px">Special Events</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button id="theme-minions-btn" onclick="activateThemeWithHelp('minions')" style="flex:1;max-width:200px;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(245,197,24,0.35);background:rgba(245,197,24,0.08);color:#F5C518;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;line-height:1.4">
+          🍌 Go Bananas<br><span style="font-size:10px;font-weight:400;opacity:0.7">Lights, Camera, Banana! mode</span>
+        </button>
+        <button id="theme-odyssey-btn" onclick="activateThemeWithHelp('odyssey')" style="flex:1;max-width:200px;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(200,168,75,0.35);background:rgba(30,111,212,0.08);color:#C8A84B;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;line-height:1.4">
+          ⚓ Sail the Seas<br><span style="font-size:10px;font-weight:400;opacity:0.7">The Odyssey Opens mode</span>
+        </button>
+      </div>
+      <div id="theme-status" style="text-align:center;font-size:10px;color:var(--text3);min-height:16px"></div>
+      <div style="text-align:center;margin-top:4px"><button id="theme-default-btn" onclick="toggleTheme(null)" style="display:none;background:none;border:none;color:var(--text3);font-size:11px;text-decoration:underline;cursor:pointer">↩ Return to regular draft</button></div>
     </div>
     <div id="how-to-play-panel" style="display:none;background:var(--surface2);border-radius:var(--r-lg);padding:1.1rem;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6">
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
@@ -2876,13 +3055,21 @@ function statsHtml(o) {
 
 function renderChoosing() {
   const cat = CATEGORIES[S.round];
+  // MINION TAKEOVER: auto-select for player, they must confirm
+  if (S.minionTakeover > 0 && S.opts && S.opts.length && !S.minionAutoSelected) {
+    const autoIdx = Math.floor(Math.random() * S.opts.length);
+    S.selIdx = autoIdx;
+    S.minionAutoSelected = { idx: autoIdx, name: S.opts[autoIdx]?.name };
+  }
   const showKnown = ["director","lead","supporting","composer"].includes(cat.key);
   return `${scoreBar()}${progressBar()}
   <div class="round-row"><span class="round-badge">Round ${S.round+1} of ${CATEGORIES.length}  -  Pick your ${cat.label}</span></div>
   ${picksSoFar()}
   <div class="choices-title">Choose one ${cat.icon} ${cat.label}</div>
+  ${S.minionOverride ? `<div style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.4);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:11px;color:#F5C518;text-align:center">🍌 A Minion has made a selection. You may override it  -  if you dare.</div>` : ''}
   <div class="choices-grid">
     ${S.opts.map((o,i)=>`<div class="choice ${S.selIdx===i?"sel":""}" data-i="${i}">
+      ${S.minionOverride && S.minionOverride.idx !== undefined && S.minionOverride.idx===i ? `<div style="font-size:9px;color:#F5C518;font-weight:700;letter-spacing:0.1em;margin-bottom:3px">🍌 MINION'S PICK</div>` : ''}
       <div class="choice-name">${o.name}</div>
       ${showKnown && o.known ? `<div class="choice-known">Known for: ${o.known}</div>` : `<div class="choice-era">${o.era}</div>`}
       <div class="choice-stats">
@@ -2893,7 +3080,21 @@ function renderChoosing() {
   <div class="btn-row">
     <button class="btn-sm" id="reroll-btn" ${S.skipCat<=0?"disabled":""}>Reroll options (${S.skipCat} left)</button>
   </div>
-  <button class="btn" id="confirm-btn" ${S.selIdx===null?"disabled":""}>Confirm Pick →</button>`;
+  ${S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.15);border:2px solid #F5C518;border-radius:12px;padding:12px 16px;margin-bottom:10px;text-align:center">
+    <div style="font-size:14px;font-weight:900;color:#F5C518;margin-bottom:6px">🍌 THE MINIONS HAVE ENACTED CREATIVE CONTROL 🍌</div>
+    <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their selection. They have exercised their contractual creative rights.</div>
+    <div style="font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;margin:6px 0">The Minions have selected: <span style="color:#F5C518">${S.minionAutoSelected.name}</span></div>
+    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining.</div>
+  </div>` : ''}
+  ${S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.15);border:2px solid #F5C518;border-radius:12px;padding:12px 16px;margin-bottom:10px;text-align:center">
+    <div style="font-size:14px;font-weight:900;color:#F5C518;margin-bottom:6px">🍌 MINIONS ENACTED CREATIVE CONTROL 🍌</div>
+    <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their pick. They have exercised their contractual creative rights.</div>
+    <div style="font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px">Minions selected: <span style="color:#F5C518">${S.minionAutoSelected.name}</span></div>
+    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining.</div>
+  </div>` : ''}
+  <button class="btn" id="confirm-btn" ${S.selIdx===null?"disabled":""}>
+    ${S.minionAutoSelected ? '🍌 Acknowledge Minion Creative Control →' : 'Confirm Pick →'}
+  </button>`;
 }
 
 function renderResult() {
@@ -2959,7 +3160,7 @@ function renderResult() {
       { critic:"Manohla Dargis, New York Times",   quote: noms>9  ? "An extraordinary film. A genuine gift to cinema." : boM>400 ? "Technically accomplished. Emotionally it keeps you at a distance." : "Competent work that rarely surprises and never unsettles." },
       { critic:"David Ehrlich, IndieWire",         quote: boM<100 ? "A misfire of historic proportions. A film that fails on its own terms." : noms>6 ? "Achingly beautiful. The real deal. The year's most important film." : "Crowd-pleasing in the best and worst sense of the phrase." },
       { critic:"Justin Chang, Los Angeles Times",  quote: noms>8  ? "Breathtaking in scope and feeling. The kind of film that changes people." : "A film that means well and delivers unevenly. The good parts are very good." },
-      { critic:"Amy Nicholson, Variety",           quote: boM>500 ? `${dirName} at the top of their game. Commercial cinema doing exactly what it should.` : noms>6 ? "The kind of film that stays with you for days after. That is the highest praise." : "Ambitious. Flawed. Worth seeing and arguing about afterward." },
+      { critic:"Amy Nicholson, Variety",           quote: boM>500 ? (dirName + " at the top of their game. Commercial cinema doing exactly what it should.") : noms>6 ? "The kind of film that stays with you for days after. That is the highest praise." : "Ambitious. Flawed. Worth seeing and arguing about afterward." },
     ]
   };
 
@@ -3116,8 +3317,11 @@ function bind() {
   $("start-btn")?.addEventListener("click", ()=>{ DAILY_MODE=false; S=fresh(); S.phase="rolling"; render(); });
   $("how-to-play-btn")?.addEventListener("click", ()=>{
     const p = document.getElementById("how-to-play-panel");
-    if (p) p.style.display = p.style.display === "none" ? "block" : "none";
+    if (!p) return;
+    const showing = p.style.display === "block";
+    p.style.display = showing ? "none" : "block";
   });
+  updateThemeButtons();
   $("daily-start-btn")?.addEventListener("click", ()=>{
     DAILY_MODE=true; S=fresh(); S.dailyRng=mulberry32(getDailySeed()); S.phase="rolling"; render();
   });
@@ -3218,6 +3422,13 @@ function bind() {
     const picked = S.opts[S.selIdx];
     S.picks.push(picked);
     S.lastPickFeedback = getPickFeedback(picked, S.round);
+    // MINION REVENGE: if player overrode Minion pick, Minions select next 2 rounds
+    if (S.minionOverride && S.minionOverride.idx !== undefined && S.selIdx !== S.minionOverride.idx) {
+      S.minionTakeover = 2;
+    }
+    S.minionOverride = null;
+    if (S.minionAutoSelected) S.minionTakeover = Math.max(0, (S.minionTakeover||0) - 1);
+    S.minionAutoSelected = null;
     S.round++; S.selIdx=null;
     // Clear any previous chaos banner before checking for new one
     S.chaosEvent = null;
@@ -3226,13 +3437,26 @@ function bind() {
     if (!DAILY_MODE && chaosCount < 2) {
       const _theme     = getActiveTheme();
       const _themeEvts = (_theme?.chaosInjections||[]).map(e => ({...e, reroll:false, rerollRound:null}));
-      const eligible   = [...CHAOS_EVENTS, ..._themeEvts].filter(e => e.round===S.round);
-      const ev = eligible.find(e => Math.random()<e.chance);
+      // Themed mode: ONLY theme chaos fires. Normal mode: ONLY regular chaos.
+      let eligible;
+      if (_theme && _themeEvts.length) {
+        eligible = _themeEvts.filter(e => e.round === S.round);
+      } else {
+        eligible = CHAOS_EVENTS.filter(e => e.round === S.round);
+      }
+      const _boost = (_theme && _themeEvts.length) ? 3.5 : 1;
+      const ev = eligible.find(e => Math.random() < e.chance * _boost);
       if (ev) {
         S.chaosEvent = ev;
         S.chaosModBO += (ev.penaltyBO||0);
         S.chaosModOS += (ev.penaltyOS||0);
         S.chaosHistory = [...(S.chaosHistory||[]), ev.msg.slice(0,40)];
+        // MINION TAKEOVER: a Minion picks for you
+        if (ev.minionPick && S.opts && S.opts.length) {
+          const mIdx = Math.floor(Math.random() * S.opts.length);
+          S.selIdx = mIdx;
+          S.minionOverride = { idx: mIdx, name: S.opts[mIdx]?.name };
+        }
         if (ev.reroll && ev.rerollRound !== null && ev.rerollRound !== undefined) {
           S.picks = S.picks.slice(0, ev.rerollRound);
           S.round = ev.rerollRound;
@@ -3287,6 +3511,15 @@ function switchTab(tab) {
     renderWalkOfFame();
     const ap = document.getElementById('wof-achievements');
     if (ap) ap.innerHTML = renderAchievementsPanel();
+    const glList = document.getElementById('global-lb-list');
+    if (glList) {
+      glList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Loading...</div>';
+      sbFetchWoF(50).then(rows => {
+        if (!rows || !rows.length) { glList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">No global entries yet. Be the first!</div>'; return; }
+        globalEntries = rows.map(r => ({ id:r.id, filmTitle:r.film_title, verdict:r.verdict, boM:r.bo_m, noms:r.noms, wins:r.wins, score:r.score||0, rtCritic:r.rt_critic, rtAudience:r.rt_audience, director:r.director, leadActor:r.lead_actor, submittedBy:r.submitted_by, createdAt:r.created_at }));
+        renderGlobalEntries();
+      });
+    }
   }
   if (tab==='lb') { renderLeaderboard(); renderGlobalLeaderboard(); }
   if (tab==='daily') { renderStandaloneDailyBoard(); }
@@ -4079,6 +4312,15 @@ function renderAchievementsPanel() {
 const SB_URL = "https://vebndlyvfrxbrwsiwtbj.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlYm5kbHl2ZnJ4YnJ3c2l3dGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3OTI0NjIsImV4cCI6MjA5NjM2ODQ2Mn0._S5KbhWvL6JGN2OhddY_-4Ht-PKhWRtNR538ayiFxDI";
 
+async function sbFetchWoF(limit) {
+  try {
+    const res = await fetch(SB_URL + "/rest/v1/walk_of_fame?select=*&order=score.desc&limit=" + (limit||50),
+      { headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY } });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
 async function sbInsert(row) {
   try {
     const res = await fetch(SB_URL + "/rest/v1/walk_of_fame", {
@@ -4159,6 +4401,7 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
     verdict:       verdict?.title   || "",
     bo_m:          boM   || 0,
     noms:          noms  || 0,
+    score:        Math.round((boM||0) + ((noms||0)*12) + ((wins||0)*20) + (((rtCritic||0)+(rtAudience||0))/4)),
     wins:          wins  || 0,
     rt_critic:     rtCritic   || 0,
     rt_audience:   rtAudience || 0,
