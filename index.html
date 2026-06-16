@@ -2722,52 +2722,64 @@ const THEMES = {
     introTagBorder: "rgba(200,168,75,0.30)",
     productionCredit: "A Universal Pictures Production",
     presentsLine: "In Association With Syncopy Films",
-    lockedPicks: { studio: "Universal Pictures", genre: "Epic Drama" },
+    lockedPicks: { studio: "Universal Pictures", genre: "Epic Drama", director: "Christopher Nolan" },
     optionInjections: {
       director: [
-        { name:"Christopher Nolan",  bo:20, oscar:16, era:"Epic",    known:"The Odyssey director. The one everyone is going to see." },
-        { name:"Denis Villeneuve",   bo:18, oscar:15, era:"Epic",    known:"Dune. Arrival. The natural competitor in this space." },
-        { name:"Ridley Scott",       bo:17, oscar:14, era:"Epic",    known:"Gladiator. Kingdom of Heaven. He lives here." },
-        { name:"Peter Jackson",      bo:17, oscar:15, era:"Epic",    known:"LOTR. He knows mythology. He knows scope." },
-        { name:"David Lean",         bo:16, oscar:16, era:"Classic", known:"Lawrence of Arabia. The original epic." },
+        { name:"Christopher Nolan",   bo:20, oscar:16, era:"Epic",     known:"The Odyssey director. The one everyone is going to see. The default choice." },
+        { name:"Denis Villeneuve",    bo:18, oscar:15, era:"Epic",     known:"Dune. Arrival. The natural rival. He would also make a great Odyssey." },
+        { name:"Ridley Scott",        bo:17, oscar:14, era:"Epic",     known:"Gladiator. Kingdom of Heaven. He has been building toward ancient worlds his whole career." },
+        { name:"Peter Jackson",       bo:17, oscar:15, era:"Epic",     known:"LOTR. The scale of mythology is his natural habitat." },
+        { name:"David Lean",          bo:16, oscar:16, era:"Classic",  known:"Lawrence of Arabia. The Bridge on the River Kwai. The original epic filmmaker." },
+        { name:"Zack Snyder",         bo:15, oscar:8,  era:"Epic",     known:"300. Visual mythology at maximum scale. The fanbase is enormous." },
       ],
       lead: [
-        { name:"Matt Damon (Odysseus)", bo:16, oscar:10, era:"Epic",     known:"The Martian. Saving Private Ryan. He comes home from impossible places." },
-        { name:"Tom Hanks (Odysseus)",  bo:17, oscar:14, era:"Epic",     known:"Cast Away is already a modern Odyssey." },
-        { name:"Oscar Isaac (Odysseus)",bo:14, oscar:12, era:"Prestige", known:"Inside Llewyn Davis. The Odyssey structure is in his DNA." },
-        { name:"Paul Mescal (Odysseus)",bo:13, oscar:13, era:"Prestige", known:"Gladiator II. Already in epic territory." },
-        { name:"Cillian Murphy",        bo:15, oscar:14, era:"Epic",     known:"Oppenheimer. He carries the weight of worlds." },
-        { name:"Chris Hemsworth",       bo:16, oscar:8,  era:"Action",   known:"Thor energy. The gods are already familiar with him." },
+        { name:"Matt Damon (Odysseus)",  bo:16, oscar:10, era:"Epic",     known:"The Martian. Saving Private Ryan. He comes home from impossible circumstances." },
+        { name:"Tom Hanks (Odysseus)",   bo:17, oscar:14, era:"Epic",     known:"Cast Away is already a modern Odyssey. Twenty years of wandering. He knows." },
+        { name:"Oscar Isaac (Odysseus)", bo:14, oscar:12, era:"Prestige", known:"Inside Llewyn Davis. A man who cannot go home because home no longer exists as he left it. This is the Odyssey." },
+        { name:"Paul Mescal (Odysseus)", bo:13, oscar:13, era:"Prestige", known:"Gladiator II. Already in epic territory. He carries exhaustion in his face before the journey begins." },
+        { name:"Cillian Murphy (Odysseus)",bo:15,oscar:14,era:"Epic",     known:"Oppenheimer. He carries the weight of worlds without showing it. Odysseus needs exactly this." },
+        { name:"Joel Edgerton (Odysseus)",bo:12, oscar:10, era:"Epic",    known:"Troy. He understands bronze-age honour culture and the stillness of men who have fought too long." },
       ],
       supporting: [
-        { name:"Cate Blanchett (Athena)",     bo:14, oscar:15, era:"Prestige", known:"A goddess who meddles. Her natural register." },
-        { name:"Nicole Kidman (Circe)",       bo:13, oscar:13, era:"Prestige", known:"The witch-goddess. Kidman makes mythology feel psychological." },
-        { name:"Tilda Swinton (Circe)",       bo:11, oscar:13, era:"Arthouse", known:"Not human energy. Exactly right for a sorceress." },
-        { name:"Anthony Hopkins (Poseidon)",  bo:13, oscar:13, era:"Classic",  known:"The antagonist god. Hopkins plays divine grievance." },
-        { name:"Idris Elba (Poseidon)",       bo:14, oscar:11, era:"Epic",     known:"The storm given form." },
-        { name:"Lupita Nyong'o (Penelope)",   bo:13, oscar:13, era:"Prestige", known:"Waiting. Loyal. Devastating." },
+        { name:"Cate Blanchett (Athena)",      bo:14, oscar:15, era:"Prestige",  known:"The goddess of wisdom who walks among mortals, visible only to the hero. Her natural register." },
+        { name:"Nicole Kidman (Circe)",        bo:13, oscar:13, era:"Prestige",  known:"The witch-goddess who turns men into pigs. Kidman makes mythology feel psychological and inevitable." },
+        { name:"Tilda Swinton (Circe)",        bo:11, oscar:13, era:"Arthouse",  known:"Not human energy. The only correct casting for a sorceress. She does not need direction for this." },
+        { name:"Anthony Hopkins (Poseidon)",   bo:13, oscar:13, era:"Classic",   known:"The sea god's grievance is personal and operatic. Hopkins plays divine grievance as a matter of principle." },
+        { name:"Idris Elba (Poseidon)",        bo:14, oscar:11, era:"Epic",      known:"The storm given form. He looks like the sea is afraid of him." },
+        { name:"Lupita Nyong'o (Penelope)",    bo:13, oscar:13, era:"Prestige",  known:"Twenty years of waiting. The loyalty and the grief and the vigil. She will not rush a single frame." },
+        { name:"Monica Bellucci (Calypso)",    bo:10, oscar:10, era:"European",  known:"The nymph who kept Odysseus on her island for seven years. The one who offered immortality. He chose home." },
+        { name:"Anya Taylor-Joy (Nausicaa)",   bo:13, oscar:13, era:"Prestige",  known:"The princess who finds the shipwrecked hero on the beach. The kindness that saves the voyage." },
+        { name:"Ben Mendelsohn (Antinous)",    bo:11, oscar:11, era:"Drama",     known:"The head suitor. The man who presumes too much in Ithaca while the king is at sea. The best villain in Homer." },
+        { name:"Pedro Pascal (Menelaus)",      bo:14, oscar:12, era:"Epic",      known:"The king whose wife started the war. He knows what Odysseus is owed and what it cost." },
+        { name:"Daniel Craig (Ajax)",          bo:14, oscar:10, era:"Epic",      known:"The greatest fighter at Troy after Achilles. He carries the weight of what war leaves behind." },
+        { name:"The Sirens (Practical Effects)",bo:8, oscar:14, era:"Mythic",   known:"Three voices from no identifiable source. Nolan has confirmed they will not be CGI. The crew is concerned." },
       ],
       screenplay: [
-        { name:"Epic Adaptation of Homer",         bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. The Academy loves this." },
-        { name:"Original Epic Vision",             bo:17, oscar:13, era:"Epic",        known:"The director wrote it. This is the definitive version." },
-        { name:"Mythological Prestige Adaptation", bo:13, oscar:15, era:"Prestige",    known:"Myth treated as journalism. The Academy responds." },
-        { name:"Literary Darkness Reframe",        bo:11, oscar:14, era:"Literary",    known:"The Odyssey as modern desolation. Nobody arrives home cleanly." },
-        { name:"Multi-Generational War Epic",      bo:13, oscar:14, era:"Epic",        known:"The war. The aftermath. The return. Twenty years." },
+        { name:"Epic Adaptation of Homer",          bo:16, oscar:15, era:"Adaptation", known:"3000 years of source material. Every high school English class is a marketing budget already paid." },
+        { name:"Original Epic Vision",              bo:17, oscar:13, era:"Epic",        known:"The director wrote it himself over five years. This is the definitive version. He will say so." },
+        { name:"Mythological Prestige Adaptation",  bo:13, oscar:15, era:"Prestige",    known:"Myth treated as journalism. The ancient world as living tissue. The Academy responds to this register." },
+        { name:"Literary Darkness Reframe",         bo:11, oscar:14, era:"Literary",    known:"The Odyssey as modern desolation. Nobody arrives home cleanly. The wine-dark sea takes something from everyone." },
+        { name:"Multi-Generational War Epic",       bo:13, oscar:14, era:"Epic",        known:"The war. The wandering. The return. Four storylines spanning twenty years. The Trojan Horse is act one." },
+        { name:"The Faithful Text",                 bo:14, oscar:16, era:"Classical",   known:"Every book. Every monster. Every god. Runtime is four hours and the Academy has cleared its evening." },
       ],
       composer: [
-        { name:"Hans Zimmer",          bo:16, oscar:14, era:"Epic",    known:"The natural Nolan choice. The score will shake foundations." },
-        { name:"Ludwig Goransson",     bo:15, oscar:13, era:"Epic",    known:"Oppenheimer. Tenet. Already in the Nolan ecosystem." },
-        { name:"Howard Shore",         bo:15, oscar:14, era:"Epic",    known:"LOTR. Epic mythology lives in his catalogue." },
-        { name:"Max Richter",          bo:12, oscar:11, era:"Prestige",known:"On the Nature of Daylight. The score of longing." },
+        { name:"Hans Zimmer",          bo:16, oscar:14, era:"Epic",       known:"The natural Nolan choice. He will invent an ancient sound from instruments that do not yet exist." },
+        { name:"Ludwig Goransson",     bo:15, oscar:13, era:"Epic",       known:"Oppenheimer. Tenet. Already inside the Nolan ecosystem. He knows what the director's silence sounds like." },
+        { name:"Howard Shore",         bo:15, oscar:14, era:"Epic",       known:"LOTR established that mythological scores require inventing an entire musical culture. He has done it once." },
+        { name:"Max Richter",          bo:12, oscar:11, era:"Prestige",   known:"On the Nature of Daylight became the sound of longing for a generation. The Odyssey is about longing." },
+        { name:"Ennio Morricone",      bo:11, oscar:13, era:"Classic",    known:"The estate has been contacted. Previously unreleased material is being discussed. The sound of ancient grief." },
+        { name:"Greek Classical Ensemble", bo:9, oscar:15, era:"Mythic", known:"Lyres. Aulos. Kithara. The instruments of Homer's world recorded in the ruins where the stories happened." },
+        { name:"Johann Johannsson",    bo:11, oscar:13, era:"Arthouse",   known:"Arrival was about the impossibility of return. The Odyssey is about the necessity of return. He already wrote this score." },
       ],
       budget: [
-        { name:"Epic Scale ($200M to $250M)",    bo:17, oscar:12, era:"Epic",    known:"The Odyssey budget. IMAX. Practical sea effects. Malta." },
-        { name:"Mega ($250M to $350M)",          bo:18, oscar:10, era:"Epic",    known:"When Nolan wants to rebuild Troy and actually set it on fire." },
+        { name:"Epic Scale ($200M to $250M)",  bo:17, oscar:12, era:"Epic",  known:"The Odyssey budget. IMAX. Practical sea effects. A working longship. Malta." },
+        { name:"Mega ($250M to $350M)",        bo:18, oscar:10, era:"Epic",  known:"When Nolan wants to rebuild Troy and actually set it on fire. Universal approved it in one meeting." },
+        { name:"All-In ($350M+)",              bo:16, oscar:11, era:"Event", known:"Cleopatra in 1963 dollars. Historic either way. The Cyclops is practical. Everything is practical." },
       ],
       season: [
-        { name:"Summer Tentpole (May to Jul)",   bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date." },
-        { name:"IMAX Global Event",              bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The only correct way." },
-        { name:"Awards Season (Nov to Dec)",     bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world." },
+        { name:"Summer Tentpole (May to Jul)", bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date. The tracking numbers are not numbers anymore." },
+        { name:"IMAX Global Event",            bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The wine-dark sea on a six-storey screen. The only correct way to watch this." },
+        { name:"Awards Season (Nov to Dec)",   bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world. The Academy has been waiting for this their entire existence." },
       ],
     },
     verdictOverrides: {
@@ -3006,15 +3018,31 @@ function renderIntro() {
       <div style="text-align:center;margin-top:4px"><button id="theme-default-btn" onclick="toggleTheme(null)" style="display:none;background:none;border:none;color:var(--text3);font-size:11px;text-decoration:underline;cursor:pointer">↩ Return to regular draft</button></div>
     </div>
     <div id="how-to-play-panel" style="display:none;background:var(--surface2);border-radius:var(--r-lg);padding:1.1rem;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
-      <div style="margin-bottom:8px"><strong>9 rounds.</strong> Each round you spin for a category  -  Director, Lead Actor, Supporting Actor, Studio, Screenplay, Genre, Composer, Budget, and Release Strategy.</div>
-      <div style="margin-bottom:8px"><strong>Choose one of 4-8 options</strong> in each round. Every pick has a Box Office score and an Oscar score. Higher is better  -  but not always safer.</div>
-      <div style="margin-bottom:8px"><strong>Synergies fire automatically.</strong> Certain combinations of picks unlock bonus or penalty modifiers. Jonny Greenwood + Paul Thomas Anderson. A24 + Awards Season. Michael Bay + Arthouse. Draft smart.</div>
-      <div style="margin-bottom:8px"><strong>Chaos events</strong> can hit at any time (max 2 per draft). A director walks out. The script leaks. A test screening goes catastrophically wrong. Roll with it.</div>
-      <div style="margin-bottom:8px"><strong>Production Bonuses</strong> are awarded at the end for exceptional draft patterns  -  All-Star Draft, Prestige Sweep, Cultural Crossover, and more.</div>
-      <div style="margin-bottom:8px"><strong>Your result</strong> combines box office gross, Oscar nominations and wins, Tomatometer, Audience Score, and any bonuses into a final score and verdict.</div>
-      <div style="margin-bottom:8px"><strong>You get:</strong> 1 round skip · 1 option reroll · Hard Mode (no scores visible)</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">Submit your film to Walk of Fame to appear on the global leaderboard. Play the Daily Draft to compete with everyone worldwide on the same picks.</div>
+      <div id="htp-regular">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">🎬 How to Play</div>
+        <div style="margin-bottom:8px"><strong>9 rounds.</strong> Each round: Director, Lead, Supporting, Studio, Screenplay, Genre, Composer, Budget, Release. Pick one of 4-8 options.</div>
+        <div style="margin-bottom:8px"><strong>Synergies fire automatically.</strong> A24 + Awards Season. Nolan + Zimmer. Right combos = bonuses. Wrong ones = penalties.</div>
+        <div style="margin-bottom:8px"><strong>Chaos events</strong> can hit mid-draft (max 2 per draft). A director walks out. The script leaks. Roll with it.</div>
+        <div style="margin-bottom:8px"><strong>Production Bonuses</strong> at the end: All-Star Draft, Prestige Sweep, Cultural Crossover.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">Submit to Walk of Fame for the global leaderboard. Daily Draft puts everyone on the same picks.</div>
+      </div>
+      <div id="htp-minions" style="display:none">
+        <div style="font-size:13px;font-weight:700;color:#F5C518;margin-bottom:10px">🍌 How to Play - Lights, Camera, Banana!</div>
+        <div style="margin-bottom:8px"><strong style="color:#F5C518">Mission:</strong> Produce the greatest Minions film ever made. Studio locked to Universal/Illumination. Genre locked to Animated. You are inside the banana now.</div>
+        <div style="margin-bottom:8px"><strong>Options are Illumination-weighted.</strong> Kyle Balda. Pierre Coffin. Pharrell Williams. Steve Carell as Gru. Kevin Hart. The names you know dominate the pool.</div>
+        <div style="margin-bottom:8px"><strong>Chaos is Minion-only and unlimited.</strong> Minions escape. Gru has notes. Pharrell shows up uninvited. There is no limit. They will intervene as many times as they choose. Regular Hollywood chaos does not cross the banana line.</div>
+        <div style="margin-bottom:8px"><strong>Minion picks:</strong> A Minion may select an option on your behalf. Override it and they enact creative control over subsequent rounds. There are consequences for disagreeing with the Minions.</div>
+        <div style="margin-bottom:8px"><strong>Verdicts speak Minion.</strong> BABABOI = all-time classic. BANANA = $800M. Tatata = disappointment. Poopaye = it is over.</div>
+        <div style="font-size:11px;color:#8a7200;margin-top:8px">Bababoi. That is all the instructions you need.</div>
+      </div>
+      <div id="htp-odyssey" style="display:none">
+        <div style="font-size:13px;font-weight:700;color:#C8A84B;margin-bottom:10px">⚓ How to Play - The Odyssey Opens</div>
+        <div style="margin-bottom:8px"><strong style="color:#C8A84B">Mission:</strong> Produce an epic worthy of Homer. Studio locked to Universal. Genre locked to Epic Drama.</div>
+        <div style="margin-bottom:8px"><strong>Options are epic-weighted.</strong> Directors: Nolan, Villeneuve, Ridley Scott. Odysseus: Matt Damon, Tom Hanks, Cillian Murphy. Gods: Blanchett as Athena, Hopkins as Poseidon.</div>
+        <div style="margin-bottom:8px"><strong>Chaos comes from the text.</strong> The Trojan Horse arrives carrying studio executives. Malta floods. Poseidon intervenes. The Sirens affect the crew. Max 2 events per draft. Regular chaos does not cross the wine-dark sea.</div>
+        <div style="margin-bottom:8px"><strong>Verdicts speak epic register.</strong> A voyage completed. The gods approved. Or: the sea took it. Not all heroes make it home.</div>
+        <div style="font-size:11px;color:#5a7090;margin-top:8px">The wine-dark sea awaits. Draft wisely.</div>
+      </div>
     </div>
   </div>`;
 }
@@ -3066,7 +3094,7 @@ function renderChoosing() {
   <div class="round-row"><span class="round-badge">Round ${S.round+1} of ${CATEGORIES.length}  -  Pick your ${cat.label}</span></div>
   ${picksSoFar()}
   <div class="choices-title">Choose one ${cat.icon} ${cat.label}</div>
-  ${S.minionOverride ? `<div style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.4);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:11px;color:#F5C518;text-align:center">🍌 A Minion has made a selection. You may override it  -  if you dare.</div>` : ''}
+  ${S.minionOverride && !S.minionAutoSelected ? `<div style="background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.4);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:11px;color:#F5C518;text-align:center">🍌 A Minion has made a selection. You may override it  -  if you dare.</div>` : ''}
   <div class="choices-grid">
     ${S.opts.map((o,i)=>`<div class="choice ${S.selIdx===i?"sel":""}" data-i="${i}">
       ${S.minionOverride && S.minionOverride.idx !== undefined && S.minionOverride.idx===i ? `<div style="font-size:9px;color:#F5C518;font-weight:700;letter-spacing:0.1em;margin-bottom:3px">🍌 MINION'S PICK</div>` : ''}
@@ -3320,6 +3348,15 @@ function bind() {
     if (!p) return;
     const showing = p.style.display === "block";
     p.style.display = showing ? "none" : "block";
+    if (!showing) {
+      const th = getActiveTheme();
+      const reg = document.getElementById("htp-regular");
+      const min = document.getElementById("htp-minions");
+      const ody = document.getElementById("htp-odyssey");
+      if (reg) reg.style.display = !th ? "block" : "none";
+      if (min) min.style.display = th && th.id==="minions" ? "block" : "none";
+      if (ody) ody.style.display = th && th.id==="odyssey" ? "block" : "none";
+    }
   });
   updateThemeButtons();
   $("daily-start-btn")?.addEventListener("click", ()=>{
@@ -3388,7 +3425,23 @@ function bind() {
           if (f.length >= cat.opts) basePool = f;
         }
       }
+      // ── THEME OPTION INJECTION ──
+      const _rollTheme = getActiveTheme();
+      if (_rollTheme?.optionInjections?.[cat.key]) {
+        const injected = _rollTheme.optionInjections[cat.key].filter(p => !usedNames2.has(p.name));
+        basePool = [...injected, ...basePool.filter(p => !injected.some(i => i.name === p.name))];
+      }
+      // Locked picks: force studio/genre to top; pre-select director
+      const _lockedVal = _rollTheme?.lockedPicks?.[cat.key];
+      if (_lockedVal) {
+        const lockedOpt = basePool.find(p => p.name === _lockedVal) || { name: _lockedVal, bo:14, oscar:14, era:'Special', known:_rollTheme.name };
+        basePool = [lockedOpt, ...basePool.filter(p => p.name !== _lockedVal)];
+      }
       S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(basePool, cat.opts, S.dailyRng) : getRandom(basePool, cat.opts);
+      // If director is locked (e.g. Nolan for Odyssey), pre-select position 0
+      if (_lockedVal && cat.key === 'director' && S.opts[0]?.name === _lockedVal) {
+        S.selIdx = 0;
+      }
       S.selIdx=null; S.spinning=false; S.phase="choosing"; render();
     }, 650);
   });
