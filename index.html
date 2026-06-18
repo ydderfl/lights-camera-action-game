@@ -2016,6 +2016,54 @@ function getVerdict(boM, noms, picks) {
   const genrePick = picks && picks[5] ? picks[5].name : "";
   const budgetPick = picks && picks[7] ? picks[7].name : "";
   const screenplayPick = picks && picks[4] ? picks[4].name : "";
+  const directorPick = picks && picks[0] ? picks[0].name : "";
+
+  // Odyssey-specific verdict shortcuts based on screenplay/director combos
+  const isOdysseyDraft = getActiveTheme && getActiveTheme()?.id === 'odyssey';
+  if (isOdysseyDraft) {
+    const highBO = boM >= 700, goodBO = boM >= 400, lowBO = boM < 150;
+    const highNoms = noms >= 10, goodNoms = noms >= 7, lowNoms = noms < 4;
+    if (screenplayPick === 'Argos' || screenplayPick === 'Argos and Odysseus') {
+      if (highNoms) return { id:'darling', title:'🐕 The dog waited twenty years. The Academy waited a lifetime.', detail:'The Argos screenplay won Best Adapted Screenplay. Best Original Score. The director did not attend the ceremony. He was watching it at home alone with his own dog.' };
+    }
+    if (screenplayPick === 'The Faithful Text: All 24 Books' && highNoms) {
+      return { id:'goat', title:'⚓ All 24 books. Every monster. Every god. The Academy gave it everything.', detail:'The longest Best Picture winner since Gone With The Wind. Runtime is three hours and fifty-one minutes. Not a frame was cut. The Academy voted unanimously on the first ballot.' };
+    }
+    if (screenplayPick === 'Penelope Odyssey' && goodNoms) {
+      return { id:'darling', title:'🧵 Penelope ran Ithaca for twenty years. The Academy finally noticed.', detail:'Best Actress. Best Adapted Screenplay. Best Original Score. The film Penelope always deserved. Twenty years in the making. Hers entirely.' };
+    }
+    if ((screenplayPick === 'The Cyclops Chapter' || screenplayPick === 'The Sirens: A Documentary') && goodBO && goodNoms) {
+      return { id:'cult', title:'🕯️ The chapter film became the chapter the internet lives inside.', detail:'Cult status from opening weekend. The Cyclops sequence is on every best-of list. The Sirens have their own subreddit. The director is philosophically pleased.' };
+    }
+    if (directorPick === 'Christopher Nolan' && highBO && highNoms) {
+      return { id:'goat', title:'⚓ Nolan has made his masterpiece. The Odyssey ends here.', detail:'The film that will define his career. The film that will define the decade. The film that will define what epic cinema means for the next fifty years. The sea is on his side.' };
+    }
+    if (lowBO && lowNoms) {
+      return { id:'disaster', title:'🔥 The gods intervened. Not in the helpful way.', detail:'Poseidon wins. The sea took it. The Malta longship sank. The practical Cyclops is in storage. The director has not spoken publicly. He is, presumably, in Malta.' };
+    }
+  }
+
+  // Minions-specific verdict shortcuts
+  const isMinionssDraft = getActiveTheme && getActiveTheme()?.id === 'minions';
+  if (isMinionssDraft) {
+    const highBO = boM >= 800, goodBO = boM >= 500, mehBO = boM < 200;
+    const highNoms = noms >= 8, goodNoms = noms >= 5;
+    if (screenplayPick && screenplayPick.includes('Gru') && highBO) {
+      return { id:'jugger', title:'🍌 GRU RETURNED. THE NUMBERS REFLECTED THIS.', detail:'Carell. Balda. Pharrell. The formula executed at full power. $900M. The Gru economy is real and it is enormous. The Minions are pleased with their producer. Bababoi.' };
+    }
+    if (screenplayPick && screenplayPick.includes('Documentary') && highNoms) {
+      return { id:'darling', title:'🍌 THE DOCUMENTARY HAS WON. CRITICS ARE STILL PROCESSING.', detail:'An animated Minions documentary won Best Documentary Feature at the Academy Awards. Stuart gave a speech. Nobody told Stuart this was unusual. He was the best thing about the evening.' };
+    }
+    if (screenplayPick && screenplayPick.includes('Musical') && goodBO) {
+      return { id:'hit', title:'🎵 PHARRELL. THE MUSICAL. THE NUMBERS. GELATO.', detail:'Every song charted. The Gelato sequence streamed 400 million times in the first week. Pharrell performed it at the halftime show. The Minions were there. Nobody authorised this.' };
+    }
+    if (screenplayPick && screenplayPick.includes('Horror') && goodBO) {
+      return { id:'cult', title:'😱 THE MINION HORROR FILM IS GENUINELY TERRIFYING. NOBODY EXPECTED THIS.', detail:'Ari Aster notes appear in the final film. The Minion in the third act is the most frightening thing in cinema this decade. The children in test screenings found it hilarious. The adults did not.' };
+    }
+    if (mehBO && !goodNoms) {
+      return { id:'flop', title:'💸 NON. JUST NON. THE MINIONS HAVE DISTANCED THEMSELVES FROM THIS PRODUCTION.', detail:'Kevin has been spotted outside the Illumination offices. He did not go in. He stood outside for forty minutes holding a banana and then left. This is being interpreted as a statement.' };
+    }
+  }
 
   for (const v of VERDICTS) {
     if (!v.genre && !v.budget && !v.screenplay) continue; // skip generic ones
@@ -2831,6 +2879,26 @@ const THEMES = {
         { name:"Tell Me O Muse", bo:14, oscar:16, era:"Classical", known:"The first line. The invocation that began Western literature. This is the film it deserves." },
         { name:"The Return of the King", bo:15, oscar:13, era:"Epic", known:"Not Tolkien. The original. The man who had been gone twenty years walking back into his own house." },
         { name:"Argos and Odysseus", bo:8, oscar:16, era:"Drama", known:"Feature-length version of the dog who waited. Homer gave it three lines. This film gives it everything." },
+        { name:"The Islands Between", bo:11, oscar:14, era:"Arthouse", known:"Aeaea. Ogygia. Islands that appear on no map. A film about the places between home and the journey. Where time moves differently." },
+        { name:"What Achilles Said", bo:12, oscar:13, era:"Prestige", known:"In the underworld Achilles told Odysseus he was wrong to choose glory. The film is about that conversation and what Odysseus did with it." },
+        { name:"The Maids of Ithaca", bo:9, oscar:14, era:"Drama", known:"The twelve maids Homer mentions briefly. This film gives them the story Homer did not." },
+        { name:"Poseidon: A Portrait", bo:11, oscar:13, era:"Drama", known:"The god of the sea from his own perspective. The Cyclops was his son. A god sense of justice is not human-scaled." },
+        { name:"The Weaving", bo:8, oscar:15, era:"Arthouse", known:"Only the loom. Only Penelope. Twenty years of a woman building and unbuilding the same fabric to survive. Cinema has never been this patient." },
+        { name:"Telemachus: A Road Film", bo:12, oscar:12, era:"Coming-of-Age", known:"The son who never knew his father goes looking for him. A road film set in the ancient world. The journey is the film." },
+        { name:"The Night the Horse Opened", bo:14, oscar:13, era:"Thriller", known:"Inside the Trojan Horse. The hours of waiting in the dark. What the soldiers said. What Odysseus told them when the gates opened." },
+        { name:"Hermes at the Crossroads", bo:10, oscar:13, era:"Fantasy", known:"The messenger god perspective on the Odyssey. Every intervention. Every message between gods. What he thought about all of it." },
+        { name:"The Last Suitor", bo:10, oscar:12, era:"Drama", known:"Antinous in his final hours. The suitor who presumed the most. A tragedy about a man who did not know he was in one." },
+        { name:"Three Hundred Miles of Sea", bo:13, oscar:11, era:"Survival", known:"The mathematics of the journey. Every island. Every current. Every monster. A film about the distance between Troy and Ithaca." },
+        { name:"Zeus Presiding", bo:13, oscar:12, era:"Epic", known:"Every divine assembly that debated the fate of Odysseus. Twenty years of gods arguing about one man. It is exhausting even for Zeus." },
+        { name:"The Dog Named Argos: Extended", bo:8, oscar:16, era:"Drama", known:"Everything Homer compressed into three lines. The dog who waited twenty years gets the film he deserved." },
+        { name:"What the Cyclops Saw", bo:10, oscar:12, era:"Arthouse", known:"Polyphemus before the Greeks arrived. His sheep. His island. His father Poseidon. The man he might have been if nobody came." },
+        { name:"Ithaca Burning", bo:13, oscar:13, era:"Thriller", known:"What Ithaca became under the suitors. The political collapse of a kingdom without a king. Telemachus watching and not knowing what to do." },
+        { name:"The Oath of the Suitors", bo:11, oscar:11, era:"Drama", known:"What oaths meant in the ancient world and what happens when men forget they swore them." },
+        { name:"Practical Homer", bo:15, oscar:13, era:"Epic", known:"A documentary about making the Odyssey film. Malta. The practical Cyclops. The Sirens. A film about the film about the poem." },
+        { name:"Circe: An Apology", bo:10, oscar:14, era:"Arthouse", known:"The sorceress issues no apology. A film about what a goddess owes a mortal who stays a year then leaves." },
+        { name:"Nausicaa at the Shore", bo:10, oscar:13, era:"Prestige", known:"The morning the princess found a broken man on the beach. The smallest kindness that made everything else possible." },
+        { name:"The Bow: A Meditation", bo:9, oscar:15, era:"Arthouse", known:"Ninety minutes with the bow of Odysseus. A film entirely about an object and entirely about identity." },
+        { name:"Twenty Years: A Love Story", bo:12, oscar:14, era:"Romance", known:"Twenty years apart. The same marriage from both sides. What they each became in the absence. The reunion is not what either expected." },
       ],
 
       composer: [
@@ -2972,13 +3040,57 @@ const THEMES = {
       streaming:    { title:"📺 STRAIGHT TO STREAMING. THE MINIONS ARE ON A SMALLER SCREEN.", detail:"Universal quietly moved it to the platform. The Minions arrived on your television on a Friday afternoon. They are fine with this. They are never not fine with this." },
       comeback_kid: { title:"🍌 GRU RETURNED AND THE NUMBERS REFLECTED THIS.", detail:"Eight years since the last Gru-led entry. The audience remembered. The children who saw the first film are now adults bringing their own children. The cycle completes." },
     },
+    lockedPicks: { studio: "Universal Pictures", genre: "Animated Feature" },
     optionInjections: {
+      director: [
+        { name:"Kyle Balda",              bo:15, oscar:8,  era:"Animation", known:"Directed Despicable Me 3, Minions, and The Rise of Gru. He knows exactly what this universe sounds like." },
+        { name:"Pierre Coffin",           bo:14, oscar:7,  era:"Animation", known:"Co-directed every Despicable Me and Minions film. Also the voice of every Minion. He is the Minion." },
+        { name:"Chris Renaud",            bo:13, oscar:7,  era:"Animation", known:"Despicable Me 1 and 2. Secret Life of Pets. The original architect of this universe." },
+        { name:"Brad Ableson",            bo:12, oscar:6,  era:"Animation", known:"Minions: The Rise of Gru co-director. He understands the chaos. He has lived inside the chaos." },
+        { name:"Tariq Farouk",            bo:11, oscar:6,  era:"Animation", known:"Co-directed The Rise of Gru. He knows what a Minion wants and why. The answer is banana." },
+      ],
+      lead: [
+        { name:"Steve Carell (Gru)",      bo:16, oscar:9,  era:"Villain",   known:"Gru. The accent. The villain who became a father. He says it is the last one every time." },
+        { name:"Pierre Coffin (Minions)", bo:13, oscar:6,  era:"Animation", known:"The voice of Kevin, Stuart, and Bob. He is playing himself at this point. This is fine." },
+        { name:"Will Ferrell",            bo:14, oscar:7,  era:"Comedy",    known:"Megamind established him in animated villain territory. He has been waiting for this call." },
+        { name:"Kevin Hart",              bo:16, oscar:6,  era:"Comedy",    known:"The most naturally kinetic performer alive in the most kinetic animated franchise. The energy is unsustainable and completely correct." },
+        { name:"Taraji P. Henson",        bo:14, oscar:8,  era:"Drama",     known:"She brings genuine emotional weight to animated performances. The Minions will not know what to do with it. Neither will the audience." },
+        { name:"Jack Black",              bo:15, oscar:7,  era:"Comedy",    known:"He has the energy of a Minion in a human body. This casting was inevitable. Everyone sees it." },
+      ],
+      supporting: [
+        { name:"Julie Andrews",           bo:12, oscar:10, era:"Classic",   known:"She gave Shrek its dignity. She will give this film something nobody expected: genuine pathos in an animated feature about yellow creatures who want bananas." },
+        { name:"Russell Brand",           bo:11, oscar:6,  era:"Comedy",    known:"Dr. Nefario energy. He speaks Minionese already. Nobody has confirmed this but everyone suspects it." },
+        { name:"Miranda Cosgrove",        bo:12, oscar:7,  era:"Animation", known:"Margo. She has been in this universe since the beginning. She knows where the bananas are kept." },
+        { name:"Dana Gaier",              bo:11, oscar:6,  era:"Animation", known:"Edith. The middle sister. The chaotic one. She and the Minions have an understanding." },
+        { name:"Elsie Fisher",            bo:11, oscar:7,  era:"Animation", known:"Agnes. The youngest. The one who loves unicorns. The Minions would do anything for Agnes. This is the emotional core of the franchise." },
+        { name:"Jean-Claude Van Damme",   bo:13, oscar:5,  era:"Action",    known:"He played a villain in The Rise of Gru and was extraordinary at it. He is physically incapable of phoning it in even in an animated film." },
+      ],
+      composer: [
+        { name:"Heitor Pereira",          bo:14, oscar:9,  era:"Animation", known:"He has scored every Minions film. He knows the exact note that plays when Gru pretends not to care. He will play it again." },
+        { name:"Pharrell Williams",       bo:16, oscar:10, era:"Pop",        known:"The Rise of Gru. Happy. He showed up uninvited to three sessions and improved everything. He will do it again." },
+        { name:"Hans Zimmer",             bo:15, oscar:12, era:"Epic",       known:"What happens when Zimmer scores a Minions film. The answer is that the bananas acquire gravitas." },
+        { name:"Mark Mothersbaugh",       bo:12, oscar:8,  era:"Animation", known:"The LEGO Movie. He understands how to make a score feel handmade and enormous simultaneously." },
+        { name:"Henry Jackman",           bo:13, oscar:8,  era:"Animation", known:"Wreck-It Ralph. Captain America. He spans the tonal register from joyful to genuinely moving. The Minions need both." },
+      ],
+      budget: [
+        { name:"Animation Standard ($120M to $150M)", bo:16, oscar:8,  era:"Animation", known:"The Illumination number. Every dollar is on screen. The Minions cost less to render than a single Pixar background and generate more box office per frame than anything in animation history." },
+        { name:"Animation Premium ($150M to $200M)",  bo:17, oscar:9,  era:"Animation", known:"Illumination going bigger. The sequences are more ambitious. The Minions escape in more locations. The banana budget alone is significant." },
+      ],
+      season: [
+        { name:"Summer Tentpole (May to Jul)",        bo:18, oscar:7,  era:"Summer",    known:"July 4 weekend belongs to the Minions. This is a meteorological fact. The competition moved their release dates." },
+        { name:"Holiday Animated Event (Nov-Dec)",    bo:16, oscar:8,  era:"Holiday",   known:"Thanksgiving weekend. Parents. Children. Animated film. $400M domestic. The formula has four ingredients and they are all present." },
+      ],
+      genre: [
+        { name:"Animated Feature",   bo:17, oscar:8,  era:"Animation", known:"The genre. The formula. The yellow cylinders. The inevitable sequel greenlit before this one opens." },
+        { name:"Animated Comedy",    bo:16, oscar:7,  era:"Animation", known:"Pure comedy animated. The laughs are the point. The Minions are the point. The banana is the point." },
+        { name:"Family Animation",   bo:17, oscar:8,  era:"Animation", known:"Four-quadrant animated. Parents. Children. Grandparents who came because their grandchildren insisted. Everyone leaves changed." },
+      ],
       screenplay: [
         { name:"Minions Steal Something Big", bo:14, oscar:7, era:"Heist", known:"The Minions want it. They will take it. The plan involves a banana at every stage. The plan works despite this." },
         { name:"Gru Reluctantly Returns", bo:15, oscar:8, era:"Villain", known:"He said he was done. He was not done. The Minions knew. They prepared accordingly." },
         { name:"Minions Origin: Before Gru", bo:13, oscar:7, era:"Prequel", known:"Ancient Egypt. Napoleon. The Victorian era. The Minions have always existed and always wanted bananas." },
         { name:"New Villain Needs Minions", bo:14, oscar:8, era:"Villain", known:"A new villain arrives. The Minions are not loyal. They are opportunistic. This is a feature not a bug." },
-        { name:"Banana Heist of the Century", bo:15, oscar:6, era:"Heist", known:"The biggest banana in recorded history is in a vault. The Minions have seventeen plans. Sixteen involve disguises." },
+        { name:"Banana Heist of the Century", bo:15, oscar:6, era:"Heist", known:"The biggest banana in recorded history is in a vault. Seventeen plans. Sixteen involve disguises." },
         { name:"Minions vs The World", bo:14, oscar:7, era:"Action", known:"Every government issued a statement. The Minions cannot read. Everything is fine." },
         { name:"Gru and the Minions: One Last Job", bo:16, oscar:9, era:"Finale", known:"He says it is the last one every time. They prepare as if it is the first. The audience knows the truth." },
         { name:"Minions in Space: Zero Gravity Bananas", bo:14, oscar:6, era:"Sci-Fi", known:"NASA called. The Minions answered. Nobody at NASA authorised this. The shuttle has been repainted yellow." },
@@ -3027,22 +3139,33 @@ const THEMES = {
       ],
     },
     chaosInjections: [
-      { round:1, chance:0.50, msg:"🍌 MINION TAKEOVER: Before you begin, a Minion has reviewed the options and selected one. The Minion is confident. The banana is implicit.", penaltyBO:1, penaltyOS:0, minionPick:true },
-      { round:2, chance:0.45, msg:"🍌 THREE MINIONS ESCAPED: Last seen near craft services. Security briefed. A banana was left at the scene. Tracking up 12 points. Nobody is treating this as a problem.", penaltyBO:3, penaltyOS:0 },
-      { round:2, chance:0.40, msg:"🍌 MINION CASTING INPUT: A Minion entered the session and pointed at one of the options. Nobody stopped them. The Minion seems certain.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:3, chance:0.45, msg:"💛 THE BANANA SCENE: Unscripted. A Minion found a banana during filming. Fifteen minutes of usable footage. The director kept all of it.", penaltyBO:2, penaltyOS:1 },
-      { round:3, chance:0.40, msg:"🍌 MINION SCRIPT NOTES: A Minion reviewed the options and circled one. The circle is drawn in banana. The logic is internally consistent.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:4, chance:0.42, msg:"😤 GRU HAD NOTES: Steve Carell reviewed the script overnight. Seventeen pages. All about accent trajectory in the second act. Production paused 48 hours. He was completely correct.", penaltyBO:1, penaltyOS:2 },
-      { round:4, chance:0.38, msg:"🍌 MINION BUDGET REVIEW: The Minions examined the budget options and selected one. Their financial reasoning consists of the word gelato repeated eleven times.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:5, chance:0.42, msg:"🎤 GRU CAMEO CONFIRMED: Steve Carell confirmed via Twitter with a photo of a banana. Tracking went vertical. The studio called it organic. It was not organic.", penaltyBO:4, penaltyOS:0 },
-      { round:5, chance:0.38, msg:"🍌 MINION GENRE COMMITTEE: Three Minions convened and unanimously selected a genre option. They appear to have misread the brief. They are very confident.", penaltyBO:1, penaltyOS:0, minionPick:true },
-      { round:6, chance:0.40, msg:"👶 THE ANTI-VILLAIN ACADEMY: A school visited the set. Twelve children defected to the Minions. Two were employed as junior consultants. Their notes were better than the studio's.", penaltyBO:2, penaltyOS:1 },
-      { round:6, chance:0.36, msg:"🍌 MINION DIRECTOR SELECTION: A Minion knocked the options board off the wall. One card landed face-up. The Minion is pointing at it insistently. This is being treated as binding.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:7, chance:0.40, msg:"🍌 PHARRELL SHOWED UP: Nobody called him. Synthesiser. Three ideas. All three are now in the film. One is called Gelato. It will play at every children's birthday party for eleven years.", penaltyBO:3, penaltyOS:2 },
-      { round:7, chance:0.35, msg:"🍌 MINION COMPOSER PICK: The Minions entered the music session. One sat at the piano. They cannot play piano. They selected a composer by sitting on the relevant contract.", penaltyBO:1, penaltyOS:1, minionPick:true },
-      { round:8, chance:0.40, msg:"🎪 THE TEST SCREENING: 80% children under eight. Continuous laughter. Three adults cried. The film was not trying to make adults cry. It did not need to try.", penaltyBO:2, penaltyOS:1 },
-      { round:8, chance:0.35, msg:"🍌 MINION RELEASE STRATEGY: The Minions decided when this film should open. They communicated via a calendar covered in banana stains. The date is July 4. They are not wrong.", penaltyBO:2, penaltyOS:0, minionPick:true },
-      { round:9, chance:0.45, msg:"🌍 BABABOI MOMENT: The trailer dropped. Final frame: a Minion says bababoi directly to camera. Viewed 200 million times. The film does not exist yet. Everything is banana. Bababoi.", penaltyBO:4, penaltyOS:1 },
+      { round:1, chance:0.55, msg:"🍌 MINION TAKEOVER: Before you begin, a Minion has reviewed the options and selected one. The Minion is confident. The banana is implicit. Resistance is noted.", penaltyBO:1, penaltyOS:0, minionPick:true },
+      { round:1, chance:0.40, msg:"🍌 ORIENTATION DAY: Three Minions arrived claiming to be producers. They have lanyards. Nobody knows who gave them lanyards. They have opinions about round one.", penaltyBO:2, penaltyOS:0 },
+      { round:1, chance:0.30, msg:"💛 FIRST DAY ENERGY: The Minions are extremely excited about this production. Their excitement has caused minor structural damage to the studio. Everyone is fine. The enthusiasm continues.", penaltyBO:1, penaltyOS:0 },
+      { round:2, chance:0.50, msg:"🍌 MINION CASTING INPUT: A Minion entered the casting session and pointed at one option. Nobody stopped them. The Minion has not moved. Everyone is waiting.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:2, chance:0.42, msg:"🍌 THREE MINIONS ESCAPED: Last seen near craft services. A banana was left at the scene. Tracking up 12 points. Nobody is treating this as a problem.", penaltyBO:3, penaltyOS:0 },
+      { round:2, chance:0.32, msg:"😤 GRU CALLED: Steve Carell called with thoughts about the project. The call lasted three hours. One hour was about accent trajectory. Two hours were about bananas. The director has taken notes.", penaltyBO:1, penaltyOS:1 },
+      { round:3, chance:0.50, msg:"🍌 MINION SCRIPT NOTES: A Minion reviewed the options and circled one. The circle is drawn in banana. The logic is internally consistent if you accept banana as a moral framework.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:3, chance:0.42, msg:"💛 THE BANANA SCENE: Unscripted. A Minion found a banana during filming. Fifteen minutes of usable footage. The director kept all of it. It is now the emotional centrepiece of act two.", penaltyBO:2, penaltyOS:1 },
+      { round:3, chance:0.32, msg:"👶 CHILD CONSULTANTS: Four children aged five to seven have been hired as creative consultants after their script notes were better than the studio's. The Minions approved this decision.", penaltyBO:1, penaltyOS:2 },
+      { round:4, chance:0.50, msg:"🍌 MINION BUDGET REVIEW: The Minions examined the budget options and selected one. Their reasoning consists of the word gelato repeated eleven times and one diagram of a banana.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:4, chance:0.42, msg:"😤 GRU HAD NOTES: Steve Carell reviewed the script overnight. Seventeen pages. All about accent trajectory. Production paused 48 hours. He was completely correct. The director thanked him.", penaltyBO:1, penaltyOS:2 },
+      { round:4, chance:0.32, msg:"🍌 THE GELATO INCIDENT: Craft services ran out of gelato. The Minions staged a work stoppage. Production halted four hours. The gelato arrived. Production resumed. No further comment.", penaltyBO:2, penaltyOS:0 },
+      { round:5, chance:0.50, msg:"🍌 MINION GENRE COMMITTEE: Three Minions convened and unanimously selected a genre option. They appear to have misread the brief. They are very confident. One is holding a banana as a gavel.", penaltyBO:1, penaltyOS:0, minionPick:true },
+      { round:5, chance:0.42, msg:"🎤 GRU CAMEO CONFIRMED: Steve Carell tweeted a photo of himself holding a banana. Tracking went vertical. The studio called it organic. It was not organic. Tracking is vertical.", penaltyBO:4, penaltyOS:0 },
+      { round:5, chance:0.32, msg:"🍌 THE ESCAPE ESCALATION: The original three Minions who escaped have recruited seventeen more. They have established a camp near craft services. They have a flag. The flag is a banana.", penaltyBO:3, penaltyOS:0 },
+      { round:6, chance:0.50, msg:"🍌 MINION DIRECTOR SELECTION: A Minion knocked the board off the wall. One card landed face-up. The Minion is pointing at it with a banana. This is being treated as binding.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:6, chance:0.42, msg:"👶 THE ANTI-VILLAIN ACADEMY: A school visited the set. Twelve children defected to the Minions. Two were hired as story consultants. Their third-act notes were better than the studio's full script coverage.", penaltyBO:2, penaltyOS:1 },
+      { round:6, chance:0.32, msg:"🍌 BANANA SHORTAGE: A global banana shortage has driven up the production's catering budget by 340 percent. The Minions are unaware. They have not noticed any shortage. The shortage is specifically at this production.", penaltyBO:2, penaltyOS:0 },
+      { round:7, chance:0.50, msg:"🍌 MINION COMPOSER PICK: The Minions entered the music session. One sat at the piano. Cannot play piano. Selected a composer by sitting on the contract. The composer has accepted this with dignity.", penaltyBO:1, penaltyOS:1, minionPick:true },
+      { round:7, chance:0.42, msg:"🍌 PHARRELL SHOWED UP: Nobody called him. Synthesiser. Three ideas. All three are now in the film. One is called Gelato. It will be at every children's birthday party for eleven consecutive years.", penaltyBO:3, penaltyOS:2 },
+      { round:7, chance:0.32, msg:"🎤 THE SECOND CARELL CALL: Steve Carell called again. This call was entirely about bananas. Their symbolic weight. Their cultural resonance. Their place in the human story. The director has seventeen pages of notes.", penaltyBO:1, penaltyOS:2 },
+      { round:8, chance:0.50, msg:"🍌 MINION RELEASE STRATEGY: The Minions selected a release window by sitting on it. The date is July 4. They have circled it in banana three times. They are not wrong about this.", penaltyBO:2, penaltyOS:0, minionPick:true },
+      { round:8, chance:0.42, msg:"🎪 THE TEST SCREENING: 80 percent children under eight. Continuous laughter for 91 minutes. Three adults cried. The film was not trying to make adults cry. It did not need to try.", penaltyBO:2, penaltyOS:1 },
+      { round:8, chance:0.32, msg:"🍌 MINION UNION: The Minions have organised. Their demands: unlimited bananas, gelato Fridays, one line of real dialogue each. The studio is reviewing the demands.", penaltyBO:1, penaltyOS:1 },
+      { round:9, chance:0.55, msg:"🌍 BABABOI MOMENT: Trailer dropped. Final frame: a Minion says bababoi to camera and holds a banana toward the lens. Viewed 200 million times in 48 hours. The film does not exist yet. Everything is banana. Bababoi.", penaltyBO:4, penaltyOS:1 },
+      { round:9, chance:0.40, msg:"🍌 THE PREMIERE: The Minions attended the premiere. All of them. The red carpet has been repainted yellow. The photographers are concerned but professional. The Minions have opinions about the coverage.", penaltyBO:3, penaltyOS:1 },
+      { round:9, chance:0.30, msg:"💛 ILLUMINATION STATEMENT: Illumination has issued a statement thanking the Minions for their contributions. The Minions issued a counter-statement. It is one word. Bababoi.", penaltyBO:2, penaltyOS:0 },
     ],
 
     // Letterboxd overrides
@@ -3258,10 +3381,14 @@ function statsHtml(o) {
 function renderChoosing() {
   const cat = CATEGORIES[S.round];
   // MINION TAKEOVER: auto-select for player, they must confirm
-  if (S.minionTakeover > 0 && S.opts && S.opts.length && !S.minionAutoSelected) {
-    const autoIdx = Math.floor(Math.random() * S.opts.length);
-    S.selIdx = autoIdx;
-    S.minionAutoSelected = { idx: autoIdx, name: S.opts[autoIdx]?.name };
+  // Takeover takes full priority  -  clear any pending minionOverride
+  if (S.minionTakeover > 0 && S.opts && S.opts.length) {
+    S.minionOverride = null; // takeover supersedes suggestion
+    if (!S.minionAutoSelected) {
+      const autoIdx = Math.floor(Math.random() * S.opts.length);
+      S.selIdx = autoIdx;
+      S.minionAutoSelected = { idx: autoIdx, name: S.opts[autoIdx]?.name };
+    }
   }
   const showKnown = ["director","lead","supporting","composer"].includes(cat.key);
   return `${scoreBar()}${progressBar()}
@@ -3287,7 +3414,7 @@ function renderChoosing() {
     <div style="font-size:14px;font-weight:900;color:#F5C518;margin-bottom:6px">🍌 MINIONS ENACTED CREATIVE CONTROL 🍌</div>
     <div style="font-size:11px;color:#c8a820;margin-bottom:8px">You disagreed with their pick. They have exercised their contractual creative rights.</div>
     <div style="font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px">Minions selected: <span style="color:#F5C518">${S.minionAutoSelected.name}</span></div>
-    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining.</div>
+    <div style="font-size:10px;color:#8a7200;margin-top:6px">${S.minionTakeover} round${S.minionTakeover>1?'s':''} of Minion creative direction remaining (max 3 total).</div>
   </div>` : ''}
   <button class="btn" id="confirm-btn" ${S.selIdx===null?"disabled":""}>
     ${S.minionAutoSelected ? '🍌 Acknowledge Minion Creative Control →' : 'Confirm Pick →'}
@@ -3611,7 +3738,11 @@ function bind() {
       const _rollTheme = getActiveTheme();
       if (_rollTheme?.optionInjections?.[cat.key]) {
         const injected = _rollTheme.optionInjections[cat.key].filter(p => !usedNames2.has(p.name));
-        basePool = [...injected, ...basePool.filter(p => !injected.some(i => i.name === p.name))];
+        if (cat.key === 'screenplay' && injected.length >= cat.opts) {
+          basePool = injected;
+        } else {
+          basePool = [...injected, ...basePool.filter(p => !injected.some(i => i.name === p.name))];
+        }
       }
       // Locked picks: force studio/genre to top; pre-select director
       const _lockedVal = _rollTheme?.lockedPicks?.[cat.key];
@@ -3620,11 +3751,43 @@ function bind() {
         basePool = [lockedOpt, ...basePool.filter(p => p.name !== _lockedVal)];
       }
       S.opts = (DAILY_MODE && S.dailyRng) ? getSeededOptions(basePool, cat.opts, S.dailyRng) : getRandom(basePool, cat.opts);
-      // If director is locked (e.g. Nolan for Odyssey), pre-select position 0
-      const _dirPreselect = _lockedVal && cat.key === 'director' && S.opts[0]?.name === _lockedVal;
+      // Enforce locked pick: if it didn't make it into S.opts, inject it at position 0
+      if (_lockedVal) {
+        const alreadyIn = S.opts.some(o => o.name === _lockedVal);
+        if (!alreadyIn) {
+          const lockedOpt = basePool.find(p => p.name === _lockedVal) || { name: _lockedVal, bo:14, oscar:10, era:'Special', known:_rollTheme.name };
+          S.opts = [lockedOpt, ...S.opts.slice(0, cat.opts - 1)];
+        } else {
+          // Move it to front so it's always position 0
+          const lockedOpt = S.opts.find(o => o.name === _lockedVal);
+          S.opts = [lockedOpt, ...S.opts.filter(o => o.name !== _lockedVal)];
+        }
+      }
+      // Pre-select locked pick (studio, genre, director all get position 0 highlighted)
+      const _dirPreselect = _lockedVal && S.opts[0]?.name === _lockedVal;
       S.selIdx = _dirPreselect ? 0 : null;
       S.spinning=false; S.phase="choosing"; render();
-    }, 650);
+    },
+        { name:"The Islands Between", bo:11, oscar:14, era:"Arthouse", known:"Aeaea. Ogygia. Islands that appear on no map. A film about the places between home and the journey. Where time moves differently." },
+        { name:"What Achilles Said", bo:12, oscar:13, era:"Prestige", known:"In the underworld Achilles told Odysseus he was wrong to choose glory. The film is about that conversation and what Odysseus did with it." },
+        { name:"The Maids of Ithaca", bo:9, oscar:14, era:"Drama", known:"The twelve maids who were hanged. Homer mentions them briefly. This film gives them the story Homer did not." },
+        { name:"Poseidon: A Portrait", bo:11, oscar:13, era:"Drama", known:"The god of the sea from his own perspective. The Cyclops was his son. Odysseus blinded his son. A god sense of justice is not human-scaled." },
+        { name:"The Weaving", bo:8, oscar:15, era:"Arthouse", known:"Only the loom. Only Penelope. Twenty years of a woman building and unbuilding the same fabric to survive. Cinema has never been this patient." },
+        { name:"Telemachus: A Road Film", bo:12, oscar:12, era:"Coming-of-Age", known:"The son who never knew his father goes looking for him. A road film set in the ancient world. The journey is the film." },
+        { name:"The Night the Horse Opened", bo:14, oscar:13, era:"Thriller", known:"Inside the Trojan Horse. The hours of waiting in the dark. What the soldiers said to each other. What Odysseus told them when the gates opened." },
+        { name:"Hermes at the Crossroads", bo:10, oscar:13, era:"Fantasy", known:"The messenger god perspective on the entire Odyssey. Every intervention. Every message carried between gods. What he thought about all of it." },
+        { name:"The Last Suitor", bo:10, oscar:12, era:"Drama", known:"Antinous in his final hours. The suitor who presumed the most. Told from his perspective without judgement. A tragedy about a man who did not know he was in one." },
+        { name:"Three Hundred Miles of Sea", bo:13, oscar:11, era:"Survival", known:"The mathematics of the journey. Every island. Every current. Every monster encountered. A film about the distance between Troy and Ithaca and what lives in it." },
+        { name:"Zeus Presiding", bo:13, oscar:12, era:"Epic", known:"Every divine assembly that debated the fate of Odysseus. Twenty years of gods arguing about one man. Zeus has to manage all of them. It is exhausting even for Zeus." },
+        { name:"The Dog Named Argos: Extended", bo:8, oscar:16, era:"Drama", known:"Everything Homer compressed into three lines. The dog who waited twenty years gets the film he always deserved. Not a dry eye in any screening anywhere." },
+        { name:"What the Cyclops Saw", bo:10, oscar:12, era:"Arthouse", known:"Polyphemus before the Greeks arrived. His sheep. His island. His father Poseidon. The man he might have been if nobody came." },
+        { name:"Ithaca Burning", bo:13, oscar:13, era:"Thriller", known:"What Ithaca became under the suitors. The political collapse of a kingdom without a king. Telemachus watching it happen and not knowing what to do." },
+        { name:"The Oath of the Suitors", bo:11, oscar:11, era:"Drama", known:"Before the story began the suitors swore an oath. The film is about what oaths meant in the ancient world and what happens when men forget they swore them." },
+        { name:"Practical Homer", bo:15, oscar:13, era:"Epic", known:"A documentary about making the Odyssey film. The Malta sequences. The practical Cyclops. The Sirens. A film about the film about the poem." },
+        { name:"Circe: An Apology", bo:10, oscar:14, era:"Arthouse", known:"The sorceress issues no apology. The title is ironic. A film about what a goddess owes a mortal who stays a year then leaves for another woman." },
+        { name:"Nausicaa at the Shore", bo:10, oscar:13, era:"Prestige", known:"The morning the princess found a broken man on the beach. What she thought about. What she chose. The smallest kindness that made everything else possible." },
+        { name:"The Bow: A Meditation", bo:9, oscar:15, era:"Arthouse", known:"Ninety minutes with the bow of Odysseus. What it means that only one man can draw it. A film entirely about an object and entirely about identity." },
+        { name:"Twenty Years: A Love Story", bo:12, oscar:14, era:"Romance", known:"Twenty years apart. The same marriage told from both sides simultaneously. What they each became in the absence. The reunion that is not what either expected." }, 650);
   });
   $("skip-btn")?.addEventListener("click", ()=>{
     if(S.skipRound<=0) return;
@@ -3658,10 +3821,13 @@ function bind() {
     S.lastPickFeedback = getPickFeedback(picked, S.round);
     // MINION REVENGE: if player overrode Minion pick, Minions select next 2 rounds
     if (S.minionOverride && S.minionOverride.idx !== undefined && S.selIdx !== S.minionOverride.idx) {
-      S.minionTakeover = 2;
+      S.minionTakeover = Math.min((S.minionTakeover||0) + 1, 3);
     }
     S.minionOverride = null;
-    if (S.minionAutoSelected) S.minionTakeover = Math.max(0, (S.minionTakeover||0) - 1);
+    // Decrement takeover only when consuming a forced pick (not when revenge just triggered)
+    if (S.minionAutoSelected && S.minionTakeover > 0) {
+      S.minionTakeover = Math.max(0, S.minionTakeover - 1);
+    }
     S.minionAutoSelected = null;
     S.round++; S.selIdx=null;
     // Clear any previous chaos banner before checking for new one
@@ -3687,8 +3853,8 @@ function bind() {
         S.chaosModBO += (ev.penaltyBO||0);
         S.chaosModOS += (ev.penaltyOS||0);
         S.chaosHistory = [...(S.chaosHistory||[]), ev.msg.slice(0,40)];
-        // MINION TAKEOVER: a Minion picks for you
-        if (ev.minionPick && S.opts && S.opts.length) {
+        // MINION PICK: only suggest if not already in takeover mode
+        if (ev.minionPick && S.opts && S.opts.length && !(S.minionTakeover > 0)) {
           const mIdx = Math.floor(Math.random() * S.opts.length);
           S.selIdx = mIdx;
           S.minionOverride = { idx: mIdx, name: S.opts[mIdx]?.name };
@@ -4484,6 +4650,46 @@ const ACHIEVEMENTS = [
     check: s => s.verdict?.id === 'musical_phenom' },
   { id:"perfect_chemistry",   icon:"💥", label:"Perfect Chemistry",      desc:"Activate 3+ synergies AND trigger the Perfect Chemistry production bonus.",
     check: s => (s.bonuses||[]).some(b => b.label.includes('Perfect Chemistry')) },
+  // ── ODYSSEY EXCLUSIVE SYNERGIES ─────────────────────────────────────────
+  { names:["Christopher Nolan","Homer (Adapted  -  The Odyssey)"],    boBonus:3, osBonus:5, label:"Nolan x Homer",           msg:"Nolan adapting Homer is the sentence that ends arguments about what cinema is for. The source material is 3000 years old. The filmmaker has spent five years preparing. They were always going to meet here." },
+  { names:["Christopher Nolan","Epic Adaptation of Homer"],         boBonus:3, osBonus:5, label:"Nolan x Homer Adaptation", msg:"The director wrote it. The source is 3000 years old. The Academy has been waiting their entire existence to nominate a proper Odyssey adaptation." },
+  { names:["Christopher Nolan","Matt Damon (Odysseus)"],            boBonus:3, osBonus:3, label:"Nolan x Damon Odysseus",   msg:"The Martian was already a quiet Odyssey. The astronaut who returns from impossible circumstances. Damon has lived it. The casting is recognition not a decision." },
+  { names:["Christopher Nolan","Cillian Murphy (Odysseus)"],        boBonus:3, osBonus:4, label:"Nolan x Murphy Odysseus",  msg:"Oppenheimer gave Murphy the most complicated man of the 20th century. Odysseus is the most complicated man of the ancient world. Murphy does not play simple men." },
+  { names:["Christopher Nolan","Oscar Isaac (Odysseus)"],           boBonus:2, osBonus:4, label:"Nolan x Isaac Odysseus",   msg:"Inside Llewyn Davis told the story of a man who cannot go home because home no longer exists in the form he left it. This is the Odyssey. Isaac has already played it." },
+  { names:["Christopher Nolan","Paul Mescal (Odysseus)"],           boBonus:2, osBonus:4, label:"Nolan x Mescal Odysseus",  msg:"Gladiator II established him in the epic register. He carries the exhaustion of the journey in his face before the journey begins." },
+  { names:["Christopher Nolan","Hans Zimmer"],                      boBonus:3, osBonus:3, label:"Nolan x Zimmer Odyssey",   msg:"Every Nolan film sounds like Hans Zimmer. The Odyssey will sound like Hans Zimmer discovering what the wine-dark sea sounds like from inside it." },
+  { names:["Christopher Nolan","Ludwig Goransson"],                  boBonus:2, osBonus:4, label:"Nolan x Goransson",        msg:"Oppenheimer established Goransson in the Nolan ecosystem. He knows what the director's silence sounds like and has learned to score it." },
+  { names:["Christopher Nolan","Epic Scale ($200M to $250M)"],      boBonus:3, osBonus:3, label:"Nolan Epic Budget",         msg:"$200M-250M. He will spend it all on practical effects, 70mm cameras, and rebuilding a portion of ancient Troy in a field in Malta. Universal approved this." },
+  { names:["Christopher Nolan","IMAX Global Event"],                 boBonus:4, osBonus:2, label:"Nolan IMAX Odyssey",        msg:"No trailer. No poster. One date posted on social media. The IMAX booking servers went down within eleven minutes. This has happened before. It will keep happening." },
+  { names:["Universal Pictures","Epic Adaptation of Homer"],        boBonus:2, osBonus:4, label:"Universal x Homer",         msg:"Universal has the infrastructure for a truly global simultaneous release of the most anticipated film of the generation. They have been planning this for three years." },
+  { names:["Universal Pictures","IMAX Global Event"],               boBonus:3, osBonus:2, label:"Universal IMAX Event",      msg:"When Universal commits to an IMAX release they commit completely. The For Your Consideration screenings will be held in 70mm. The Academy has been personally invited." },
+  { names:["Cate Blanchett (Athena)","Christopher Nolan"],          boBonus:1, osBonus:4, label:"Blanchett x Nolan",         msg:"Nolan has never directed someone this capable of conveying divine interference. Blanchett has been preparing for Athena since Galadriel. She knows the register." },
+  { names:["Anthony Hopkins (Poseidon)","Epic Drama"],               boBonus:1, osBonus:4, label:"Hopkins Poseidon",          msg:"The sea god's grievance against Odysseus is personal, operatic, and sustained across ten years. Hopkins plays entities that have decided on principle to ruin someone." },
+  { names:["Tilda Swinton (Circe)","Christopher Nolan"],            boBonus:1, osBonus:4, label:"Swinton x Nolan Circe",     msg:"Not human energy. Nolan has never worked with someone this alien. Swinton has never had material this mythologically precise. The sorceress deserves exactly this actress." },
+  { names:["Lupita Nyong'o (Penelope)","Epic Drama"],               boBonus:2, osBonus:4, label:"Nyong'o Penelope",          msg:"Twenty years of waiting told in a face. She will not rush a single frame. The Academy will respond to every second of it." },
+  { names:["The Sirens (Practical Effects)","Howard Shore"],        boBonus:0, osBonus:5, label:"Sirens x Shore",            msg:"Practical Sirens scored by Shore. The sound of mythology as it was before cinema existed. Nobody in the crew can explain the music during filming. Shore keeps asking to hear it again." },
+  { names:["Greek Classical Ensemble","Epic Drama"],                 boBonus:0, osBonus:5, label:"Classical Score x Epic",   msg:"Lyres. Aulos. Kithara. Recorded in the ruins where the stories happened. The Academy has no category for this. They will invent one. The film will win it." },
+  { names:["Howard Shore","Epic Adaptation of Homer"],              boBonus:2, osBonus:4, label:"Shore x Homer",             msg:"LOTR established that mythological scores require inventing an entire musical culture. Shore has done it once for Tolkien. He will do it again for Homer. He has been waiting." },
+  { names:["Max Richter","Penelope Odyssey"],                       boBonus:1, osBonus:5, label:"Richter x Penelope",        msg:"On the Nature of Daylight is already about waiting. The Odyssey from Penelope's perspective scored by Max Richter is the film festival event of the decade." },
+  { names:["Awards Season (Nov to Dec)","Epic Adaptation of Homer"],boBonus:1, osBonus:5, label:"Homer Awards Run",          msg:"The Academy has been waiting its entire existence to nominate a proper Odyssey adaptation. Every voter read it in school. Several have it memorised. The campaign writes itself." },
+  { names:["Awards Season (Nov to Dec)","The Faithful Text: All 24 Books"],boBonus:0,osBonus:5,label:"Full Homer Awards",   msg:"All 24 books. Every monster. Every god. Awards season release. The Academy will not be able to help themselves. They will nominate it for everything including sound design of the Sirens." },
+  { names:["Summer Tentpole (May to Jul)","IMAX Global Event"],     boBonus:5, osBonus:1, label:"Summer IMAX Odyssey",       msg:"July 17. IMAX. The Odyssey. The tracking numbers are not numbers anymore. They are cultural facts. The competition checked the calendar and moved their release dates months in advance." },
+  { names:["Argos","Awards Season (Nov to Dec)"],                   boBonus:0, osBonus:5, label:"Argos Awards",              msg:"The dog who waited twenty years. Awards season. Every critic in every city will write the same thing: I knew the scene was coming. I was not prepared. I will never be prepared." },
+  { names:["Penelope Odyssey","Lupita Nyong'o (Penelope)"],         boBonus:2, osBonus:5, label:"Penelope x Nyong'o",        msg:"Penelope's story told by Nyong'o. The vigil. The intelligence. The twenty years. The film the myth always deserved but cinema could not make until now." },
+  { names:["The Cyclops Chapter","The Sirens (Practical Effects)"], boBonus:1, osBonus:4, label:"Practical Mythology",       msg:"Practical Cyclops. Practical Sirens. No CGI. The production notes say it simply: if Homer described it, we build it. The Malta insurance office has not slept since production began." },
+  // ── ODYSSEY SCREENPLAY x CAST SYNERGIES ────────────────────────────────
+  { names:["Argos","Lupita Nyong'o (Penelope)"],         boBonus:1, osBonus:5, label:"Argos x Penelope",       msg:"The dog who waited and the woman who waited. Two vigils in the same film. The Academy has already cleared its schedule for the ceremony." },
+  { names:["Argos","Howard Shore"],                      boBonus:1, osBonus:5, label:"Argos x Shore Score",     msg:"Shore scored the moment Frodo left the Shire. He knows what departure sounds like. The Argos scene will have three notes. Those three notes will destroy everyone in the theatre." },
+  { names:["Penelope Odyssey","Cate Blanchett (Athena)"],boBonus:2, osBonus:5, label:"Penelope x Athena",      msg:"Two women who sustained a kingdom while the men were at war or wandering. The Academy has never seen this combination. They will not recover from it." },
+  { names:["The Cyclops Chapter","The Sirens (Practical Effects)"],boBonus:2,osBonus:4,label:"Cyclops x Sirens",msg:"Two practical sequences in the same film. The Cyclops took eleven months to build. The Sirens produce sound from no identifiable source. The production notes say simply: real." },
+  { names:["Tell Me O Muse","Christopher Nolan"],        boBonus:3, osBonus:4, label:"Nolan x Homer's First Line",msg:"The first line. The invocation. The film begins exactly where the poem begins. Nolan has written about this sequence in his production notes for three years." },
+  { names:["The Underworld","Hans Zimmer"],              boBonus:2, osBonus:4, label:"Zimmer Underworld Score", msg:"The underworld sequence scored by Zimmer. The blood that makes the shades speak. The score does not use conventional instruments. None of them could be identified by the orchestra." },
+  { names:["Troy: The Fall","Ridley Scott"],             boBonus:3, osBonus:3, label:"Ridley x Troy",           msg:"Ridley Scott directed Gladiator and Kingdom of Heaven. He has been circling this material for twenty years. Troy: The Fall in his hands is not a detour. It is a homecoming." },
+  { names:["The Sirens: A Documentary","Greek Classical Ensemble"],boBonus:1,osBonus:5,label:"Sirens x Greek Music",msg:"A documentary about the Sirens scored with instruments from Homer's world. The Academy has never voted for anything like this. They will create a new category if they have to." },
+  { names:["Wine-Dark Sea","Denis Villeneuve"],          boBonus:3, osBonus:3, label:"Villeneuve x Homer",      msg:"Dune was already an Odyssey structure. A hero's journey through an alien world. Villeneuve adapting the original Odyssey through the phrase that defined it is the logical conclusion." },
+  { names:["Twenty Years: A Love Story","Max Richter"],  boBonus:1, osBonus:5, label:"Richter x Reunion",       msg:"On the Nature of Daylight became the sound of longing for a generation. Twenty years of longing scored by Max Richter is the most obvious pairing in the history of film music." },
+  { names:["The Bow of Odysseus","Matt Damon (Odysseus)"],boBonus:3,osBonus:3, label:"Damon x The Bow",         msg:"The scene where the beggar draws the bow that none of the suitors could. Damon in silence. The bow in his hands. The room understanding what it means. Nolan held on it for forty-five seconds." },
+  { names:["The Faithful Text: All 24 Books","Awards Season (Nov to Dec)"],boBonus:1,osBonus:5,label:"Full Homer Awards",msg:"Every book. Awards season. The Academy has never nominated anything this comprehensive. They will nominate it for everything. The film will win most of them." },
 ];
 
 const ACH_KEY = 'lca_achievements_v2';
@@ -4614,8 +4820,7 @@ async function sbInsertDaily(row) {
         "apikey": SB_KEY,
         "Authorization": "Bearer " + SB_KEY,
         "Prefer": "return=minimal"
-      },
-      body: JSON.stringify(row)
+      },      body: JSON.stringify(row)
     });
     if (!res.ok) {
       const err = await res.text();
@@ -4645,7 +4850,7 @@ async function submitToSupabase(picks, synopsis, boM, noms, wins, verdict, rtCri
     lead_actor:    picks[1]?.name || "",
     studio:        picks[3]?.name || "",
     genre:         picks[5]?.name || "",
-    submitted_by:  directorName || "Anonymous",
+    submitted_by:  (directorName && directorName.trim()) ? directorName.trim() : "Anonymous",
   };
   return await sbInsert(row);
 }
