@@ -391,12 +391,13 @@ function generateFilmTitle(picks) {
 
 
 function generateSynopsis(picks, filmTitle, boM, noms) {
-  const director  = picks[0]?.name || "an unknown director";
-  const lead      = picks[1]?.name || "an unnamed star";
-  const supporting= picks[2]?.name || "a supporting cast";
-  const studio    = picks[3]?.name || "an indie studio";
-  const genre     = picks[5]?.name || "a drama";
-  const composer  = picks[6]?.name || "an unknown composer";
+  const director   = picks[0]?.name || "an unknown director";
+  const lead       = picks[1]?.name || "an unnamed star";
+  const supporting = picks[2]?.name || "a supporting cast";
+  const studio     = picks[3]?.name || "an indie studio";
+  const screenplay = picks[4]?.name || "";
+  const genre      = picks[5]?.name || "a drama";
+  const composer   = picks[6]?.name || "an unknown composer";
   const budget    = picks[7]?.name || "mid-budget";
   const season    = picks[8]?.name || "limited release";
 
@@ -548,7 +549,102 @@ function generateSynopsis(picks, filmTitle, boM, noms) {
     ]
   };
 
-  const pool = isHorror ? setupPools.horror : isMusical ? setupPools.musical : isAction ? setupPools.action : isSequel ? setupPools.sequel : isSci ? setupPools.scifi : isBiopic ? setupPools.biopic : isCrime ? setupPools.crime : isAnimated ? setupPools.animated : isComedy ? setupPools.comedy : setupPools.general;
+  
+  // ── THEMED SYNOPSIS OVERRIDES ────────────────────────────────────────────
+  const _synTheme = typeof getActiveTheme === 'function' ? getActiveTheme() : null;
+  const _isMinSyn = _synTheme?.id === 'minions';
+  const _isOdySyn = _synTheme?.id === 'odyssey';
+
+  // Minions-specific setups by screenplay
+  if (_isMinSyn) {
+    const minionSetups = {
+      "Minions Steal Something Big":          [`The plan was simple. The Minions wanted it. They were going to take it. The plan involved a banana at every stage. The plan worked despite this`,`Security footage from seventeen countries. A trail of banana peels. ${lead} called in to investigate. Nothing prepared them for what they found`],
+      "Gru Reluctantly Returns":              [`He said he was done. He was not done. The Minions knew he was not done. They had been preparing for his return for three years. They had a banner`,`${lead} receives the call at 6am. He had been retired for eight years. The banana arrives first. Then the message. Then the Minions`],
+      "Minions Origin: Before Gru":           [`Ancient Egypt, 50 BC. The Minions have found their next great villain. He has not found them yet. He is about to have a difficult afternoon`,`The Minions have existed since the dawn of time, seeking the most despicable master they can find. Napoleon was their most recent disappointment`],
+      "Banana Heist of the Century":          [`The biggest banana in recorded history. In a vault. Behind seventeen security systems. The Minions have seventeen plans. Sixteen involve disguises`,`A museum. A banana. Three Minions. Forty-seven minutes of footage that security will never be able to fully explain`],
+      "Minions: The Musical":                 [`Pharrell showed up. Nobody called him. He had a synthesiser and fourteen songs fully formed. Every song is about bananas. The director kept all fourteen`,`${lead} plays the world's most reluctant music producer. The Minions have a concept album. The concept is banana. The execution is extraordinary`],
+      "Minions vs. Godzilla":                 [`Universal and Toho reached an agreement. The Minions reached Godzilla first. Godzilla was not expecting this. Neither was the script`,`Tokyo, 2am. Something enormous approaches from the sea. Something small and yellow approaches from the other direction. Neither will yield`],
+      "The Minion Who Wanted an Oscar":       [`Stuart has decided the Minions deserve Academy recognition. The campaign he runs is unprecedented in both scope and commitment to the colour yellow`,`${lead} is a veteran awards consultant hired to manage the most unusual client of their career. Stuart has opinions about everything. All of them involve bananas`],
+      "Minions Found a Country":              [`The UN recognised the new nation within six months. The flag is yellow. The anthem is bababoi in three-part harmony. Tourism is exceptional`,`By accident. They were dividing a banana fairly and wrote the resulting governance structure on a napkin. The napkin is now a constitutional document`],
+      "Minions Run For President":             [`Kevin filed the paperwork incorrectly. He is now on the ballot in seven states. The polls are inexplicable. ${lead} plays the campaign manager who did not sign up for this`,`A political thriller about a presidential candidate who cannot speak English, has no policy platform, and whose sole promise involves bananas. The polling numbers make no sense to anyone`],
+      "Minions vs. Godzilla":                 [`Universal and Toho reached an agreement. The Minions reached Godzilla first. Godzilla was not expecting this. Neither was the script. ${director} describes it as a film about perspective`,`Tokyo, 2am. Something enormous approaches from the sea. Something small and yellow approaches from the other direction. Neither will yield. The city watches`],
+      "Minions: The Documentary":             [`A serious filmmaker followed the Minions for two years expecting chaos. He found something else. Something that has won him a Palme d'Or and a recurring nightmare`,`The documentary was supposed to take six months. It took two years. The filmmaker cannot fully explain what happened during month eleven. The footage from month eleven is the best footage`],
+      "Minions: A Horror Film":               [`Ari Aster was briefly attached. He departed. He left notes. The notes are in the film. The film is not a horror film. It is something else. Something the classification board had to create a new category for`,`${lead} plays a filmmaker hired to make a standard Minions sequel who discovers the Minions are genuinely terrifying when you look at them long enough. This is that film`],
+      "Minions Become Lawyers":               [`The bar exam results were disputed. The case went to the Supreme Court. The Minions represented themselves. ${lead} plays the opposing counsel. ${lead} lost`,`Three Minions. One law degree between them. The constitutional arguments they make in court are technically valid and have never been raised before. Several legal scholars have taken notes`],
+      "Inside a Minion Mind":                 [`What does a Minion think about? The film spends 88 minutes exploring this question in real time. The answer involves bananas and something unexpectedly moving about belonging`,`${director} convinced Illumination to let them make a film with no dialogue, no plot, and no human characters. What they made is a meditation on loyalty and the colour yellow`],
+      "Minions Discover the Internet":        [`The first Minion meme predates the internet by twelve years. The Minions did not know this. They do now. The servers did not survive the revelation. ${lead} plays the cybersecurity consultant`,`A Minion finds a computer. Then another Minion finds a computer. By minute twenty they have discovered every corner of the internet simultaneously. The internet has not recovered`],
+      "A Minion Love Story":                  [`Kevin falls in love. The object of his affection is a particularly large banana. ${lead} provides the voice of Kevin. ${lead} describes it as the most emotional performance of their career. Critics agree`,`A love story in the classical sense. Two characters. An insurmountable obstacle. A sacrifice. The banana is the obstacle and the sacrifice. This film made three critics cry and none of them can explain it`],
+      "The Minion Who Could Talk":            [`One Minion develops the ability to speak full sentences. He does not use this gift wisely. Nobody asked him to. ${lead} plays the linguist studying him who slowly realises the sentences are getting more sophisticated`,`The talking Minion has things to say. He has had them for a long time. The film is about what happens when you finally have the words for what you have always known`],
+      "Minions: The Long Goodbye":            [`Gru is retiring. The Minions are not retiring. The film treats this tension with unexpected gravity. ${lead} plays Gru's adult daughter who does not understand why her father is crying at his own retirement party`,`The farewell film that is not quite a farewell. Gru says goodbye. The Minions do not say goodbye because goodbye is not in their vocabulary. They have prepared for his retirement for years. They have made the banner`],
+      "All Minions Films Simultaneously":     [`Every Minions film edited into one continuous experience. Runtime: eleven hours. ${director} describes it as the definitive cut. Seven test audience members left during hour three and returned for hours eight through eleven`,`A man sits down to watch what he thinks is a Minions film. Eleven hours later he stands up a different person. He cannot explain what changed. The Minions can. They don't`],
+      "Minions: Corporate Espionage":         [`The Minions infiltrate a competing supervillain corporation. They are very bad at subtlety. They succeed anyway. ${lead} plays the head of corporate security who files the incident report`,`A thriller in which the villains are completely incapable of stealth and succeed through sheer confident wrongness. ${director} calls it the most realistic film about corporate espionage ever made`],
+      "Gru Diary: A Tell-All":                [`Gru wrote a memoir. Chapter seven makes specific claims about the Minions that the Minions dispute. The publisher has lawyers. The Minions have a counter-memoir. The counter-memoir is written in banana`,`${lead} plays Gru narrating his own memoir in voiceover while the Minions interrupt from offscreen to correct the record. They are not wrong. Gru knows they are not wrong. He published it anyway`],
+      "Minions vs. The Moon":                 [`The moon looked at them funny. The Minions took this personally. ${director} describes the film as a meditation on perceived slights and proportionate responses. It is not proportionate`,`Three Minions and a rocket. The moon has been warned. The moon did not take the warning seriously. The moon should have taken the warning seriously`],
+    };
+    const minionEndings = {
+      "Minions Steal Something Big":    [`The banana was recovered. The Minions were not punished. There is no legal framework for punishing a Minion. The item they stole is still missing`],
+      "Gru Reluctantly Returns":        [`He saves the world. He says it was the last time. The Minions prepare for the next one. They have already made the banner`],
+      "Banana Heist of the Century":    [`The banana was eaten. On set. During filming. The director kept the footage. It is now the third act. The studio approved it`],
+      "Minions: The Musical":           [`The album debuted at number one. Pharrell won a Grammy. The Minions performed at the ceremony. Nobody had authorised this. The Academy has questions`],
+    };
+    const mKey = screenplay;
+    const mSetups = minionSetups[mKey];
+    const mEndings = minionEndings[mKey];
+    if (mSetups && mSetups.length) {
+      return {
+        title: filmTitle,
+        tagline: `Bababoi. ${genre}. ${studio}. The banana is involved.`,
+        body: mSetups[Math.floor(Math.random()*mSetups.length)] + `. ${lead} is ${["extraordinary", "committed", "unhinged in the best way", "giving the performance of their career"][Math.floor(Math.random()*4)]}. ${director} keeps the camera on the Minions. This is correct. ` + (mEndings?.[mKey]?.[0] || `The Minions are satisfied with the outcome. The Academy has not yet issued a statement`),
+        criticQuote: boM > 500 ? "Bababoi. I said it. I stand by it." : "The formula functions. The children understand something the critics do not.",
+        criticName: "A.O. Scott, New York Times",
+        lbStars: boM > 600 ? "★★★★★" : "★★★★",
+        lbUser: "banana_certified",
+        lbReview: "bababoi."
+      };
+    }
+  }
+
+  // Odyssey-specific setups by screenplay
+  if (_isOdySyn) {
+    const odysseySetups = {
+      "Argos":                              [`The dog waits. That is the entire film. Twenty years of waiting compressed into ninety minutes. When his master returns, he sees him. He wags once. He is done`,`Homer gave Argos three lines. This film gives him everything Homer compressed into three lines and the thirty years that preceded them`],
+      "Argos and Odysseus":                 [`A dog. A man who has been gone twenty years. The moment of recognition that Homer described in three lines and that this film gives ninety minutes`,`Two stories. Twenty years apart. The same relationship told from both sides simultaneously. What Argos thought about while he waited. What Odysseus thought about on the sea`],
+      "Penelope Odyssey":                   [`Ithaca. Twenty years. A woman who ran a kingdom, raised a son, held off a hundred and eight suitors, and waited. This is her story`,`${lead} plays Penelope with a stillness that contains twenty years of grief, intelligence, and patience. The film does not look away from a single day of it`],
+      "The Cyclops Chapter":                [`One cave. One monster. One desperate plan involving a sharpened stake and a quantity of wine. Eighty minutes. Nobody brought enough wine`,`Polyphemus has never had guests. He is not prepared for guests who arrive uninvited, eat his food, blind him, and escape under his sheep. Nobody told him this was possible`],
+      "The Sirens: A Documentary":          [`Shot entirely at sea. The crew reported hearing music from no identifiable source on the third day. The director kept filming. The sound is in the film`,`A documentary filmmaker following the route of Odysseus encounters something the equipment cannot explain. The sound that has no source. Three crew members still cannot describe it`],
+      "Telemachus Rising":                  [`${lead} plays Telemachus at twenty. The son who grew up without a father, who spent his youth watching the suitors destroy his home, and who is now old enough to do something about it`,`Two journeys. The father crossing the sea to come home. The son crossing the island to find news of a father he has never met. They are more alike than either knows`],
+      "Troy: The Fall":                     [`The last night of Troy. Ten years of siege compressed into one night. The horse. The fire. The decision that could not be unmade. Odysseus watches the city burn and begins the long journey home`,`${director} shows the fall of Troy in a single continuous take. Forty-seven minutes. The city falls in real time. Then the sea, and what waits in it`],
+      "The Underworld":                     [`Book Eleven only. Odysseus descends to speak with the dead. What they say to him. What he cannot bring himself to say back`,`${lead} performs the underworld sequence in near-silence. The dead speak. He listens. His mother speaks last. He reaches for her three times. Three times she passes through his arms`],
+      "What the Cyclops Saw":               [`Polyphemus before the Greeks arrived. His sheep. His island. His father the sea god who gave him one eye that could see further than any human eye. The man he might have been`,`The monster's perspective. Before he was a monster. The film is sixty percent silence and forty percent a single eye watching the horizon. Then the ships arrive`],
+      "The Maids of Ithaca":               [`Homer mentions them briefly. They served the suitors during the long years of occupation. They were hanged when Odysseus returned. This film gives them the story Homer did not`,`${lead} plays the eldest of the twelve. What they knew. What they did to survive. What surviving cost them. The film ends where Homer's three lines begin`],
+      "Practical Homer":                    [`A documentary about making the Odyssey film. The Malta sequences. The practical Cyclops that took eleven months to build. The Sirens that make sound from no identifiable source`,`${director} agreed to let cameras follow the production. He now regrets this. The documentary is more interesting than the film. He has acknowledged this`],
+      "The Bow of Odysseus":                [`The bow that only one man can draw. The day of the contest. Every suitor who tried and failed. The beggar in the corner who has not tried yet`,`${lead} does not speak for the last twenty minutes. He simply draws the bow. The room understands what this means. ${director} held the shot for forty-five seconds`],
+      "Nausicaa at the Shore":              [`The morning a princess found a broken man on the beach. What she thought about as she looked at him. What she chose to do. The smallest kindness that made everything else possible`,`${lead} plays Nausicaa as a young woman who recognises something in the wreckage that washed up on her shore. She does not know his name. She knows what he needs`],
+      "Poseidon: A Portrait":               [`The sea god from his own perspective. The Cyclops was his son. Odysseus blinded his son. A god's grief is not human-scaled and it does not follow human timelines`,`${lead} plays Poseidon in a performance conducted entirely through water, weather, and the sound of the sea. He does not appear on screen until the final scene`],
+      "The Night the Horse Opened":         [`Inside the Trojan Horse. The hours in the dark. What the soldiers said to each other when nobody could hear them. What Odysseus told them to do when the gates opened`,`${lead} plays Odysseus in the horse. The film is the wait. Eighty minutes of men in darkness deciding what kind of men they are about to become`],
+      "Ithaca Burning":                     [`What Ithaca became while Odysseus was gone. The suitors. The political collapse. Telemachus watching it happen and growing old enough to understand what he is watching`,`A kingdom without a king. The film documents the slow degradation of Ithaca under the suitors. ${lead} plays Antinous as a man who genuinely believes he is the rightful heir`],
+      "Circe: An Apology":                  [`The sorceress issues no apology. The title is ironic. The film is about what she owes a mortal who stayed a year on her island and then chose another woman over immortality`,`${lead} plays Circe in the aftermath. Odysseus is gone. The men she turned into pigs are still pigs. The island is quiet. The film is about what a goddess does with a year she cannot get back`],
+      "Twenty Years: A Love Story":         [`Twenty years apart. The same marriage told from both sides simultaneously. What Penelope became. What Odysseus became. Whether they are still the same people who made the same promise`,`${lead} and ${supporting} play Odysseus and Penelope in alternating sequences. The marriage. The departure. Twenty years of becoming different people. The reunion that is not what either expected`],
+    };
+    const oKey = screenplay;
+    const oSetups = odysseySetups[oKey];
+    if (oSetups && oSetups.length) {
+      const isHighNoms = noms >= 8;
+      const isHighBO   = boM >= 500;
+      return {
+        title: filmTitle,
+        tagline: isHighNoms ? `The Academy has been waiting for this its entire existence` : isHighBO ? `The wine-dark sea. IMAX. ${director}.` : `A voyage undertaken. The sea is not friendly here`,
+        body: oSetups[Math.floor(Math.random()*oSetups.length)] + `. ${director} does not look away from a single moment of it. ${composer} provides a score that the crew reported hearing from no identifiable source during filming. ` + (isHighNoms ? `The Academy responds. All twelve nominations are correct` : isHighBO ? `The audience follows. The sea takes $${boM}M worldwide` : `The film exists. The wine-dark sea is on screen. That is sufficient`),
+        criticQuote: isHighNoms ? "A voyage completed. The most fully realised epic adaptation in the history of cinema." : "The ambition is total. The sea is always right.",
+        criticName: isHighNoms ? "A.O. Scott, New York Times" : "Manohla Dargis, New York Times",
+        lbStars: isHighNoms ? "★★★★★" : "★★★★",
+        lbUser: isHighNoms ? "wept_for_the_dog" : "aegean_enjoyer",
+        lbReview: isHighNoms ? "i was not prepared. i will never be prepared." : "three hours. i would have taken six."
+      };
+    }
+  }
+
+const pool = isHorror ? setupPools.horror : isMusical ? setupPools.musical : isAction ? setupPools.action : isSequel ? setupPools.sequel : isSci ? setupPools.scifi : isBiopic ? setupPools.biopic : isCrime ? setupPools.crime : isAnimated ? setupPools.animated : isComedy ? setupPools.comedy : setupPools.general;
   const setup = pool[Math.floor(Math.random() * pool.length)];
 
   // Lead performance line - varies by score and specific names
@@ -2465,15 +2561,61 @@ const SYNERGIES = [
   { names:["Slow Burn Thriller","Park Chan-wook"],    boBonus:1, osBonus:4, label:"Park x Slow Burn",        msg:"Oldboy. Decision to Leave. The slow burn is not a genre for him  -  it is a moral framework. The film will be three steps ahead of the audience at all times." },
   { names:["Slow Burn Thriller","A24"],               boBonus:1, osBonus:3, label:"A24 Slow Burn",           msg:"A24 has infinite patience for the slow burn. Their audience has been trained to wait for the third act by everything else on their slate." },
   { names:["Slow Burn Thriller","Cate Blanchett"],    boBonus:1, osBonus:4, label:"Blanchett x Slow Burn",   msg:"Tar was a slow burn psychological portrait that she dominated from the first frame. The genre is where her range has the most room to operate." },
+  // ══ MINIONS UNIVERSE ═══════════════════════════════════════════════════════
+  { names:["Kyle Balda","Pierre Coffin (Minions)"],    boBonus:4, osBonus:2, label:"Balda x Coffin",           msg:"The director and the voice of every Minion. They have made five films together. The Minions work because Coffin is inside them and Balda knows where to point the camera." },
+  { names:["Kyle Balda","Steve Carell (Gru)"],         boBonus:4, osBonus:3, label:"Balda x Gru",              msg:"Balda has directed every Gru film since Despicable Me 3. The accent. The anti-villain arc. The Minions in the background doing something unexplained. This is the relationship." },
+  { names:["Kyle Balda","Pharrell Williams"],           boBonus:3, osBonus:2, label:"Balda x Pharrell",         msg:"Rise of Gru. Pharrell showed up and the film became something else. Balda knows to step back when Pharrell has an idea. This continues to be the correct decision." },
+  { names:["Steve Carell (Gru)","Pierre Coffin (Minions)"], boBonus:4, osBonus:2, label:"Gru x His Minions",  msg:"The villain who became a father and the Minions who were with him for all of it. The accent and the bababoi. The franchise works because these two things work together." },
+  { names:["Steve Carell (Gru)","Pharrell Williams"],  boBonus:3, osBonus:2, label:"Gru x Pharrell",           msg:"Carell's Gru and Pharrell's score are the emotional register of the franchise. One provides the pathos. The other provides the joy. The Minions provide the chaos." },
+  { names:["Pharrell Williams","Animated Feature"],    boBonus:3, osBonus:3, label:"Pharrell x Animation",      msg:"Happy arrived in summer and became the sound of that summer globally. Pharrell understands joy at a molecular level and animation is where joy lives at full volume." },
+  { names:["Pharrell Williams","Summer Tentpole (May to Jul)"], boBonus:3, osBonus:2, label:"Pharrell Summer", msg:"A Pharrell summer score is not a film release. It is a seasonal event. The songs will be everywhere. The children will sing them. The parents will know all the words by August." },
+  { names:["Universal Pictures","Animated Feature"],  boBonus:4, osBonus:2, label:"Universal Animation",        msg:"Universal has the distribution infrastructure for a truly global animated release. The Minions have already proven this. The formula is known. The execution is reliable." },
+  { names:["Universal / Illumination","Animated Feature"], boBonus:5, osBonus:2, label:"Illumination Machine", msg:"The machine. The yellow cylinders. The inevitable $800M. The sequel greenlit before this one opens. The children in overalls. The formula has never failed. It will not fail now." },
+  { names:["Kevin Hart","Animated Feature"],           boBonus:4, osBonus:1, label:"Hart x Animation",         msg:"The most naturally kinetic human performer alive joins the most kinetic animated franchise. The energy on set was unsustainable and completely correct." },
+  { names:["Jack Black","Animated Feature"],           boBonus:3, osBonus:2, label:"Jack Black x Animation",   msg:"He has the energy of a Minion in a human body. This was inevitable. Everyone in animation knew this was coming. The only question was timing." },
+  { names:["Pierre Coffin (Minions)","Animated Feature"], boBonus:3, osBonus:2, label:"Coffin x Animation",    msg:"He voices every Minion. He also co-directed the first three films. He understands the universe from the inside because he is, in a meaningful sense, inside it." },
+  { names:["Heitor Pereira","Animated Feature"],       boBonus:3, osBonus:2, label:"Pereira x Illumination",   msg:"He has scored every Minions film. He knows the exact note that plays when Gru pretends not to care. He has played it six times. He will play it again." },
+  { names:["One Billion Bananas","Summer Tentpole (May to Jul)"], boBonus:5, osBonus:1, label:"Banana Economy Summer", msg:"The official Illumination budget classification meets the official Illumination release window. The competition reviewed the tracking numbers and quietly moved their films." },
+  { names:["Minions Weekend","Summer Tentpole (May to Jul)"], boBonus:4, osBonus:1, label:"Double Summer Lock",  msg:"Minions Weekend as release strategy in peak summer. Universal has done this twice. The result was the same both times. The competition has learned to schedule around it." },
+  { names:["Bababoi Day (July 2)","Pierre Coffin (Minions)"], boBonus:3, osBonus:2, label:"Coffin x Bababoi Day", msg:"The voice of every Minion releasing a film on the holiday the Minions themselves created. The internet will understand the significance. The studio press release will not." },
+  // ══ ODYSSEY UNIVERSE ════════════════════════════════════════════════════════
+  { names:["Christopher Nolan","Homer (Adapted  -  The Odyssey)"], boBonus:3, osBonus:5, label:"Nolan x Homer",  msg:"The most anticipated film of the generation. The director who has been reaching for something ancient finally finding it. The Academy has cleared its evening." },
+  { names:["Christopher Nolan","Epic Adaptation of Homer"],      boBonus:3, osBonus:5, label:"Nolan x Homer Epic", msg:"Nolan adapting Homer is the sentence that ends arguments about what cinema is for. Five years of preparation. The wine-dark sea on IMAX film. The Academy was not prepared." },
+  { names:["Christopher Nolan","Matt Damon (Odysseus)"],         boBonus:3, osBonus:3, label:"Nolan x Damon",  msg:"The Martian was already a quiet Odyssey. The astronaut who comes home from impossible circumstances. Nolan recognised this. The casting is not a choice. It is recognition." },
+  { names:["Christopher Nolan","Cillian Murphy (Odysseus)"],     boBonus:3, osBonus:4, label:"Nolan x Murphy", msg:"Oppenheimer gave Murphy the most complicated man of the 20th century. Odysseus is the most complicated man of the ancient world. Murphy does not play simple men. He never has." },
+  { names:["Christopher Nolan","Oscar Isaac (Odysseus)"],        boBonus:2, osBonus:4, label:"Nolan x Isaac",  msg:"Inside Llewyn Davis told the story of a man who cannot go home because home no longer exists. This is the Odyssey. Isaac has already played it once. Now at full scale." },
+  { names:["Christopher Nolan","Hans Zimmer"],                    boBonus:3, osBonus:3, label:"Nolan x Zimmer Odyssey", msg:"Every Nolan film sounds like Hans Zimmer. The Odyssey will sound like Zimmer discovering what the wine-dark sea sounds like from inside a 70mm frame." },
+  { names:["Christopher Nolan","Ludwig Goransson"],               boBonus:2, osBonus:4, label:"Nolan x Goransson Odyssey", msg:"Oppenheimer established Goransson inside the Nolan ecosystem. He knows what the director's silence sounds like. He has learned to score around it." },
+  { names:["Christopher Nolan","IMAX Global Event"],             boBonus:4, osBonus:2, label:"Nolan IMAX",     msg:"One date posted on social media. The IMAX booking servers went down in eleven minutes. This has happened before. The servers were upgraded. It happened again." },
+  { names:["Christopher Nolan","The July 17 Opening"],           boBonus:4, osBonus:3, label:"Nolan July 17",  msg:"One image of the Mediterranean at dawn. The date in the caption. The IMAX servers went down. Universal had upgraded them. They went down anyway." },
+  { names:["Christopher Nolan","Whatever It Takes"],             boBonus:3, osBonus:4, label:"Nolan Budget",   msg:"Universal stopped asking about the budget after the Malta footage arrived. The Cyclops sequence justified the entire production budget on its own. The accountants have accepted this." },
+  { names:["Cate Blanchett (Athena)","Epic Adaptation of Homer"], boBonus:1, osBonus:4, label:"Blanchett Athena", msg:"The goddess who walks among mortals visible only to the hero. She has been preparing for Athena since Galadriel. The register is identical. The stakes are higher." },
+  { names:["Cate Blanchett (Athena)","Christopher Nolan"],       boBonus:1, osBonus:4, label:"Blanchett x Nolan", msg:"Nolan has never directed someone this capable of conveying divine interference without explanation. The Academy will notice every frame she is in." },
+  { names:["Lupita Nyong'o (Penelope)","Penelope Odyssey"],      boBonus:2, osBonus:5, label:"Nyong'o x Penelope screenplay", msg:"Nyong'o playing Penelope in a film told from Penelope's perspective. Twenty years of governing. Twenty years of waiting. The Academy will not know which to nominate first." },
+  { names:["Anthony Hopkins (Poseidon)","Epic Drama"],            boBonus:1, osBonus:4, label:"Hopkins Poseidon", msg:"The sea god's grievance is personal and operatic and sustained across ten years. Hopkins plays entities that have decided on principle to ruin someone. He will not need direction." },
+  { names:["The Sirens (Practical Effects)","Greek Classical Ensemble"], boBonus:1, osBonus:5, label:"Sirens x Classical Score", msg:"Practical Sirens scored with instruments from Homer's world. The crew cannot explain the music during filming. Shore keeps asking to hear it again. Nobody can find the source." },
+  { names:["Argos","Awards Season (Nov to Dec)"],                boBonus:1, osBonus:5, label:"Argos Awards",    msg:"The dog who waited twenty years. Awards season release. Every critic will write the same thing: I knew the scene was coming. I was not prepared. I will never be prepared." },
+  { names:["The Malta Number","Christopher Nolan"],              boBonus:2, osBonus:4, label:"Malta x Nolan",   msg:"Everything filmed on location. Ancient Greece reconstructed in Malta. Nolan refuses to name three of the sites. The insurance company has filed a formal inquiry." },
+  { names:["Worldwide Simultaneous Release","IMAX Global Event"], boBonus:4, osBonus:2, label:"Global IMAX Drop", msg:"Every market every format every timezone simultaneously. Universal coordinated seventy-two countries. The wine-dark sea opened everywhere at once. Homer would have found this appropriate." },
 ];
 
 function detectSynergies(picks) {
   const active = [];
+  // Only use non-empty pick names
+  const pickNames = picks.map(p => p?.name || '').filter(n => n.length > 1);
   for (const syn of SYNERGIES) {
-    const matched = syn.names.every(name =>
-      name === "Any" ||
-      picks.some(p => p && p.name && syn.names.some(n => n !== "Any" && p.name.split(' ').some(w => name.includes(w)) && name.split(' ').filter(w=>w.length>3).every(w => p.name.includes(w))))
-    );
+    const matched = syn.names.every(synName => {
+      if (synName === "Any") return true;
+      // A synergy name matches a pick if:
+      // 1. Exact match, OR
+      // 2. Pick name contains the full synergy name (e.g. pick "Christopher Nolan" matches syn "Christopher Nolan"), OR
+      // 3. Synergy name contains the FULL pick name (only if pick is 4+ chars to avoid false matches)
+      return pickNames.some(pName =>
+        pName === synName ||
+        pName.includes(synName) ||
+        (pName.length >= 4 && synName.includes(pName))
+      );
+    });
     if (matched) active.push(syn);
   }
   return active;
@@ -2911,14 +3053,18 @@ const THEMES = {
         { name:"Johann Johannsson",    bo:11, oscar:13, era:"Arthouse",   known:"Arrival was about the impossibility of return. The Odyssey is about the necessity of return. He already wrote this score." },
       ],
       budget: [
-        { name:"Epic Scale ($200M to $250M)",  bo:17, oscar:12, era:"Epic",  known:"The Odyssey budget. IMAX. Practical sea effects. A working longship. Malta." },
-        { name:"Mega ($250M to $350M)",        bo:18, oscar:10, era:"Epic",  known:"When Nolan wants to rebuild Troy and actually set it on fire. Universal approved it in one meeting." },
-        { name:"All-In ($350M+)",              bo:16, oscar:11, era:"Event", known:"Cleopatra in 1963 dollars. Historic either way. The Cyclops is practical. Everything is practical." },
+        { name:"Epic Scale ($200M to $250M)",    bo:17, oscar:12, era:"Epic",      known:"The Odyssey budget. IMAX. Practical sea effects. A working longship. Malta. The insurance company has questions about the Cyclops." },
+        { name:"Mega ($250M to $350M)",           bo:18, oscar:10, era:"Epic",      known:"When Nolan wants to rebuild Troy and actually set it on fire. Universal approved in one meeting. The accountants were not in the meeting." },
+        { name:"All-In ($350M+)",                 bo:16, oscar:11, era:"Event",     known:"Cleopatra in 1963 dollars adjusted for inflation. Historic either way. The Cyclops is practical. The Sirens are practical. Everything is practical. This is Nolan." },
+        { name:"Whatever It Takes",               bo:17, oscar:13, era:"Prestige",  known:"Universal stopped asking about the budget after the Malta footage arrived. The Cyclops sequence justified the entire production budget on its own. The accountants have accepted this." },
+        { name:"The Malta Number",                bo:15, oscar:14, era:"Location",  known:"Everything filmed on location. Ancient Greece reconstructed in Malta, Jordan, and three classified sites Nolan refuses to name. The budget is the location. The location is correct." },
       ],
       season: [
-        { name:"Summer Tentpole (May to Jul)", bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date. The tracking numbers are not numbers anymore." },
-        { name:"IMAX Global Event",            bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The wine-dark sea on a six-storey screen. The only correct way to watch this." },
-        { name:"Awards Season (Nov to Dec)",   bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world. The Academy has been waiting for this their entire existence." },
+        { name:"Summer Tentpole (May to Jul)",         bo:18, oscar:10, era:"Summer",  known:"July 17. The Odyssey opens. You already know this date. The tracking numbers are not numbers anymore. They are cultural facts." },
+        { name:"IMAX Global Event",                    bo:17, oscar:12, era:"Global",  known:"70mm in select markets. The wine-dark sea on a six-storey screen. The only correct way to watch this. The Dolby Atmos Sirens sequence requires a certified venue." },
+        { name:"Awards Season (Nov to Dec)",           bo:14, oscar:16, era:"Awards",  known:"The platform strategy. Critics first. Then the world. The Academy has been waiting its entire existence to nominate a proper Odyssey adaptation." },
+        { name:"The July 17 Opening",                  bo:19, oscar:11, era:"Event",   known:"Nolan announced the date by posting a single image of the Mediterranean at dawn. The IMAX booking servers went down within eleven minutes. This was expected. They had been upgraded." },
+        { name:"Worldwide Simultaneous Release",       bo:18, oscar:9,  era:"Global",  known:"Every market, every format, every timezone at once. Universal coordinated seventy-two countries. The wine-dark sea opened everywhere simultaneously. Homer would have found this appropriate." },
       ],
     },
     verdictOverrides: {
@@ -2941,42 +3087,79 @@ const THEMES = {
       comeback_kid:   { title:"🌊 The hero returned. Nobody expected it. Nobody expected this.", detail:"Against all odds the film delivered something extraordinary. The Academy noticed late. The audience noticed first." },
     },
     chaosInjections: [
-      // ROUND 1  -  day one
-      { round:1, chance:0.35, msg:"⚔️ DAY ONE RESHOOT: Nolan reshot the opening sequence three times on day one. He has not explained why. The crew understands. The studio does not.", penaltyBO:0, penaltyOS:2 },
-      { round:1, chance:0.30, msg:"📐 THE FORMAT DECISION: Nolan announced at 6am on day one that the aspect ratio will change three times during the film. The camera department has been briefed. Nobody else has.", penaltyBO:1, penaltyOS:2 },
-      { round:1, chance:0.28, msg:"🌊 THE SEA CONSULTANT: Nolan hired a maritime historian, a classics scholar, and a practical effects oceanographer. All three disagree about the wine-dark sea. Production is paused while they argue.", penaltyBO:0, penaltyOS:2 },
-      // ROUND 2  -  cast drama
-      { round:2, chance:0.35, msg:"🐴 THE TROJAN HORSE: A wooden horse arrived on set. Nobody ordered it. The doors opened. Eleven studio executives emerged with script notes. Nolan accepted none of the notes.", penaltyBO:-1, penaltyOS:2 },
-      { round:2, chance:0.30, msg:"🏛️ ATHENA INTERVENES: Cate Blanchett rewrote her own dialogue overnight. Nolan read it at 5am. He cancelled the day's shoot and incorporated everything. The studio was not consulted.", penaltyBO:0, penaltyOS:3 },
-      { round:2, chance:0.28, msg:"⚓ THE SHIP PROBLEM: The practical longship arrived from Norway. It is seventeen feet longer than the harbour in Malta can accommodate. Nolan considers this a creative opportunity.", penaltyBO:-1, penaltyOS:1 },
-      // ROUND 3  -  location
-      { round:3, chance:0.35, msg:"⛵ MALTA: A swell destroyed the practical longship on day one. The director called it authentic. The insurance company called it a claim. Both filed paperwork simultaneously.", penaltyBO:-1, penaltyOS:2 },
-      { round:3, chance:0.30, msg:"🔥 TROY BURNS: The practical Troy set caught fire during the night shoot. Nolan kept the cameras rolling. The footage is extraordinary. The set is gone. He is rebuilding it.", penaltyBO:-2, penaltyOS:3 },
-      { round:3, chance:0.28, msg:"🌿 THE OLIVE GROVE: Nolan spent four days filming in an olive grove that does not appear in any draft of the script. He says it will make sense in the edit. The editor is in Malta.", penaltyBO:0, penaltyOS:2 },
-      // ROUND 4  -  production
-      { round:4, chance:0.35, msg:"🌊 POSEIDON INTERVENES: The underwater unit flooded the soundstage at 3am. The rushes were extraordinary. The director kept everything. Universal approved the additional water budget.", penaltyBO:0, penaltyOS:3 },
-      { round:4, chance:0.30, msg:"🐑 THE FLOCK: Nolan insisted on real sheep for the Cyclops sequence. Two hundred sheep. On a soundstage. The animal wranglers have filed a formal statement. It is in the film.", penaltyBO:-1, penaltyOS:2 },
-      { round:4, chance:0.28, msg:"📜 THE HOMER DISPUTE: A classicist published an essay arguing the film misreads Book Nine. Nolan gave a two-hour response at a press junket. He was correct. The classicist has retracted.", penaltyBO:1, penaltyOS:2 },
-      // ROUND 5  -  buzz
-      { round:5, chance:0.35, msg:"📸 THE LEAK: A single practical effects frame appeared online. The internet declared it the greatest image in cinema history. The marketing team cancelled the trailer. The image is the campaign.", penaltyBO:3, penaltyOS:2 },
-      { round:5, chance:0.30, msg:"🎭 THE CYCLOPS SCREEN TEST: Test footage of the practical Cyclops escaped. Reddit declared it the most frightening thing they have ever seen. The studio is pretending this was intentional.", penaltyBO:2, penaltyOS:3 },
-      { round:5, chance:0.28, msg:"📰 THE NOLAN PROFILE: A 12,000-word New Yorker profile ran. It discussed the film for 400 words. The rest covered his theories about analogue filmmaking and the nature of time. Both trended.", penaltyBO:1, penaltyOS:2 },
-      // ROUND 6  -  supernatural
-      { round:6, chance:0.35, msg:"🧜 THE SIRENS: Three crew members reported hearing music from no identifiable source. One could not recall their cues for five days. The director kept every take.", penaltyBO:0, penaltyOS:3 },
-      { round:6, chance:0.30, msg:"⚡ ZEUS: Lightning struck the Malta set twice in one afternoon. No injuries. Nolan declared the footage usable. The cinematographer declared it miraculous. Both are correct.", penaltyBO:1, penaltyOS:3 },
-      { round:6, chance:0.28, msg:"🌀 CIRCE: The actress playing Circe refused to leave character between takes. For three weeks. The crew began bringing her offerings. The director considered this appropriate research.", penaltyBO:0, penaltyOS:2 },
-      // ROUND 7  -  post production
-      { round:7, chance:0.33, msg:"🎬 THE ASPECT RATIO INTERVIEW: Nolan gave a forty-minute interview. He mentioned the story twice. The internet covered the format for 72 hours. Every other film was temporarily forgotten.", penaltyBO:2, penaltyOS:1 },
-      { round:7, chance:0.28, msg:"🎵 THE SCORE SESSION: Zimmer played the main theme to Nolan at 2am after twelve hours of recording. Nolan listened twice, said nothing, and asked for the whole thing to be rebuilt from a single lyre.", penaltyBO:0, penaltyOS:3 },
-      { round:7, chance:0.25, msg:"✂️ THE RUNTIME: The first assembly cut is four hours and fifty-two minutes. Nolan has described this as a starting point. Universal has described this as a negotiation.", penaltyBO:-1, penaltyOS:2 },
-      // ROUND 8  -  creature
-      { round:8, chance:0.33, msg:"🏛️ THE CYCLOPS: The practical creature took eleven months to build. Nolan requested two additional shots that required four more weeks in Malta. Universal approved in the same phone call.", penaltyBO:1, penaltyOS:3 },
-      { round:8, chance:0.28, msg:"🐉 SCYLLA: The six-headed practical creature required a custom crane. The crane required a permit. The permit required six months. Nolan built a second crane. The permit did not cover the second crane.", penaltyBO:-1, penaltyOS:3 },
-      { round:8, chance:0.25, msg:"🌊 THE CHARYBDIS SEQUENCE: Nolan built a functioning whirlpool on a soundstage in Malta. It destroyed the set. He rebuilt it. It destroyed the second set. The third is in the film and it is extraordinary.", penaltyBO:-1, penaltyOS:4 },
-      // ROUND 9  -  the return
-      { round:9, chance:0.35, msg:"🌅 THE RETURN: Nolan finished the final cut at 4:12am. He watched it alone. He called one person. He said: it is done. Three hours and seventeen minutes. Not a frame will be cut. Universal has agreed.", penaltyBO:3, penaltyOS:4 },
-      { round:9, chance:0.28, msg:"🏹 THE BOW SEQUENCE: The final twenty minutes of the film contain no dialogue. Only music, one bow, and one hundred and eight deaths. Test audiences were silent for eleven minutes after the credits.", penaltyBO:2, penaltyOS:4 },
-      { round:9, chance:0.25, msg:"🐕 ARGOS: Nolan added a single scene in the final cut that was not in any draft of the script. The dog who waited twenty years. Three seconds. Nobody in any test screening has not cried. Nobody.", penaltyBO:1, penaltyOS:5 },
+
+      // ── ROUND 1: DAY ONE ─────────────────────────────────────────────────
+      { round:1, chance:0.42, penaltyBO:0,  penaltyOS:2,
+        msg:"⚔️ THE FIRST MORNING: Nolan arrived on set at 4am and stood in silence for forty minutes looking at the horizon before calling action. The crew waited. Nobody asked why. The first frame of the film is that horizon. It is the best frame in the film." },
+      { round:1, chance:0.35, penaltyBO:1,  penaltyOS:2,
+        msg:"📜 THE HOMER QUESTION: At the read-through, Nolan stopped and asked the assembled cast to consider whether Odysseus is actually a good person. The question took three days to resolve. The film now contains the argument. Both sides are represented. Neither wins." },
+      { round:1, chance:0.28, penaltyBO:-1, penaltyOS:3,
+        msg:"🔮 THE ORACLE: A classical scholar hired as consultant predicted on day one that the film would either be the greatest epic in cinema history or an unmitigated disaster. She said there was no middle outcome possible with this material and this director. She was correct." },
+
+      // ── ROUND 2: CAST DISCOVERIES ────────────────────────────────────────
+      { round:2, chance:0.42, penaltyBO:0,  penaltyOS:3,
+        msg:"🏛️ ATHENA INTERVENES: Cate Blanchett rewrote every one of her scenes overnight. She did not tell anyone. Nolan read the rewrites at 5am, cancelled the day's shoot, and incorporated everything. The scenes she wrote are now the emotional spine of the film. Nobody has been able to explain how she knew." },
+      { round:2, chance:0.35, penaltyBO:-1, penaltyOS:2,
+        msg:"🐴 THE TROJAN HORSE: A full-scale working wooden horse arrived on set. Nobody ordered it. The delivery note says it is from Troy. The address does not exist. The doors opened. The horse was empty. Nolan filmed the empty horse for two days. The footage is in the film. It is extraordinary." },
+      { round:2, chance:0.28, penaltyBO:2,  penaltyOS:2,
+        msg:"🌊 POSEIDON SENDS A MESSAGE: The lead actor fell into the sea during a rehearsal and was underwater for forty seconds before resurfacing completely calm. He said the water told him something about the character. He gave the best performance of the shoot that afternoon. Nolan kept the wet costume for the rest of filming." },
+
+      // ── ROUND 3: MALTA ───────────────────────────────────────────────────
+      { round:3, chance:0.42, penaltyBO:-1, penaltyOS:3,
+        msg:"⛵ MALTA INCIDENT ONE: The practical longship constructed over eight months sank on its first day at sea. Nolan watched it go under from the shore. He said nothing for eleven minutes. Then he said: good. Build another one. The second longship is in the film. The sinking of the first longship is also in the film." },
+      { round:3, chance:0.35, penaltyBO:-2, penaltyOS:4,
+        msg:"🔥 TROY BURNS: The full-scale Troy set  -  six months to build, forty craftspeople, historically accurate to the Bronze Age  -  caught fire on the night of the first shoot. Nolan kept the cameras rolling. The fire is now the fall of Troy. The Academy does not know it was accidental. Nolan has not corrected this assumption." },
+      { round:3, chance:0.28, penaltyBO:0,  penaltyOS:3,
+        msg:"🌊 THE WINE-DARK SEA: The cinematographer spent a week shooting the Mediterranean at different hours trying to find the exact color Homer described. On day seven at 4:47am the sea turned a color that has no name in any modern language. They have 40 minutes of it. It opens the film." },
+
+      // ── ROUND 4: THE CREATURES ────────────────────────────────────────────
+      { round:4, chance:0.42, penaltyBO:1,  penaltyOS:3,
+        msg:"🐑 THE CYCLOPS PREPARATION: Nolan hired an animal behaviorist, a sculptor, a cave expert, and a blindness consultant before shooting the Cyclops sequence. He wanted to understand what it would feel like to be the Cyclops. He spent two days in a darkened cave with the consultants. He has not discussed what was decided in the cave." },
+      { round:4, chance:0.35, penaltyBO:-1, penaltyOS:4,
+        msg:"🌊 POSEIDON INTERVENES PERSONALLY: The underwater photography unit flooded the soundstage at 3am while running tests. Nobody was injured. The rushes were screened the next morning. The entire crew watched in silence. Nolan said: we are keeping all of it. The insurance claim is the largest in the production company's history." },
+      { round:4, chance:0.28, penaltyBO:0,  penaltyOS:4,
+        msg:"🐍 THE MONSTER THAT HEARS: The Scylla sequence required Nolan to devise a completely new approach to practical creature effects. He spent three weeks researching cephalopod neurology. The creature that appears in the film moves in a way that no creature in cinema has ever moved. Three crew members asked to leave the set during filming. All three returned." },
+
+      // ── ROUND 5: WORD GETS OUT ────────────────────────────────────────────
+      { round:5, chance:0.42, penaltyBO:3,  penaltyOS:2,
+        msg:"📸 THE FRAME THAT ESCAPED: A single frame from the Cyclops sequence appeared on a film forum at 3am. By 8am it had been viewed eleven million times. By noon critics were calling it the greatest single frame of practical effects in cinema history. The marketing department cancelled the trailer. The frame is the campaign." },
+      { round:5, chance:0.35, penaltyBO:2,  penaltyOS:2,
+        msg:"🎬 NOLAN SPEAKS: Nolan gave his first interview about the film. It was forty minutes long. He discussed the story for four minutes. He spent thirty-six minutes discussing the relationship between celluloid grain and the texture of the ancient world. The internet covered the grain for seventy-two hours. Every other film was temporarily forgotten." },
+      { round:5, chance:0.28, penaltyBO:1,  penaltyOS:3,
+        msg:"📖 THE CLASSICISTS RESPOND: The Classics departments of fourteen universities published open letters about the film before it was released. Seven praised the production's fidelity to Homer. Seven condemned it. Nolan read all fourteen. He thanked the ones who condemned it. He said they had identified the parts he was most proud of." },
+
+      // ── ROUND 6: THE GODS INTERFERE ───────────────────────────────────────
+      { round:6, chance:0.42, penaltyBO:1,  penaltyOS:4,
+        msg:"🧜 THE SIRENS INCIDENT: Three crew members independently reported hearing music during the Sirens sequence. Not the score  -  something beneath it, coming from no speaker, no instrument, no person on set. Nolan asked them to describe it separately. Their descriptions were identical. He kept the takes where the crew can be seen reacting to something the microphones did not capture." },
+      { round:6, chance:0.35, penaltyBO:2,  penaltyOS:3,
+        msg:"⚡ ZEUS WEIGHS IN: Lightning struck the Malta set twice in forty minutes during the storm sequence. No generators. Clear sky three miles away. Nolan declared it usable footage. The meteorologist issued a report. The report described the lightning as statistically impossible. The report is in the press kit." },
+      { round:6, chance:0.28, penaltyBO:0,  penaltyOS:4,
+        msg:"🌀 CIRCE'S METHOD: The actress playing Circe informed the crew on day one that she would not be leaving character between takes. She maintained this for the entire five-week shoot. By week three the crew had begun bringing her offerings before calling action. Nolan has confirmed this was not in the schedule but was in the film." },
+
+      // ── ROUND 7: THE EDIT ─────────────────────────────────────────────────
+      { round:7, chance:0.42, penaltyBO:0,  penaltyOS:3,
+        msg:"✂️ THE RUNTIME NEGOTIATION: The first assembly cut is four hours and fifty-two minutes. Nolan presented it to Universal. There was a silence that lasted eleven minutes. The head of the studio said: not a frame. Nolan said he had already cut forty minutes. They shook hands. The film is four hours and twelve minutes." },
+      { round:7, chance:0.35, penaltyBO:-1, penaltyOS:3,
+        msg:"🎵 THE SCORE SESSION: Zimmer played the main theme at 2am after twelve hours of recording. Nolan listened to it twice with his eyes closed. He opened his eyes and said: it is the sound of a man who can see his house from the sea but cannot reach it. Zimmer went back to the studio. He did not emerge for six days. The score that emerged is the one in the film." },
+      { round:7, chance:0.28, penaltyBO:2,  penaltyOS:2,
+        msg:"🏛️ THE ARGOS DECISION: In the edit Nolan discovered that a scene he had not scripted  -  a crew member's dog had wandered onto set during the Ithaca sequence  -  had been filmed by second unit. He watched it four times. He called his editor at midnight. He said: this is the end of the film. It is the end of the film." },
+
+      // ── ROUND 8: THE CREATURES REVISITED ─────────────────────────────────
+      { round:8, chance:0.42, penaltyBO:1,  penaltyOS:4,
+        msg:"🏛️ THE CYCLOPS BREATHES: The practical Cyclops  -  eleven months to build, forty-three artists, 2.8 tonnes of materials  -  was delivered to set and Nolan looked at it for six minutes before saying it was missing something. He spent four days with the creature team in Malta. On day five he said: it needed to breathe. The mechanism that makes it breathe required three additional weeks. It breathes in the film. It is the most frightening thing in cinema this decade." },
+      { round:8, chance:0.35, penaltyBO:-1, penaltyOS:4,
+        msg:"🌊 CHARYBDIS: Nolan built a functioning whirlpool on a soundstage. The first test destroyed the set. He rebuilt it. The second test destroyed the second set. He built a third. The third whirlpool worked. The footage from all three builds is in the film. Nolan calls it the honest version of the sequence. The sequence is four minutes long and there is not a single cut." },
+      { round:8, chance:0.28, penaltyBO:0,  penaltyOS:5,
+        msg:"🐉 SCYLLA'S SOUND: The Scylla sequence has no score. Nolan and Zimmer agreed after watching the footage that music would be dishonest. The sequence is six minutes of pure practical creature sound, ocean, and the voices of six men who understand what is about to happen to them. It has been described by three critics as the most disturbing sequence in cinema since Apocalypse Now." },
+
+      // ── ROUND 9: THE RETURN ───────────────────────────────────────────────
+      { round:9, chance:0.45, penaltyBO:3,  penaltyOS:5,
+        msg:"🌅 IT IS DONE: Nolan finished the final cut at 4:12am. He watched it alone in a screening room. When it ended he sat in the dark for twenty-two minutes. He called one person. He said two words: it is done. He drove home. He has given no interviews since. The film opens Friday. The tracking numbers are not numbers anymore." },
+      { round:9, chance:0.35, penaltyBO:2,  penaltyOS:5,
+        msg:"🏹 THE BOW: The final twenty-three minutes of the film contain no dialogue. No score after the first eight minutes. Only a bow. A room full of men who cannot draw it. And then a man who has been gone twenty years and can. The test screening was silent for fourteen minutes after it ended. Then the audience stood. The standing ovation lasted longer than the silent scene." },
+      { round:9, chance:0.28, penaltyBO:4,  penaltyOS:4,
+        msg:"🐕 THE DOG WHO WAITED: Nolan added a scene that was not in any draft of the script. A stray dog appeared on the Ithaca location during the final week of shooting. Second unit filmed it waiting by the gates. Nolan watched the footage once. He called his editor. He said: this is Argos. Rearrange the last act around it. The editor rearranged the last act. Nobody who has seen the film can describe the scene without stopping." },
+
     ],
     letterboxdExtra: [
       { user:"70mm_or_nothing", stars:"★★★★★", review:"three hours. i would have taken six. give me more." },
@@ -3073,12 +3256,18 @@ const THEMES = {
         { name:"Henry Jackman",           bo:13, oscar:8,  era:"Animation", known:"Wreck-It Ralph. Captain America. He spans the tonal register from joyful to genuinely moving. The Minions need both." },
       ],
       budget: [
-        { name:"Animation Standard ($120M to $150M)", bo:16, oscar:8,  era:"Animation", known:"The Illumination number. Every dollar is on screen. The Minions cost less to render than a single Pixar background and generate more box office per frame than anything in animation history." },
+        { name:"Animation Standard ($120M to $150M)", bo:16, oscar:8,  era:"Animation", known:"The Illumination number. Every dollar on screen. The Minions cost less to render than a single Pixar background and generate more box office per frame than anything in animation history." },
         { name:"Animation Premium ($150M to $200M)",  bo:17, oscar:9,  era:"Animation", known:"Illumination going bigger. The sequences are more ambitious. The Minions escape in more locations. The banana budget alone is significant." },
+        { name:"One Billion Bananas",                 bo:18, oscar:7,  era:"Banana",    known:"The official Illumination budget classification for this production. What a billion bananas costs. Where a billion bananas goes. The insurance paperwork alone took four months." },
+        { name:"Whatever Pharrell Costs",             bo:17, oscar:8,  era:"Music",     known:"The budget was set. Then Pharrell showed up. The budget is now different. The studio has not released exact figures. The gelato line item alone is significant." },
+        { name:"Gru's Discretionary Fund",            bo:15, oscar:7,  era:"Villain",   known:"An off-balance-sheet production vehicle established during Despicable Me 2. The Minions control the fund. The fund primarily holds bananas." },
       ],
       season: [
         { name:"Summer Tentpole (May to Jul)",        bo:18, oscar:7,  era:"Summer",    known:"July 4 weekend belongs to the Minions. This is a meteorological fact. The competition moved their release dates." },
         { name:"Holiday Animated Event (Nov-Dec)",    bo:16, oscar:8,  era:"Holiday",   known:"Thanksgiving weekend. Parents. Children. Animated film. $400M domestic. The formula has four ingredients and they are all present." },
+        { name:"Minions Weekend",                     bo:19, oscar:6,  era:"Event",     known:"Universal simply called it Minions Weekend. The calendar cleared. The competition filed for an extension. It opened on a Tuesday to reduce pressure on the weekend. The weekend still broke records." },
+        { name:"Bababoi Day (July 2)",                bo:18, oscar:6,  era:"Cultural",  known:"The Minions have a holiday. It is July 2. Nobody authorised this. The internet authorised it. Banana-related merchandise sold out in fourteen countries." },
+        { name:"Surprise Drop",                       bo:16, oscar:7,  era:"Guerrilla", known:"Universal posted a single banana emoji at 3am. The servers went down within six minutes. The film was released at 6am. By noon it had broken the single-day streaming record." },
       ],
       genre: [
         { name:"Animated Feature",   bo:17, oscar:8,  era:"Animation", known:"The genre. The formula. The yellow cylinders. The inevitable sequel greenlit before this one opens." },
@@ -3738,9 +3927,11 @@ function bind() {
       const _rollTheme = getActiveTheme();
       if (_rollTheme?.optionInjections?.[cat.key]) {
         const injected = _rollTheme.optionInjections[cat.key].filter(p => !usedNames2.has(p.name));
-        if (cat.key === 'screenplay' && injected.length >= cat.opts) {
+        // Screenplay + director in themed mode: REPLACE pool entirely with themed options
+        if ((cat.key === 'screenplay' || cat.key === 'director') && injected.length >= cat.opts) {
           basePool = injected;
         } else {
+          // For all other categories: inject at front so themed options dominate
           basePool = [...injected, ...basePool.filter(p => !injected.some(i => i.name === p.name))];
         }
       }
@@ -4155,7 +4346,7 @@ function buildShareCardSVG() {
   <rect x="0" y="0" width="600" height="6" fill="url(#cneon)" rx="3" opacity="0.35"/>
 
   <!-- Game label -->
-  <text x="30" y="23" font-family="system-ui,sans-serif" font-size="7.5" fill="${dim2}" letter-spacing="3.5">LIGHTS, CAMERA, ACTION!</text>
+  <text x="30" y="23" font-family="system-ui,sans-serif" font-size="7.5" fill="${dim2}" letter-spacing="3.5">${isOdySVG ? "THE ODYSSEY OPENS" : isMinSVG ? "LIGHTS, CAMERA, BANANA!" : "LIGHTS, CAMERA, ACTION!"}</text>
 
   <!-- Film title + tagline -->
   <text x="30" y="52" font-family="Georgia,serif" font-size="26" font-weight="900" font-style="italic" fill="url(#cgold)" filter="url(#cglow)">${title}</text>
@@ -4167,9 +4358,9 @@ function buildShareCardSVG() {
   <text x="30"  y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#A0C4E8">$${S.boM}M</text>
   <text x="30"  y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">BOX OFFICE</text>
   <text x="168" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="${gold}">${S.noms} noms</text>
-  <text x="168" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">OSCAR  ·  ${S.wins||0} WINS</text>
+  <text x="168" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">${isOdySVG ? "ACADEMY  ·  "+S.wins+" WINS" : "OSCAR  ·  "+(S.wins||0)+" WINS"}</text>
   <text x="336" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#E83040">${S.rtCritic||0}%</text>
-  <text x="336" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">TOMATOMETER</text>
+  <text x="336" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">${isOdySVG ? "CRITICS" : "TOMATOMETER"}</text>
   <text x="472" y="93"  font-family="system-ui,sans-serif" font-size="20" font-weight="700" fill="#E07020">${S.rtAudience||0}%</text>
   <text x="472" y="104" font-family="system-ui,sans-serif" font-size="7"  fill="${dim}" letter-spacing="1.5">AUDIENCE</text>
 
@@ -4192,7 +4383,7 @@ function buildShareCardSVG() {
   <text x="30" y="231" font-family="Georgia,serif" font-size="12" fill="${warm}" opacity="0.8">${support}</text>
 
   <text x="30" y="245" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">PRESENTED BY</text>
-  <text x="30" y="257" font-family="system-ui,sans-serif" font-size="10" fill="${dim2}">${studioArticle} ${studio} Film</text>
+  <text x="30" y="257" font-family="system-ui,sans-serif" font-size="10" fill="${dim2}">${isOdySVG ? "A Universal Pictures Epic" : isMinSVG ? "A Minions Production" : studioArticle+" "+studio+" Film"}</text>
 
   <text x="30" y="271" font-family="system-ui,sans-serif" font-size="7" fill="${dim}" letter-spacing="1.5">MUSIC BY</text>
   <text x="30" y="282" font-family="system-ui,sans-serif" font-size="10" fill="${dim2}" opacity="0.85">${composer}</text>
@@ -4690,7 +4881,25 @@ const ACHIEVEMENTS = [
   { names:["Twenty Years: A Love Story","Max Richter"],  boBonus:1, osBonus:5, label:"Richter x Reunion",       msg:"On the Nature of Daylight became the sound of longing for a generation. Twenty years of longing scored by Max Richter is the most obvious pairing in the history of film music." },
   { names:["The Bow of Odysseus","Matt Damon (Odysseus)"],boBonus:3,osBonus:3, label:"Damon x The Bow",         msg:"The scene where the beggar draws the bow that none of the suitors could. Damon in silence. The bow in his hands. The room understanding what it means. Nolan held on it for forty-five seconds." },
   { names:["The Faithful Text: All 24 Books","Awards Season (Nov to Dec)"],boBonus:1,osBonus:5,label:"Full Homer Awards",msg:"Every book. Awards season. The Academy has never nominated anything this comprehensive. They will nominate it for everything. The film will win most of them." },
-];
+
+  // ── MINIONS MODE ACHIEVEMENTS ────────────────────────────────
+  { id:"bababoi",           icon:"🍌", label:"BABABOI",                  desc:"Score goat verdict in Minions mode",                       cond: s => getActiveTheme()?.id==='minions' && s.verdict?.id==='goat' },
+  { id:"banana_economy",    icon:"💛", label:"The Banana Economy",        desc:"Reach $800M+ box office in Minions mode",                  cond: s => getActiveTheme()?.id==='minions' && (s.boM||0) >= 800 },
+  { id:"minionpick_accept", icon:"✅", label:"Bowed to the Minions",       desc:"Accept all Minion picks in a full Minions draft",          cond: s => getActiveTheme()?.id==='minions' && !(s.minionOverride) },
+  { id:"gelato",            icon:"🍦", label:"GELATO",                    desc:"Win 5+ Oscars with a Minions production",                  cond: s => getActiveTheme()?.id==='minions' && (s.noms||0) >= 8 && (s.wins||0) >= 5 },
+  { id:"pharrell_arrived",  icon:"🎵", label:"Pharrell Showed Up",         desc:"Score $600M+ with a Minions musical draft",               cond: s => getActiveTheme()?.id==='minions' && (s.picks?.[4]?.name||'').includes('Musical') && (s.boM||0) >= 600 },
+  { id:"creative_control",  icon:"🍌", label:"They Enacted Creative Control",desc:"Trigger Minion takeover 3 times in one draft",           cond: s => getActiveTheme()?.id==='minions' && (s.minionTakeover||0) >= 3 },
+  { id:"full_banana",       icon:"🌍", label:"Full Banana",               desc:"Fire 9+ chaos events in a single Minions draft",           cond: s => getActiveTheme()?.id==='minions' && (s.chaosHistory||[]).length >= 9 },
+  { id:"gru_returned",      icon:"😤", label:"Gru Returned",              desc:"Draft Gru Reluctantly Returns and hit $700M+",             cond: s => getActiveTheme()?.id==='minions' && (s.picks?.[4]?.name||'').includes('Gru Reluctantly') && (s.boM||0) >= 700 },
+  // ── ODYSSEY MODE ACHIEVEMENTS ─────────────────────────────────
+  { id:"wine_dark",         icon:"⚓", label:"Wine-Dark Sea",              desc:"Score goat verdict in Odyssey mode",                       cond: s => getActiveTheme()?.id==='odyssey' && s.verdict?.id==='goat' },
+  { id:"argos_wept",        icon:"🐕", label:"Argos Wept",                desc:"Draft the Argos screenplay and win 10+ nominations",       cond: s => getActiveTheme()?.id==='odyssey' && ['Argos','Argos and Odysseus'].includes(s.picks?.[4]?.name||'') && (s.noms||0) >= 10 },
+  { id:"malta_survived",    icon:"⛵", label:"Malta Survived",             desc:"Trigger all 9 chaos events in Odyssey mode",              cond: s => getActiveTheme()?.id==='odyssey' && (s.chaosHistory||[]).length >= 9 },
+  { id:"nolan_delivered",   icon:"🎬", label:"Nolan Delivered",           desc:"Draft Christopher Nolan in Odyssey mode and reach goat",   cond: s => getActiveTheme()?.id==='odyssey' && (s.picks?.[0]?.name||'').includes('Nolan') && s.verdict?.id==='goat' },
+  { id:"penelope_waited",   icon:"🧵", label:"Penelope Waited",           desc:"Draft Penelope Odyssey and win 8+ nominations",            cond: s => getActiveTheme()?.id==='odyssey' && (s.picks?.[4]?.name||'').includes('Penelope') && (s.noms||0) >= 8 },
+  { id:"cyclops_practical", icon:"🏛️", label:"Practical Cyclops",         desc:"Draft The Cyclops Chapter with $400M+ box office",         cond: s => getActiveTheme()?.id==='odyssey' && (s.picks?.[4]?.name||'').includes('Cyclops') && (s.boM||0) >= 400 },
+  { id:"sirens_heard",      icon:"🧜", label:"The Sirens Were Heard",      desc:"Draft The Sirens: A Documentary in Odyssey mode",         cond: s => getActiveTheme()?.id==='odyssey' && (s.picks?.[4]?.name||'').includes('Sirens') },
+  { id:"voyage_complete",   icon:"🌅", label:"The Voyage is Complete",     desc:"Complete 5 Odyssey mode drafts",                          cond: s => getActiveTheme()?.id==='odyssey' && ((s.odysseyDrafts||0) >= 5) },];
 
 const ACH_KEY = 'lca_achievements_v2';
 let unlockedAchievements = JSON.parse(localStorage.getItem(ACH_KEY) || '[]');
@@ -4882,8 +5091,9 @@ function renderGlobalEntries() {
   const rankClass = ["gold","silver","bronze"];
   const visible = globalExpanded ? sorted : sorted.slice(0, 10);
   const rows = visible.map((e, i) => {
-    const byLine = (e.submittedBy||e.submitted_by && e.submittedBy||e.submitted_by !== "Anonymous")
-      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + e.submittedBy||e.submitted_by + '</span>' : '';
+    const _eName = (e.submittedBy || e.submitted_by || '').trim();
+    const byLine = (_eName && _eName !== "Anonymous")
+      ? ' &nbsp;·&nbsp; <span style="color:var(--amber)">by ' + _eName + '</span>' : '';
     return `<div class="lb-entry">
       <div class="lb-rank-num ${rankClass[i]||""}">${medals[i]||i+1}</div>
       <div class="lb-info">
